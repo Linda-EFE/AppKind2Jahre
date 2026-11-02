@@ -27,18 +27,33 @@ button { font: inherit; border: 0; cursor: pointer; }
 }
 .tile:active { transform: translateY(6px) scale(.97); box-shadow: 0 4px 0 rgba(0,0,0,.18); }
 
-/* Tiere */
-#tiere { background: #d8f3dc; }
-.grid { height: 100%; display: grid; gap: 14px; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 1fr; }
+/* Tiere (3D-Bilder) */
+#tiere { background: radial-gradient(circle at 50% 0%, #e9fbe5, #b7e4c7); }
+.grid {
+  height: 100%; display: grid; gap: 2.2vmin; padding-top: 64px;
+  grid-template-columns: repeat(3, 1fr); grid-auto-rows: 1fr; perspective: 900px;
+}
 @media (orientation: landscape) { .grid { grid-template-columns: repeat(4, 1fr); } }
 .animal {
-  background: #fff; border-radius: 28px; font-size: min(15vw, 13vh);
-  box-shadow: 0 6px 0 rgba(0,0,0,.12);
+  position: relative; padding: 0; border-radius: 30px;
+  background: radial-gradient(circle at 35% 25%, #fff 0%, var(--bg) 55%, color-mix(in srgb, var(--bg) 80%, #000) 140%);
+  box-shadow: 0 8px 0 color-mix(in srgb, var(--bg) 65%, #000), 0 14px 24px rgba(0,0,0,.18),
+              inset 0 3px 0 rgba(255,255,255,.8);
+  transform-style: preserve-3d; transition: transform .12s, box-shadow .12s;
 }
-.animal.bounce { animation: bounce .6s; }
-@keyframes bounce {
-  0% { transform: scale(1); } 30% { transform: scale(1.25) rotate(-8deg); }
-  60% { transform: scale(.92) rotate(6deg); } 100% { transform: scale(1); }
+.animal:active { transform: translateY(5px); box-shadow: 0 3px 0 color-mix(in srgb, var(--bg) 65%, #000), 0 6px 12px rgba(0,0,0,.18), inset 0 3px 0 rgba(255,255,255,.8); }
+.animal img {
+  width: min(78%, 22vh); height: auto; display: block; margin: auto; pointer-events: none;
+  filter: drop-shadow(0 10px 8px rgba(0,0,0,.25));
+  animation: breathe 2.4s ease-in-out infinite; animation-delay: var(--delay, 0s);
+}
+@keyframes breathe { 50% { transform: translateY(-4%) scale(1.03); } }
+.animal.jump img { animation: jump3d .9s cubic-bezier(.3,1.3,.5,1); }
+@keyframes jump3d {
+  0%   { transform: translateZ(0) rotateY(0) scale(1); }
+  35%  { transform: translateZ(120px) translateY(-14%) rotateY(180deg) scale(1.25); filter: drop-shadow(0 30px 14px rgba(0,0,0,.25)); }
+  70%  { transform: translateZ(60px) rotateY(340deg) scale(1.1); }
+  100% { transform: translateZ(0) rotateY(360deg) scale(1); }
 }
 
 /* Ballons */

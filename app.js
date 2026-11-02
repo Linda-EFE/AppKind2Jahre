@@ -125,26 +125,31 @@ document.querySelectorAll('.modeSwitch').forEach(b =>
 document.addEventListener('contextmenu', e => e.preventDefault());
 
 /* ---------- Tiere ---------- */
+// 3D-Tierbilder: Microsoft Fluent Emoji (MIT-Lizenz, siehe img/tiere/LICENSE-fluentui-emoji.txt)
 const ANIMALS = [
-  ['🐮', 'Die Kuh macht Muuuh!', [130, 110]],
-  ['🐶', 'Der Hund macht Wau wau!', [400, 300]],
-  ['🐱', 'Die Katze macht Miau!', [700, 900, 600]],
-  ['🐷', 'Das Schwein macht Oink oink!', [220, 180]],
-  ['🐑', 'Das Schaf macht Määäh!', [320, 330, 320]],
-  ['🐔', 'Das Huhn macht Gack gack!', [800, 650]],
-  ['🦆', 'Die Ente macht Quak quak!', [500, 450]],
-  ['🐴', 'Das Pferd macht Hüüü!', [500, 700, 400]],
-  ['🐸', 'Der Frosch macht Quak!', [180, 220]],
-  ['🦁', 'Der Löwe macht Roaaar!', [90, 70]],
-  ['🐝', 'Die Biene macht Summ summ!', [240, 245]],
-  ['🐘', 'Der Elefant macht Törööö!', [300, 450, 350]],
+  ['kuh', 'Die Kuh macht Muuuh!', [130, 110], '#c7f0bd'],
+  ['hund', 'Der Hund macht Wau wau!', [400, 300], '#ffe0b3'],
+  ['katze', 'Die Katze macht Miau!', [700, 900, 600], '#ffd6e0'],
+  ['schwein', 'Das Schwein macht Oink oink!', [220, 180], '#ffe5ec'],
+  ['schaf', 'Das Schaf macht Määäh!', [320, 330, 320], '#d7ecff'],
+  ['huhn', 'Das Huhn macht Gack gack!', [800, 650], '#fff3b0'],
+  ['ente', 'Die Ente macht Quak quak!', [500, 450], '#bde0fe'],
+  ['pferd', 'Das Pferd macht Hüüü!', [500, 700, 400], '#e9dcc9'],
+  ['frosch', 'Der Frosch macht Quak!', [180, 220], '#d8f3dc'],
+  ['loewe', 'Der Löwe macht Roaaar!', [90, 70], '#ffe8a3'],
+  ['biene', 'Die Biene macht Summ summ!', [240, 245], '#fdf0c4'],
+  ['elefant', 'Der Elefant macht Törööö!', [300, 450, 350], '#e0e7ff'],
 ];
 const grid = document.getElementById('animalGrid');
-ANIMALS.forEach(([emoji, text, notes]) => {
+ANIMALS.forEach(([img, text, notes, bg], i) => {
   const b = document.createElement('button');
-  b.className = 'animal'; b.textContent = emoji; b.setAttribute('aria-label', text);
+  b.className = 'animal';
+  b.style.setProperty('--bg', bg);
+  b.style.setProperty('--delay', (i * 0.27 % 2.4) + 's');
+  b.setAttribute('aria-label', text);
+  b.innerHTML = `<img src="img/tiere/${img}.png" alt="" draggable="false">`;
   b.addEventListener('pointerdown', () => {
-    b.classList.remove('bounce'); void b.offsetWidth; b.classList.add('bounce');
+    b.classList.remove('jump'); void b.offsetWidth; b.classList.add('jump');
     notes.forEach((f, i) => setTimeout(() => tone(f, 0.18, 'square', 0.12), i * 140));
     setTimeout(() => say(text), notes.length * 140);
     vibrate();

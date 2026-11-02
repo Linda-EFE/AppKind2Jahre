@@ -9,7 +9,7 @@ Eine einfache Spiel-App für Kinder ab ca. 2 Jahren. Ohne Lesen, ohne Werbung, o
 | 🏰 | **3D bauen** | Häuser aus Magnetplatten, die sich langsam drehen (mit dem Finger wischen zum Drehen): Würfelhäuser mit Pyramidendach und lange Häuser mit Satteldach, 1 bis 6 Stockwerke |
 | 🚒 | **Autos & Lieder** | Feuerwehr, Krankenwagen, Polizei oder THW antippen → jemand ruft um Hilfe (🔥 „Feuer, es brennt!“, 🤕 „Ich brauche ein Pflaster!“, 😟 „Ich brauche Hilfe!“, 🌊 „Wasser kommt!“), dann Tatü-tata, Blaulicht, das Fahrzeug fährt zum Einsatz, kommt zurück, das Problem ist gelöst und es spielt ein Kinderlied (Bruder Jakob, Alle meine Entchen, Hänschen klein, Funkel funkel kleiner Stern) |
 | 🎹 | **Klavier** | Klavier mit weißen und schwarzen Tasten, farbige Punkte, Noten fliegen hoch |
-| 🐮 | **Tiere** | Tier antippen → es hüpft und sagt z. B. „Die Kuh macht Muuuh!“ |
+| 🐮 | **Tiere** | 12 Tiere als 3D-Bilder. Tier antippen → es springt und dreht sich und sagt z. B. „Die Kuh macht Muuuh!“ |
 | 🎈 | **Farben** | Luftballons steigen auf; antippen → Plopp! und die Farbe wird gesagt |
 | 🎵 | **Xylophon** | Bunte Xylophon-Stäbe, antippen oder mit dem Finger drüberwischen |
 | 🫧 | **Seifenblasen** | Überall tippen/malen → Blasen und Töne (oben = hoch, unten = tief) |
@@ -28,3 +28,6 @@ Dann `http://localhost:8000` im Browser öffnen. Auf Tablet/Handy über „Zum H
 Tipp: Am iPhone/iPad den **Geführten Zugriff**, unter Android die **App-Fixierung** aktivieren, damit das Kind die App nicht verlassen kann.
 
 Die Sprachausgabe nutzt die eingebaute deutsche Stimme des Geräts.
+
+## Bildnachweis
+Die 3D-Tierbilder in `img/tiere/` stammen aus [Fluent Emoji](https://github.com/microsoft/fluentui-emoji) von Microsoft (MIT-Lizenz, siehe `img/tiere/LICENSE-fluentui-emoji.txt`).
