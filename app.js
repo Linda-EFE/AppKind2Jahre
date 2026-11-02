@@ -98,29 +98,19 @@ function go(name) {
 document.querySelectorAll('[data-go]').forEach(b =>
   b.addEventListener('pointerdown', () => { audio(); tone(660, 0.25, 'triangle'); go(b.dataset.go); }));
 
-// Zurück-Knopf: gedrückt halten ODER zweimal schnell tippen
+// Zurück: ⬅️ antippen -> Knopf "Zum Menü" erscheint (4 s) -> antippen. Am PC zusätzlich Esc.
 const home = document.getElementById('home');
-let holdTimer, firstTap = 0, tipTimer;
-function goHome() {
-  clearTimeout(holdTimer); clearTimeout(tipTimer);
-  home.classList.remove('holding', 'tip');
-  firstTap = 0;
-  go('menu');
-}
-home.addEventListener('pointerdown', e => {
-  e.preventDefault();
-  const now = Date.now();
-  if (now - firstTap < 1800) { goHome(); return; }
-  firstTap = now;
-  home.classList.add('holding', 'tip');
-  holdTimer = setTimeout(goHome, 1000);
-  clearTimeout(tipTimer);
-  tipTimer = setTimeout(() => home.classList.remove('tip'), 1800);
+const toMenu = document.getElementById('toMenu');
+let confirmTimer;
+function hideConfirm() { clearTimeout(confirmTimer); toMenu.classList.remove('show'); }
+home.addEventListener('click', () => {
+  if (toMenu.classList.contains('show')) { hideConfirm(); return; }
+  toMenu.classList.add('show');
+  clearTimeout(confirmTimer);
+  confirmTimer = setTimeout(hideConfirm, 4000);
 });
-['pointerup', 'pointerleave', 'pointercancel'].forEach(ev =>
-  home.addEventListener(ev, () => { clearTimeout(holdTimer); home.classList.remove('holding'); }));
-// Fallback für Geräte, die Pointer-Events beim langen Drücken abbrechen
-home.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
+toMenu.addEventListener('click', () => { hideConfirm(); go('menu'); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && current !== 'menu') { hideConfirm(); go('menu'); } });
 
 document.addEventListener('contextmenu', e => e.preventDefault());
 

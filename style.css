@@ -82,26 +82,24 @@ button { font: inherit; border: 0; cursor: pointer; }
   to { transform: translate(calc(-50% + var(--dx)), calc(-50% - 30vh)) scale(1); opacity: 0; }
 }
 
-/* Home-Knopf (gedrückt halten, damit Kleinkinder nicht versehentlich rausfliegen) */
+/* Zurück-Knopf + Bestätigung "Zum Menü" */
 #home {
-  position: fixed; z-index: 10; display: none;
+  position: fixed; z-index: 20; display: none;
   top: max(10px, env(safe-area-inset-top)); left: max(10px, env(safe-area-inset-left));
   width: 60px; height: 60px; border-radius: 50%;
-  background: rgba(255,255,255,.85); font-size: 28px;
-  box-shadow: 0 2px 8px rgba(0,0,0,.25); touch-action: none;
+  background: rgba(255,255,255,.9); font-size: 28px; line-height: 1;
+  box-shadow: 0 2px 8px rgba(0,0,0,.25);
 }
-#home::after {
-  content: "Nochmal tippen"; position: absolute; left: 68px; top: 50%; transform: translateY(-50%);
-  white-space: nowrap; font-size: 16px; font-weight: 600; color: #333;
-  background: #fff; padding: 6px 10px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.25);
-  opacity: 0; transition: opacity .2s; pointer-events: none;
-}
-#home.tip::after { opacity: 1; }
 body:not(.in-menu) #home { display: grid; place-items: center; }
-#home span { grid-area: 1/1; }
-#home .ring { grid-area: 1/1; width: 60px; height: 60px; transform: rotate(-90deg); }
-#home circle { fill: none; stroke: #ff6b6b; stroke-width: 4; stroke-dasharray: 100.5; stroke-dashoffset: 100.5; }
-#home.holding circle { transition: stroke-dashoffset 1s linear; stroke-dashoffset: 0; }
+#toMenu {
+  position: fixed; z-index: 20; display: none;
+  top: max(10px, env(safe-area-inset-top)); left: calc(max(10px, env(safe-area-inset-left)) + 72px);
+  height: 60px; padding: 0 22px; border-radius: 30px;
+  background: #ffd166; color: #222; font-size: 22px; font-weight: 700;
+  box-shadow: 0 3px 10px rgba(0,0,0,.3);
+}
+#toMenu.show { display: block; animation: appear .2s; }
+body.in-menu #toMenu { display: none; }
 
 /* ---------- Bauen (Magnetplatten) ---------- */
 #bauen { background: linear-gradient(#bde0fe 0%, #e7f6ff 70%); }

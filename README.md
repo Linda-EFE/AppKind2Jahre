@@ -13,7 +13,7 @@ Eine einfache Spiel-App für Kinder ab ca. 2 Jahren. Ohne Lesen, ohne Werbung, o
 | 🎵 | **Xylophon** | Bunte Xylophon-Stäbe, antippen oder mit dem Finger drüberwischen |
 | 🫧 | **Seifenblasen** | Überall tippen/malen → Blasen und Töne (oben = hoch, unten = tief) |
 
-**Zurück zum Menü:** Den ⬅️-Knopf oben links **zweimal schnell antippen** oder **gedrückt halten** (ca. 1 Sekunde). So landet das Kind nicht aus Versehen im Menü.
+**Zurück zum Menü:** Den ⬅️-Knopf oben links antippen, dann auf den gelben Knopf **„🏠 Zum Menü“** tippen (verschwindet nach 4 Sekunden wieder). Am PC geht auch die **Esc**-Taste. So landet das Kind nicht aus Versehen im Menü.
 
 ## Starten
 Es ist eine reine Web-App (HTML/CSS/JS), ohne Build-Schritt:
