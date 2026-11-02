@@ -136,10 +136,47 @@ const ANIMALS = [
   ['ente', 'Die Ente macht Quak quak!', [500, 450], '#bde0fe'],
   ['pferd', 'Das Pferd macht Hüüü!', [500, 700, 400], '#e9dcc9'],
   ['frosch', 'Der Frosch macht Quak!', [180, 220], '#d8f3dc'],
-  ['loewe', 'Der Löwe macht Roaaar!', [90, 70], '#ffe8a3'],
+  ['loewe', 'Der Löwe brüllt ganz laut!', 'roar', '#ffe8a3'],
   ['biene', 'Die Biene macht Summ summ!', [240, 245], '#fdf0c4'],
   ['elefant', 'Der Elefant macht Törööö!', [300, 450, 350], '#e0e7ff'],
 ];
+// Löwengebrüll: tiefes, knurrendes Rauschen mit anschwellender Lautstärke
+function roar() {
+  const a = audio(), t = a.currentTime, dur = 1.4;
+  const out = a.createGain();
+  out.gain.setValueAtTime(0.0001, t);
+  out.gain.exponentialRampToValueAtTime(0.9, t + 0.25);
+  out.gain.setValueAtTime(0.9, t + 0.7);
+  out.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  const comp = a.createDynamicsCompressor();
+  out.connect(comp).connect(a.destination);
+  // Rauschen (Atem/Rachen), tiefpassgefiltert
+  const buf = a.createBuffer(1, a.sampleRate * dur, a.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  const noise = a.createBufferSource(); noise.buffer = buf;
+  const lp = a.createBiquadFilter(); lp.type = 'lowpass';
+  lp.frequency.setValueAtTime(300, t);
+  lp.frequency.linearRampToValueAtTime(900, t + 0.4);
+  lp.frequency.linearRampToValueAtTime(250, t + dur);
+  lp.Q.value = 4;
+  // Knurren: schnelles Flattern der Lautstärke
+  const growl = a.createGain(); growl.gain.value = 0.6;
+  const lfo = a.createOscillator(); lfo.frequency.value = 28;
+  const lfoAmt = a.createGain(); lfoAmt.gain.value = 0.4;
+  lfo.connect(lfoAmt).connect(growl.gain);
+  noise.connect(lp).connect(growl).connect(out);
+  // tiefe Stimme darunter
+  const v = a.createOscillator(); v.type = 'sawtooth';
+  v.frequency.setValueAtTime(110, t);
+  v.frequency.linearRampToValueAtTime(150, t + 0.35);
+  v.frequency.linearRampToValueAtTime(75, t + dur);
+  const vf = a.createBiquadFilter(); vf.type = 'lowpass'; vf.frequency.value = 500;
+  const vg = a.createGain(); vg.gain.value = 0.35;
+  v.connect(vf).connect(vg).connect(growl);
+  [noise, lfo, v].forEach(n => { n.start(t); n.stop(t + dur + 0.05); });
+}
+
 const grid = document.getElementById('animalGrid');
 ANIMALS.forEach(([img, text, notes, bg], i) => {
   const b = document.createElement('button');
@@ -150,6 +187,7 @@ ANIMALS.forEach(([img, text, notes, bg], i) => {
   b.innerHTML = `<img src="img/tiere/${img}.png" alt="" draggable="false">`;
   b.addEventListener('pointerdown', () => {
     b.classList.remove('jump'); void b.offsetWidth; b.classList.add('jump');
+    if (notes === 'roar') { roar(); setTimeout(() => say(text), 1500); return; }
     notes.forEach((f, i) => setTimeout(() => tone(f, 0.18, 'square', 0.12), i * 140));
     setTimeout(() => say(text), notes.length * 140);
     vibrate();
