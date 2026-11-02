@@ -5,12 +5,15 @@ Eine einfache Spiel-App für Kinder ab ca. 2 Jahren. Ohne Lesen, ohne Werbung, o
 ## Spiele
 | | Spiel | Was passiert |
 |---|---|---|
+| 🏡 | **Häuser bauen** | Magnetplatten (Vierecke & Dreiecke) antippen oder auf die Baustelle ziehen – sie „klicken“ magnetisch in die Lücke. Fertiges Haus antippen → es purzelt um, das nächste Haus kommt |
+| 🚒 | **Autos & Lieder** | Feuerwehr, Krankenwagen oder Polizei antippen → Tatü-tata, Blaulicht und ein Kinderlied (Bruder Jakob, Alle meine Entchen, Hänschen klein) |
+| 🎹 | **Klavier** | Klavier mit weißen und schwarzen Tasten, farbige Punkte, Noten fliegen hoch |
 | 🐮 | **Tiere** | Tier antippen → es hüpft und sagt z. B. „Die Kuh macht Muuuh!“ |
 | 🎈 | **Farben** | Luftballons steigen auf; antippen → Plopp! und die Farbe wird gesagt |
-| 🎵 | **Musik** | Bunte Xylophon-Stäbe, antippen oder mit dem Finger drüberwischen |
+| 🎵 | **Xylophon** | Bunte Xylophon-Stäbe, antippen oder mit dem Finger drüberwischen |
 | 🫧 | **Seifenblasen** | Überall tippen/malen → Blasen und Töne (oben = hoch, unten = tief) |
 
-**Zurück zum Menü:** Den 🏠-Knopf oben links **gedrückt halten** (ca. 1 Sekunde). So landet das Kind nicht aus Versehen im Menü.
+**Zurück zum Menü:** Den ⬅️-Knopf oben links **gedrückt halten** (ca. 1 Sekunde). So landet das Kind nicht aus Versehen im Menü.
 
 ## Starten
 Es ist eine reine Web-App (HTML/CSS/JS), ohne Build-Schritt:

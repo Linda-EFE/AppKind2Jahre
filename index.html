@@ -15,9 +15,12 @@
 <body>
   <!-- Hauptmenü -->
   <section id="menu" class="screen active">
+    <button class="tile" data-go="bauen" style="--c:#06aed5" aria-label="Häuser bauen">🏡</button>
+    <button class="tile" data-go="autos" style="--c:#ef476f" aria-label="Autos mit Liedern">🚒</button>
+    <button class="tile" data-go="klavier" style="--c:#8d6e63" aria-label="Klavier">🎹</button>
     <button class="tile" data-go="tiere" style="--c:#ff9f1c" aria-label="Tiere">🐮</button>
+    <button class="tile" data-go="musik" style="--c:#e71d73" aria-label="Xylophon">🎵</button>
     <button class="tile" data-go="farben" style="--c:#2ec4b6" aria-label="Farben">🎈</button>
-    <button class="tile" data-go="musik" style="--c:#e71d73" aria-label="Musik">🎵</button>
     <button class="tile" data-go="blasen" style="--c:#5e60ce" aria-label="Seifenblasen">🫧</button>
   </section>
 
@@ -41,9 +44,28 @@
     <div id="bubbleArea"></div>
   </section>
 
+  <!-- Bauen mit Magnetplatten -->
+  <section id="bauen" class="screen">
+    <div id="buildZone"><div class="ground"></div></div>
+    <div id="palette">
+      <button class="pal" data-shape="sq" aria-label="Viereck"></button>
+      <button class="pal" data-shape="tri" aria-label="Dreieck"></button>
+    </div>
+  </section>
+
+  <!-- Klavier -->
+  <section id="klavier" class="screen">
+    <div id="piano"></div>
+  </section>
+
+  <!-- Autos mit Kinderliedern -->
+  <section id="autos" class="screen">
+    <div id="garage"></div>
+  </section>
+
   <button id="home" aria-label="Zurück zum Menü (gedrückt halten)">
     <svg viewBox="0 0 36 36" class="ring"><circle cx="18" cy="18" r="16"/></svg>
-    <span>🏠</span>
+    <span>⬅️</span>
   </button>
 
   <script src="app.js"></script>

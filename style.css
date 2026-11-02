@@ -17,10 +17,11 @@ button { font: inherit; border: 0; cursor: pointer; }
 .screen.active { display: block; }
 
 /* Menü */
-#menu.active { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 16px; }
+#menu.active { display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr; gap: 14px; }
+@media (orientation: landscape) { #menu.active { grid-template-columns: repeat(4, 1fr); } }
 .tile {
   background: var(--c); border-radius: 32px;
-  font-size: min(22vw, 22vh); line-height: 1;
+  font-size: 13vmin; line-height: 1; border-radius: 28px;
   box-shadow: 0 10px 0 rgba(0,0,0,.18);
   transition: transform .12s;
 }
@@ -93,3 +94,95 @@ body:not(.in-menu) #home { display: grid; place-items: center; }
 #home .ring { grid-area: 1/1; width: 56px; height: 56px; transform: rotate(-90deg); }
 #home circle { fill: none; stroke: #ff6b6b; stroke-width: 4; stroke-dasharray: 100.5; stroke-dashoffset: 100.5; }
 #home.holding circle { transition: stroke-dashoffset 1.2s linear; stroke-dashoffset: 0; }
+
+/* ---------- Bauen (Magnetplatten) ---------- */
+#bauen { background: linear-gradient(#bde0fe 0%, #e7f6ff 70%); }
+#buildZone { position: absolute; left: 0; right: 0; top: 0; bottom: 26vh; }
+#buildZone .ground {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 14px;
+  background: #7cc46a; border-top: 4px solid #5fa64f;
+}
+#palette {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 26vh;
+  display: flex; justify-content: center; align-items: center; gap: 10vw;
+  background: #f4e1c1; border-top: 6px solid #d9bf94;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.pal {
+  width: 19vh; height: 19vh; max-width: 38vw; max-height: 38vw;
+  background: none; padding: 0; touch-action: none;
+}
+.pal svg, .piece svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.pal.wiggle { animation: wiggle .4s; }
+@keyframes wiggle { 25% { transform: rotate(-12deg); } 75% { transform: rotate(12deg); } }
+.piece { position: absolute; pointer-events: none; }
+.piece.fly { transition: left .35s cubic-bezier(.3,1.4,.6,1), top .35s cubic-bezier(.3,1.4,.6,1),
+                         width .35s, height .35s; }
+.piece.ghost.hint { animation: hint .5s 3; }
+@keyframes hint { 50% { transform: scale(1.08); filter: drop-shadow(0 0 8px #fff); } }
+.piece .deco {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  font-size: var(--fs, 40px); animation: appear .4s backwards;
+}
+@keyframes appear { from { transform: scale(0); } }
+.house-done .piece:not(.ghost) { animation: happy .6s; }
+@keyframes happy { 50% { transform: translateY(-10px); } }
+.piece.tumble { transition: transform .9s ease-in, opacity .9s ease-in; opacity: 0; }
+.sun { position: absolute; right: 6vw; top: 4vh; font-size: 14vmin; animation: appear .6s, spin 8s linear infinite; }
+@keyframes spin { to { rotate: 360deg; } }
+
+/* ---------- Klavier ---------- */
+#klavier { background: #4e342e; }
+#piano {
+  position: absolute; left: 3vw; right: 3vw; bottom: 4vh; top: 22vh;
+  display: flex; gap: 4px;
+  background: #222; padding: 4px; border-radius: 14px;
+  box-shadow: 0 -10px 0 #6d4c41 inset, 0 12px 0 #3e2723;
+}
+.wkey {
+  flex: 1; background: linear-gradient(#fff 85%, #eee); border-radius: 0 0 12px 12px;
+  position: relative; touch-action: none;
+}
+.wkey::after {
+  content: ""; position: absolute; left: 50%; bottom: 8%; width: 46%; aspect-ratio: 1;
+  transform: translateX(-50%); border-radius: 50%; background: var(--c);
+}
+.bkey {
+  position: absolute; top: 4px; height: 58%; width: calc((100% - 8px) / 8 * .6);
+  background: linear-gradient(#444, #111); border-radius: 0 0 8px 8px; z-index: 2;
+  box-shadow: 0 4px 0 #000; touch-action: none;
+}
+.wkey.down { background: linear-gradient(#ffe9a8 85%, #ffd166); }
+.bkey.down { background: linear-gradient(#666, #333); box-shadow: none; }
+.note-fly {
+  position: absolute; pointer-events: none; font-size: 9vmin; z-index: 5;
+  animation: noteUp 1.4s ease-out forwards;
+}
+@keyframes noteUp {
+  from { transform: translate(-50%, -50%) scale(.6); opacity: 1; }
+  to { transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% - 22vh)) scale(1.3); opacity: 0; }
+}
+
+/* ---------- Autos mit Liedern ---------- */
+#autos { background: linear-gradient(#90e0ef 0 62%, #6c757d 62% 100%); }
+#garage {
+  height: 100%; display: flex; flex-direction: column; gap: 3vh;
+  justify-content: center; padding-top: 50px;
+}
+@media (orientation: landscape) { #garage { flex-direction: row; align-items: flex-end; padding: 0 0 4vh; } }
+.vehicle {
+  flex: 1; position: relative; border-radius: 28px;
+  background: rgba(255,255,255,.55); box-shadow: 0 8px 0 rgba(0,0,0,.18);
+  font-size: min(20vh, 30vw); line-height: 1;
+}
+@media (orientation: landscape) { .vehicle { font-size: min(24vw, 40vh); flex: 1; height: 60vh; } }
+.vehicle .car { display: inline-block; }
+.vehicle .light {
+  position: absolute; top: 10%; left: 50%; width: 9vmin; height: 9vmin; margin-left: -4.5vmin;
+  border-radius: 50%; background: #1d4ed8; opacity: 0;
+}
+.vehicle.playing { background: rgba(255,255,255,.9); }
+.vehicle.playing .car { animation: rumble .3s infinite; }
+.vehicle.playing .light { animation: blink .5s infinite; }
+@keyframes rumble { 0%,100% { transform: translate(0,0); } 25% { transform: translate(-3px,-3px) rotate(-1deg); } 75% { transform: translate(3px,-1px) rotate(1deg); } }
+@keyframes blink { 0%,49% { opacity: 1; box-shadow: 0 0 30px 12px #4cc9f0; } 50%,100% { opacity: .15; box-shadow: none; } }
