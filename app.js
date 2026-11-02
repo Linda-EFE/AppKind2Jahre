@@ -73,12 +73,19 @@ if ('speechSynthesis' in window) {
   pickVoice();
   speechSynthesis.onvoiceschanged = pickVoice;
 }
-function say(text) {
-  if (!('speechSynthesis' in window)) return;
+let lastUtterance = null;
+// Spricht text; ruft done() auf, wenn fertig (mit Zeit-Notbremse, falls der Browser kein Ende meldet)
+function say(text, { pitch = 1.25, rate = 0.85, done = null } = {}) {
+  let called = false;
+  const finish = () => { if (!called) { called = true; done && done(); } };
+  if (done) setTimeout(finish, Math.min(6000, 1200 + text.length * 85));
+  if (!('speechSynthesis' in window)) { if (done) setTimeout(finish, 800); return; }
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'de-DE'; u.rate = 0.85; u.pitch = 1.25;
+  u.lang = 'de-DE'; u.rate = rate; u.pitch = pitch;
   if (germanVoice) u.voice = germanVoice;
+  u.onend = () => setTimeout(finish, 250);
+  lastUtterance = u; // Chrome: Referenz halten, sonst feuert onend manchmal nicht
   speechSynthesis.speak(u);
 }
 
@@ -695,10 +702,14 @@ const THW_SVG = `<svg class="thw" viewBox="0 0 130 100" aria-hidden="true">
   <circle cx="102" cy="78" r="13" fill="#333"/><circle cx="102" cy="78" r="5" fill="#bbb"/>
 </svg>`;
 const VEHICLES = [
-  { car: '🚒', name: 'Ta tü, ta ta! Die Feuerwehr!', siren: ['G4', 'C5'], song: 'jakob', title: 'Bruder Jakob' },
-  { car: '🚑', name: 'Der Krankenwagen!', siren: ['A4', 'D5'], song: 'entchen', title: 'Alle meine Entchen' },
-  { car: '🚓', name: 'Die Polizei!', siren: ['B4', 'E5'], song: 'haenschen', title: 'Hänschen klein' },
-  { car: THW_SVG, name: 'Das Technische Hilfswerk!', siren: ['F4', 'B4'], song: 'funkel', title: 'Funkel, funkel, kleiner Stern' },
+  { car: '🚒', call: 'Hilfe! Feuer! Es brennt! Hilfe!', need: '🔥', solved: '💨',
+    name: 'Ta tü, ta ta! Die Feuerwehr kommt!', siren: ['G4', 'C5'], song: 'jakob', title: 'Bruder Jakob' },
+  { car: '🚑', call: 'Aua! Ich bin verletzt. Ich brauche ein Pflaster!', need: '🤕', solved: '🩹',
+    name: 'Der Krankenwagen kommt!', siren: ['A4', 'D5'], song: 'entchen', title: 'Alle meine Entchen' },
+  { car: '🚓', call: 'Hilfe! Ich brauche Hilfe!', need: '😟', solved: '😊',
+    name: 'Die Polizei kommt!', siren: ['B4', 'E5'], song: 'haenschen', title: 'Hänschen klein' },
+  { car: THW_SVG, call: 'Hilfe! Wasser kommt!', need: '🌊', solved: '☀️',
+    name: 'Das Technische Hilfswerk kommt!', siren: ['F4', 'B4'], song: 'funkel', title: 'Funkel, funkel, kleiner Stern' },
 ];
 const garage = document.getElementById('garage');
 let songBus = null, songTimers = [], playingBtn = null;
@@ -711,7 +722,13 @@ function stopSong() {
     songBus = null;
   }
   songTimers.forEach(clearTimeout); songTimers = [];
-  playingBtn?.classList.remove('playing'); playingBtn = null;
+  playId++;
+  if (playingBtn) {
+    playingBtn.classList.remove('playing', 'calling');
+    playingBtn.querySelector('.need')?.classList.remove('show', 'solved');
+    playingBtn.querySelector('.car')?.classList.remove('drive');
+  }
+  playingBtn = null;
 }
 
 function sirenTone(f, when, dur, dest) {
@@ -726,21 +743,35 @@ function sirenTone(f, when, dur, dest) {
   o.start(t); o.stop(t + dur + 0.05);
 }
 
+let playId = 0;
 function playVehicle(v, btn) {
   stopSong();
+  const id = ++playId;
   const a = audio();
   songBus = a.createGain(); songBus.connect(a.destination);
-  playingBtn = btn; btn.classList.add('playing');
-  // wegfahren und mit dem Lied zurückkommen
+  playingBtn = btn; btn.classList.add('calling');
+  const need = btn.querySelector('.need');
+  need.textContent = v.need;
+  need.classList.remove('show', 'solved'); void need.offsetWidth; need.classList.add('show');
+  vibrate(40);
+  // 1) Jemand ruft um Hilfe – danach kommt das Fahrzeug
+  say(v.call, { pitch: 1.6, rate: 0.95, done: () => { if (id === playId) rescue(v, btn, need); } });
+}
+function rescue(v, btn, need) {
+  btn.classList.remove('calling'); btn.classList.add('playing');
+  // 2) Tatü-tata, fährt weg (zum Einsatz) und kommt zurück
   const car = btn.querySelector('.car');
   car.classList.remove('drive'); void car.offsetWidth; car.classList.add('drive');
-  vibrate(40);
-  // Tatü-tata (2x)
   for (let i = 0; i < 4; i++) sirenTone(freq(v.siren[i % 2]), i * 0.5, 0.48, songBus);
   songTimers.push(setTimeout(() => say(v.name), 2050));
-  // danach das Lied
+  // 3) Geholfen! Problem gelöst
+  songTimers.push(setTimeout(() => {
+    need.textContent = v.solved; need.classList.add('solved');
+    ['C5', 'E5', 'G5'].forEach((n, i) => pianoNote(freq(n), i * 0.1, songBus, 0.35));
+  }, 3950));
+  // 4) danach das Lied
   const beat = 0.36;
-  let t = 3.6;
+  let t = 4.6;
   const r = btn.getBoundingClientRect();
   SONGS[v.song].trim().split(/\s+/).forEach(tok => {
     const [n, b] = tok.split(':');
@@ -748,14 +779,17 @@ function playVehicle(v, btn) {
     songTimers.push(setTimeout(() => flyNote(r.left + r.width * (0.2 + Math.random() * 0.6), r.top + r.height * 0.3), t * 1000));
     t += +b * beat;
   });
-  songTimers.push(setTimeout(() => { btn.classList.remove('playing'); if (playingBtn === btn) playingBtn = null; }, t * 1000 + 600));
+  songTimers.push(setTimeout(() => {
+    btn.classList.remove('playing'); need.classList.remove('show', 'solved');
+    if (playingBtn === btn) playingBtn = null;
+  }, t * 1000 + 600));
 }
 
 VEHICLES.forEach(v => {
   const b = document.createElement('button');
   b.className = 'vehicle';
   b.setAttribute('aria-label', v.name + ' – ' + v.title);
-  b.innerHTML = `<span class="car"><span class="light"></span><span class="body">${v.car}</span></span>`;
+  b.innerHTML = `<span class="need"></span><span class="car"><span class="light"></span><span class="body">${v.car}</span></span>`;
   b.addEventListener('pointerdown', () => playVehicle(v, b));
   garage.appendChild(b);
 });
