@@ -1,8 +1,31 @@
-# Kleine Entdecker 🐮🎈🎵🫧
+# Familien-Entdecker 👶🧒🧑
 
-Eine einfache Spiel-App für Kinder ab ca. 2 Jahren. Ohne Lesen, ohne Werbung, ohne Internet (nach dem ersten Laden).
+Eine Lern- und Spiel-App für drei Altersstufen. Auf der Startseite „Wer spielt heute?“ wählt man:
 
-## Spiele
+- **👶 2 Jahre – Kleine Entdecker:** Spiele ohne Lesen (siehe unten).
+- **🧒 7 Jahre – Entdecker-Akademie:** 8 Spiele mit Vorlesefunktion.
+- **🧑 17 Jahre – Skills Lab:** 8 Module mit Rechnern, Quiz und Planspiel.
+
+Die Themen für 7 und 17 Jahre: Neuroplastizität, Finanzen, Entscheidungen, Prokrastination, Metakognition, kognitive Verzerrungen, Geopolitik und Epigenetik.
+
+| Thema | 7 Jahre | 17 Jahre |
+|---|---|---|
+| Neuroplastizität | 🧠 Gehirn-Trainer: Memory mit 3D-Tieren, ein Gehirn-Bild bekommt mit jedem Üben mehr Verbindungen | 🧠 Gehirn-Gym: Zahlen-Merktest mit Verlauf, Erklärung wie das Gehirn lernt |
+| Finanzen | 🐷 Drei Spardosen: Taschengeld auf Sparen/Ausgeben/Teilen verteilen und auf einen Wunsch sparen | 💰 Geld-Labor: Zinseszins-Rechner (Start mit 17 vs. 27), Budget 50/30/20, Inflation |
+| Entscheidungen | 🤔 Was passiert dann? 8 Alltagssituationen, „Stopp – Denk nach – Entscheide“ | ⚖️ Entscheidungs-Matrix mit Gewichtung, 10-10-10, Pre-Mortem |
+| Prokrastination | 🍪 Warte-Keks (warten lohnt sich) und Aufräum-Rakete (Timer) | ⏱️ Fokus-Timer (Pomodoro), „Eat the frog“, Ursachen und Strategien |
+| Metakognition | 🪞 Farben merken: erst schätzen, dann spielen, dann überlegen was geholfen hat | 🪞 Kalibrierungs-Test: Wie gut passt meine Sicherheit zu meinem Wissen? Lernstrategien |
+| Denkfehler | 🕵️ Trick-Detektiv: optische Täuschungen, große Kiste ≠ viel, Mitläufer-Effekt | 🎭 Denkfallen-Quiz: Anker, versunkene Kosten, Basisrate, Survivorship Bias u. a. |
+| Geopolitik | 🌍 Weltreise der Zutaten: Schokolade, Fahrrad, Handy entstehen aus vielen Ländern | 🌍 Berater-Spiel „Nordland“, Nadelöhre der Welt, Grundbegriffe |
+| Epigenetik | 🌱 Mein Zell-Kochbuch: einen gesunden Tag planen | 🧬 Gene & Lebensstil: Gene an/aus, Mythos oder Fakt? |
+
+Fortschritte (Rekorde, Keksdose, Matrix, Pomodoros) werden nur im Browser des Geräts gespeichert.
+
+## 2 Jahre – Kleine Entdecker
+
+Spiele ohne Lesen, ohne Werbung, ohne Internet (nach dem ersten Laden).
+
+### Spiele
 | | Spiel | Was passiert |
 |---|---|---|
 | 🏡 | **Häuser bauen** | Magnetplatten (Vierecke & Dreiecke) antippen oder auf die Baustelle ziehen – sie „klicken“ magnetisch in die Lücke. Fertiges Haus antippen → es purzelt um, das nächste Haus kommt. Häuser mit 3 bis 8 Stockwerken, die Stockwerke werden mitgezählt |
@@ -14,7 +37,7 @@ Eine einfache Spiel-App für Kinder ab ca. 2 Jahren. Ohne Lesen, ohne Werbung, o
 | 🎵 | **Xylophon** | Bunte Xylophon-Stäbe, antippen oder mit dem Finger drüberwischen |
 | 🫧 | **Seifenblasen** | Überall tippen/malen → Blasen und Töne (oben = hoch, unten = tief) |
 
-**Zurück zum Menü:** Den ⬅️-Knopf oben links antippen, dann auf den gelben Knopf **„🏠 Zum Menü“** tippen (verschwindet nach 4 Sekunden wieder). Am PC geht auch die **Esc**-Taste. So landet das Kind nicht aus Versehen im Menü.
+**Zurück:** Bei den 2-Jährigen den ⬅️-Knopf oben links antippen, dann den gelben Knopf **„🏠 Zum Menü“** bzw. **„👪 Zur Startseite“** (verschwindet nach 4 Sekunden wieder). So landet das Kind nicht aus Versehen woanders. Bei 7 und 17 Jahren führt ⬅️ direkt zurück. Am PC geht überall auch die **Esc**-Taste.
 
 ## Starten
 Es ist eine reine Web-App (HTML/CSS/JS), ohne Build-Schritt:

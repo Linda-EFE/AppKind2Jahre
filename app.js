@@ -93,10 +93,10 @@ function vibrate(ms = 30) { if (navigator.vibrate) navigator.vibrate(ms); }
 
 /* ---------- Navigation ---------- */
 const screens = {};
-let current = 'menu';
+let current = 'start';
 function go(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === name));
-  document.body.classList.toggle('in-menu', name === 'menu');
+  document.body.classList.toggle('in-menu', name === 'start');
   if (screens[current]?.leave) screens[current].leave();
   if ('speechSynthesis' in window) speechSynthesis.cancel();
   current = name;
@@ -105,19 +105,27 @@ function go(name) {
 document.querySelectorAll('[data-go]').forEach(b =>
   b.addEventListener('pointerdown', () => { audio(); tone(660, 0.25, 'triangle'); go(b.dataset.go); }));
 
-// Zurück: ⬅️ antippen -> Knopf "Zum Menü" erscheint (4 s) -> antippen. Am PC zusätzlich Esc.
+// Wohin führt "Zurück"? Spiele der 2-Jährigen -> Menü, Menüs -> Startseite
+const PARENT = { menu: 'start', menu7: 'start', menu17: 'start', game7: 'menu7', game17: 'menu17' };
+function parentOf(n) { return PARENT[n] || 'menu'; }
+function isToddlerArea(n) { return n === 'menu' || parentOf(n) === 'menu'; }
+
+// Zurück: Im Bereich der 2-Jährigen mit Bestätigung (⬅️ antippen -> "Zum Menü" erscheint 4 s),
+// bei 7 und 17 Jahren direkt. Am PC zusätzlich Esc.
 const home = document.getElementById('home');
 const toMenu = document.getElementById('toMenu');
 let confirmTimer;
 function hideConfirm() { clearTimeout(confirmTimer); toMenu.classList.remove('show'); }
 home.addEventListener('click', () => {
+  if (!isToddlerArea(current)) { go(parentOf(current)); return; }
   if (toMenu.classList.contains('show')) { hideConfirm(); return; }
+  toMenu.textContent = current === 'menu' ? '👪 Zur Startseite' : '🏠 Zum Menü';
   toMenu.classList.add('show');
   clearTimeout(confirmTimer);
   confirmTimer = setTimeout(hideConfirm, 4000);
 });
-toMenu.addEventListener('click', () => { hideConfirm(); go('menu'); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && current !== 'menu') { hideConfirm(); go('menu'); } });
+toMenu.addEventListener('click', () => { hideConfirm(); go(parentOf(current)); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && current !== 'start') { hideConfirm(); go(parentOf(current)); } });
 
 document.querySelectorAll('.modeSwitch').forEach(b =>
   b.addEventListener('click', () => { tone(660, 0.2, 'triangle'); go(b.dataset.mode); }));

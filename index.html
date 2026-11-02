@@ -6,15 +6,26 @@
 <meta name="theme-color" content="#ffd166">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Kleine Entdecker</title>
+<title>Familien-Entdecker</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon.svg">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="ages.css">
 </head>
 <body>
-  <!-- Hauptmenü -->
-  <section id="menu" class="screen active">
+  <!-- Startseite: Wer spielt heute? -->
+  <section id="start" class="screen active">
+    <h1>Wer spielt heute?</h1>
+    <div class="ages">
+      <button class="age a2" data-go="menu"><span class="ai">👶</span><b>2 Jahre</b><small>Kleine Entdecker</small></button>
+      <button class="age a7" data-go="menu7"><span class="ai">🧒</span><b>7 Jahre</b><small>Entdecker-Akademie</small></button>
+      <button class="age a17" data-go="menu17"><span class="ai">🧑</span><b>17 Jahre</b><small>Skills Lab</small></button>
+    </div>
+  </section>
+
+  <!-- Hauptmenü 2 Jahre -->
+  <section id="menu" class="screen">
     <button class="tile" data-go="bauen" style="--c:#06aed5" aria-label="Häuser bauen">🏡</button>
     <button class="tile" data-go="bauen3d" style="--c:#7b2cbf" aria-label="3D bauen">🏰</button>
     <button class="tile" data-go="autos" style="--c:#ef476f" aria-label="Autos mit Liedern">🚒</button>
@@ -75,9 +86,17 @@
     <div id="garage"></div>
   </section>
 
+  <!-- 7 Jahre / 17 Jahre (Inhalt wird per JavaScript aufgebaut) -->
+  <section id="menu7" class="screen t7"></section>
+  <section id="game7" class="screen t7"></section>
+  <section id="menu17" class="screen t17"></section>
+  <section id="game17" class="screen t17"></section>
+
   <button id="home" aria-label="Zurück">⬅️</button>
   <button id="toMenu" aria-label="Zum Menü">🏠 Zum Menü</button>
 
   <script src="app.js"></script>
+  <script src="kids7.js"></script>
+  <script src="teen17.js"></script>
 </body>
 </html>
