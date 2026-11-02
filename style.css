@@ -86,14 +86,22 @@ button { font: inherit; border: 0; cursor: pointer; }
 #home {
   position: fixed; z-index: 10; display: none;
   top: max(10px, env(safe-area-inset-top)); left: max(10px, env(safe-area-inset-left));
-  width: 56px; height: 56px; border-radius: 50%;
-  background: rgba(255,255,255,.75); font-size: 26px;
+  width: 60px; height: 60px; border-radius: 50%;
+  background: rgba(255,255,255,.85); font-size: 28px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.25); touch-action: none;
 }
+#home::after {
+  content: "Nochmal tippen"; position: absolute; left: 68px; top: 50%; transform: translateY(-50%);
+  white-space: nowrap; font-size: 16px; font-weight: 600; color: #333;
+  background: #fff; padding: 6px 10px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.25);
+  opacity: 0; transition: opacity .2s; pointer-events: none;
+}
+#home.tip::after { opacity: 1; }
 body:not(.in-menu) #home { display: grid; place-items: center; }
 #home span { grid-area: 1/1; }
-#home .ring { grid-area: 1/1; width: 56px; height: 56px; transform: rotate(-90deg); }
+#home .ring { grid-area: 1/1; width: 60px; height: 60px; transform: rotate(-90deg); }
 #home circle { fill: none; stroke: #ff6b6b; stroke-width: 4; stroke-dasharray: 100.5; stroke-dashoffset: 100.5; }
-#home.holding circle { transition: stroke-dashoffset 1.2s linear; stroke-dashoffset: 0; }
+#home.holding circle { transition: stroke-dashoffset 1s linear; stroke-dashoffset: 0; }
 
 /* ---------- Bauen (Magnetplatten) ---------- */
 #bauen { background: linear-gradient(#bde0fe 0%, #e7f6ff 70%); }

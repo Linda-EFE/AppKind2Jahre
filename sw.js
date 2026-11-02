@@ -1,4 +1,4 @@
-const CACHE = 'kleine-entdecker-v2';
+const CACHE = 'kleine-entdecker-v3';
 const FILES = ['./', 'index.html', 'style.css', 'app.js', 'manifest.webmanifest', 'icon.svg'];
 self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting())));
 self.addEventListener('activate', e => e.waitUntil(

@@ -5,7 +5,7 @@ Eine einfache Spiel-App für Kinder ab ca. 2 Jahren. Ohne Lesen, ohne Werbung, o
 ## Spiele
 | | Spiel | Was passiert |
 |---|---|---|
-| 🏡 | **Häuser bauen** | Magnetplatten (Vierecke & Dreiecke) antippen oder auf die Baustelle ziehen – sie „klicken“ magnetisch in die Lücke. Fertiges Haus antippen → es purzelt um, das nächste Haus kommt |
+| 🏡 | **Häuser bauen** | Magnetplatten (Vierecke & Dreiecke) antippen oder auf die Baustelle ziehen – sie „klicken“ magnetisch in die Lücke. Fertiges Haus antippen → es purzelt um, das nächste Haus kommt. Häuser mit 3 bis 8 Stockwerken, die Stockwerke werden mitgezählt |
 | 🚒 | **Autos & Lieder** | Feuerwehr, Krankenwagen oder Polizei antippen → Tatü-tata, Blaulicht und ein Kinderlied (Bruder Jakob, Alle meine Entchen, Hänschen klein) |
 | 🎹 | **Klavier** | Klavier mit weißen und schwarzen Tasten, farbige Punkte, Noten fliegen hoch |
 | 🐮 | **Tiere** | Tier antippen → es hüpft und sagt z. B. „Die Kuh macht Muuuh!“ |
@@ -13,7 +13,7 @@ Eine einfache Spiel-App für Kinder ab ca. 2 Jahren. Ohne Lesen, ohne Werbung, o
 | 🎵 | **Xylophon** | Bunte Xylophon-Stäbe, antippen oder mit dem Finger drüberwischen |
 | 🫧 | **Seifenblasen** | Überall tippen/malen → Blasen und Töne (oben = hoch, unten = tief) |
 
-**Zurück zum Menü:** Den ⬅️-Knopf oben links **gedrückt halten** (ca. 1 Sekunde). So landet das Kind nicht aus Versehen im Menü.
+**Zurück zum Menü:** Den ⬅️-Knopf oben links **zweimal schnell antippen** oder **gedrückt halten** (ca. 1 Sekunde). So landet das Kind nicht aus Versehen im Menü.
 
 ## Starten
 Es ist eine reine Web-App (HTML/CSS/JS), ohne Build-Schritt:

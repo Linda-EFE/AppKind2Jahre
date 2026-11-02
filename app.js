@@ -98,16 +98,29 @@ function go(name) {
 document.querySelectorAll('[data-go]').forEach(b =>
   b.addEventListener('pointerdown', () => { audio(); tone(660, 0.25, 'triangle'); go(b.dataset.go); }));
 
-// Home-Knopf: 1,2 Sekunden gedrückt halten
+// Zurück-Knopf: gedrückt halten ODER zweimal schnell tippen
 const home = document.getElementById('home');
-let holdTimer;
+let holdTimer, firstTap = 0, tipTimer;
+function goHome() {
+  clearTimeout(holdTimer); clearTimeout(tipTimer);
+  home.classList.remove('holding', 'tip');
+  firstTap = 0;
+  go('menu');
+}
 home.addEventListener('pointerdown', e => {
   e.preventDefault();
-  home.classList.add('holding');
-  holdTimer = setTimeout(() => { home.classList.remove('holding'); go('menu'); }, 1200);
+  const now = Date.now();
+  if (now - firstTap < 1800) { goHome(); return; }
+  firstTap = now;
+  home.classList.add('holding', 'tip');
+  holdTimer = setTimeout(goHome, 1000);
+  clearTimeout(tipTimer);
+  tipTimer = setTimeout(() => home.classList.remove('tip'), 1800);
 });
 ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev =>
   home.addEventListener(ev, () => { clearTimeout(holdTimer); home.classList.remove('holding'); }));
+// Fallback für Geräte, die Pointer-Events beim langen Drücken abbrechen
+home.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
 
 document.addEventListener('contextmenu', e => e.preventDefault());
 
@@ -224,11 +237,20 @@ const BUILD_COLORS = [
   ['#2a9d4a', 'Grünes'], ['#ff8c00', 'Oranges'], ['#9b5de5', 'Lila'],
 ];
 // [Form, Spalte, Reihe (0 = unten), Breite bei Dreiecken]
+function building(width, floors, roof) {
+  const parts = [];
+  for (let y = 0; y < floors; y++) for (let x = 0; x < width; x++) parts.push(['sq', x, y]);
+  if (roof === 'zack') for (let x = 0; x < width; x++) parts.push(['tri', x, floors, 1]);
+  else parts.push(['tri', 0, floors, width]);
+  return parts;
+}
 const HOUSES = [
-  [['sq', 0, 0], ['sq', 1, 0], ['tri', 0, 1, 2]],
-  [['sq', 0, 0], ['sq', 0, 1], ['sq', 0, 2], ['tri', 0, 3, 1]],
-  [['sq', 0, 0], ['sq', 1, 0], ['sq', 2, 0], ['tri', 0, 1, 1], ['tri', 1, 1, 1], ['tri', 2, 1, 1]],
-  [['sq', 0, 0], ['sq', 1, 0], ['sq', 2, 0], ['sq', 0, 1], ['sq', 1, 1], ['sq', 2, 1], ['tri', 0, 2, 3]],
+  building(2, 3),          // Haus mit 3 Stockwerken
+  building(1, 6),          // Turm mit 6 Stockwerken
+  building(2, 5),          // 5 Stockwerke
+  building(3, 4, 'zack'),  // breites Haus mit Zackendach
+  building(2, 8),          // Hochhaus mit 8 Stockwerken
+  building(3, 7),          // großes Hochhaus mit 7 Stockwerken
 ];
 const SHAPE_NAME = { sq: 'Viereck', tri: 'Dreieck' };
 const bauen = document.getElementById('bauen');
@@ -271,7 +293,7 @@ function layoutHouse() {
   const z = zone.getBoundingClientRect();
   const cols = Math.max(...slots.map(s => s.x + (s.w || 1)));
   const rows = Math.max(...slots.map(s => s.y + (s.type === 'tri' ? triH(s.w) : 1)));
-  unit = Math.min(z.width * 0.8 / cols, (z.height - 40) * 0.9 / rows, z.width * 0.3);
+  unit = Math.min(z.width * 0.8 / cols, (z.height - 30) * 0.95 / rows, z.width * 0.3);
   originX = z.left + (z.width - cols * unit) / 2;
   groundY = z.bottom - 14;
   slots.forEach(s => {
@@ -347,7 +369,14 @@ function place(type, from, point, dragEl) {
     el.classList.remove('fly');
     target.landed = true;
     magnetClick();
-    say(colorName + ' ' + SHAPE_NAME[type] + '!');
+    const row = slots.filter(s => s.type === 'sq' && s.y === target.y);
+    if (type === 'sq' && row.every(s => s.landed)) {
+      const n = target.y + 1;
+      say(n === 1 ? 'Ein Stockwerk!' : n + ' Stockwerke!');
+      [0, 1].forEach(i => pianoNote(freq(['C5', 'G5'][i]), i * 0.1, null, 0.3));
+    } else {
+      say(colorName + ' ' + SHAPE_NAME[type] + '!');
+    }
     if (slots.every(s => s.landed)) finishHouse();
   }, 360);
 }
@@ -359,7 +388,7 @@ function finishHouse() {
   slots.filter(s => s.type === 'sq').forEach((s, i) => {
     const d = document.createElement('div');
     d.className = 'deco'; d.textContent = s === door ? '🚪' : '🪟';
-    d.style.animationDelay = (i * 0.12) + 's';
+    d.style.animationDelay = (i * 0.06) + 's';
     s.piece.style.setProperty('--fs', unit * 0.55 + 'px');
     s.piece.appendChild(d);
   });
