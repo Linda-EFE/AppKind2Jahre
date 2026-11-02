@@ -112,6 +112,9 @@ home.addEventListener('click', () => {
 toMenu.addEventListener('click', () => { hideConfirm(); go('menu'); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && current !== 'menu') { hideConfirm(); go('menu'); } });
 
+document.querySelectorAll('.modeSwitch').forEach(b =>
+  b.addEventListener('click', () => { tone(660, 0.2, 'triangle'); go(b.dataset.mode); }));
+
 document.addEventListener('contextmenu', e => e.preventDefault());
 
 /* ---------- Tiere ---------- */
