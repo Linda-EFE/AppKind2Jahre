@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#ffd166">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Kleine Entdecker</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Hauptmenü -->
+  <section id="menu" class="screen active">
+    <button class="tile" data-go="tiere" style="--c:#ff9f1c" aria-label="Tiere">🐮</button>
+    <button class="tile" data-go="farben" style="--c:#2ec4b6" aria-label="Farben">🎈</button>
+    <button class="tile" data-go="musik" style="--c:#e71d73" aria-label="Musik">🎵</button>
+    <button class="tile" data-go="blasen" style="--c:#5e60ce" aria-label="Seifenblasen">🫧</button>
+  </section>
+
+  <!-- Tiere -->
+  <section id="tiere" class="screen">
+    <div class="grid" id="animalGrid"></div>
+  </section>
+
+  <!-- Farben / Ballons -->
+  <section id="farben" class="screen">
+    <div id="balloonArea"></div>
+  </section>
+
+  <!-- Musik / Xylophon -->
+  <section id="musik" class="screen">
+    <div id="xylophone"></div>
+  </section>
+
+  <!-- Seifenblasen / Tippen überall -->
+  <section id="blasen" class="screen">
+    <div id="bubbleArea"></div>
+  </section>
+
+  <button id="home" aria-label="Zurück zum Menü (gedrückt halten)">
+    <svg viewBox="0 0 36 36" class="ring"><circle cx="18" cy="18" r="16"/></svg>
+    <span>🏠</span>
+  </button>
+
+  <script src="app.js"></script>
+</body>
+</html>

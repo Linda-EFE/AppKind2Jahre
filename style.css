@@ -1,0 +1,95 @@
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body {
+  margin: 0; height: 100%; overflow: hidden;
+  font-family: system-ui, sans-serif;
+  background: #fff8e7;
+  user-select: none; -webkit-user-select: none;
+  touch-action: none; overscroll-behavior: none;
+  -webkit-touch-callout: none;
+}
+button { font: inherit; border: 0; cursor: pointer; }
+
+.screen {
+  position: fixed; inset: 0; display: none;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+           max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+}
+.screen.active { display: block; }
+
+/* Menü */
+#menu.active { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 16px; }
+.tile {
+  background: var(--c); border-radius: 32px;
+  font-size: min(22vw, 22vh); line-height: 1;
+  box-shadow: 0 10px 0 rgba(0,0,0,.18);
+  transition: transform .12s;
+}
+.tile:active { transform: translateY(6px) scale(.97); box-shadow: 0 4px 0 rgba(0,0,0,.18); }
+
+/* Tiere */
+#tiere { background: #d8f3dc; }
+.grid { height: 100%; display: grid; gap: 14px; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 1fr; }
+@media (orientation: landscape) { .grid { grid-template-columns: repeat(4, 1fr); } }
+.animal {
+  background: #fff; border-radius: 28px; font-size: min(15vw, 13vh);
+  box-shadow: 0 6px 0 rgba(0,0,0,.12);
+}
+.animal.bounce { animation: bounce .6s; }
+@keyframes bounce {
+  0% { transform: scale(1); } 30% { transform: scale(1.25) rotate(-8deg); }
+  60% { transform: scale(.92) rotate(6deg); } 100% { transform: scale(1); }
+}
+
+/* Ballons */
+#farben { background: linear-gradient(#a2d2ff, #e0f4ff); }
+#balloonArea { position: absolute; inset: 0; }
+.balloon {
+  position: absolute; width: 22vmin; height: 27vmin;
+  border-radius: 50% 50% 48% 48% / 55% 55% 45% 45%;
+  background: radial-gradient(circle at 32% 28%, rgba(255,255,255,.7) 0 8%, transparent 9%), var(--c);
+  animation: rise linear forwards;
+}
+.balloon::after {
+  content: ""; position: absolute; left: 50%; top: 100%;
+  width: 2px; height: 9vmin; background: rgba(0,0,0,.25);
+}
+@keyframes rise { from { transform: translateY(0); } to { transform: translateY(calc(-100vh - 45vmin)); } }
+.pop { position: absolute; pointer-events: none; font-size: 14vmin; animation: pop .5s forwards; }
+@keyframes pop { from { transform: translate(-50%,-50%) scale(.4); opacity: 1; } to { transform: translate(-50%,-50%) scale(1.6); opacity: 0; } }
+
+/* Xylophon */
+#musik { background: #3d2c5e; }
+#xylophone { height: 100%; display: flex; gap: 2vmin; align-items: center; }
+.bar {
+  flex: 1; border-radius: 18px; background: var(--c);
+  box-shadow: inset 0 -10px 0 rgba(0,0,0,.2), 0 6px 0 rgba(0,0,0,.3);
+  transition: transform .08s, filter .08s;
+}
+.bar.hit { transform: scaleY(.94); filter: brightness(1.35); }
+
+/* Seifenblasen */
+#blasen { background: radial-gradient(circle at 50% 30%, #2b2d6e, #10112e); }
+#bubbleArea { position: absolute; inset: 0; }
+.bubble {
+  position: absolute; border-radius: 50%; pointer-events: none;
+  border: 3px solid rgba(255,255,255,.7);
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.8) 0 10%, var(--c) 60%, transparent 72%);
+  animation: float 2.2s ease-out forwards;
+}
+@keyframes float {
+  from { transform: translate(-50%,-50%) scale(.2); opacity: 1; }
+  to { transform: translate(calc(-50% + var(--dx)), calc(-50% - 30vh)) scale(1); opacity: 0; }
+}
+
+/* Home-Knopf (gedrückt halten, damit Kleinkinder nicht versehentlich rausfliegen) */
+#home {
+  position: fixed; z-index: 10; display: none;
+  top: max(10px, env(safe-area-inset-top)); left: max(10px, env(safe-area-inset-left));
+  width: 56px; height: 56px; border-radius: 50%;
+  background: rgba(255,255,255,.75); font-size: 26px;
+}
+body:not(.in-menu) #home { display: grid; place-items: center; }
+#home span { grid-area: 1/1; }
+#home .ring { grid-area: 1/1; width: 56px; height: 56px; transform: rotate(-90deg); }
+#home circle { fill: none; stroke: #ff6b6b; stroke-width: 4; stroke-dasharray: 100.5; stroke-dashoffset: 100.5; }
+#home.holding circle { transition: stroke-dashoffset 1.2s linear; stroke-dashoffset: 0; }
