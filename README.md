@@ -6,7 +6,8 @@ Eine einfache Spiel-App für Kinder ab ca. 2 Jahren. Ohne Lesen, ohne Werbung, o
 | | Spiel | Was passiert |
 |---|---|---|
 | 🏡 | **Häuser bauen** | Magnetplatten (Vierecke & Dreiecke) antippen oder auf die Baustelle ziehen – sie „klicken“ magnetisch in die Lücke. Fertiges Haus antippen → es purzelt um, das nächste Haus kommt. Häuser mit 3 bis 8 Stockwerken, die Stockwerke werden mitgezählt |
-| 🚒 | **Autos & Lieder** | Feuerwehr, Krankenwagen oder Polizei antippen → Tatü-tata, Blaulicht und ein Kinderlied (Bruder Jakob, Alle meine Entchen, Hänschen klein) |
+| 🏰 | **3D bauen** | Ein Würfelhaus aus Magnetplatten mit Pyramidendach, das sich langsam dreht (mit dem Finger wischen zum Drehen). 1 bis 4 Stockwerke |
+| 🚒 | **Autos & Lieder** | Feuerwehr, Krankenwagen, Polizei oder THW antippen → Tatü-tata, Blaulicht, das Fahrzeug fährt weg und kommt mit einem Kinderlied zurück (Bruder Jakob, Alle meine Entchen, Hänschen klein, Funkel funkel kleiner Stern) |
 | 🎹 | **Klavier** | Klavier mit weißen und schwarzen Tasten, farbige Punkte, Noten fliegen hoch |
 | 🐮 | **Tiere** | Tier antippen → es hüpft und sagt z. B. „Die Kuh macht Muuuh!“ |
 | 🎈 | **Farben** | Luftballons steigen auf; antippen → Plopp! und die Farbe wird gesagt |

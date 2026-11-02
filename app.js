@@ -245,7 +245,7 @@ const HOUSES = [
 const SHAPE_NAME = { sq: 'Viereck', tri: 'Dreieck' };
 const bauen = document.getElementById('bauen');
 const zone = document.getElementById('buildZone');
-const pals = [...document.querySelectorAll('.pal')];
+const pals = [...bauen.querySelectorAll('.pal')];
 let houseIdx = 0, slots = [], colorIdx = 0, houseDone = false, busy = false, sunEl = null;
 
 function triH(w) { return w === 1 ? 0.9 : 0.6 + 0.3 * w; }
@@ -301,7 +301,7 @@ function slotRect(s) {
 
 function updatePalette() {
   const [c] = BUILD_COLORS[colorIdx % BUILD_COLORS.length];
-  pals.forEach(p => { p.innerHTML = shapeSVG(p.dataset.shape, c, false); });
+  document.querySelectorAll('.pal').forEach(p => { p.innerHTML = shapeSVG(p.dataset.shape, c, false); });
 }
 
 function newHouse() {
@@ -406,12 +406,12 @@ function tumble() {
 }
 zone.addEventListener('pointerdown', tumble);
 
-// Palette: antippen ODER auf die Baustelle ziehen
-pals.forEach(pal => {
+// Palette: antippen ODER auf die Baustelle ziehen (für 2D und 3D)
+function setupPalette(pal, host, o) {
   let start = null, dragEl = null, size = 0;
   pal.addEventListener('pointerdown', e => {
     e.preventDefault();
-    if (houseDone) { tumble(); return; }
+    if (o.isDone()) { o.onDone(); return; }
     pal.setPointerCapture(e.pointerId);
     start = { x: e.clientX, y: e.clientY }; dragEl = null;
   });
@@ -419,26 +419,200 @@ pals.forEach(pal => {
     if (!start) return;
     if (!dragEl && Math.hypot(e.clientX - start.x, e.clientY - start.y) > 15) {
       const [c] = BUILD_COLORS[colorIdx % BUILD_COLORS.length];
-      dragEl = makePiece(pal.dataset.shape, c, false);
-      size = unit;
+      dragEl = document.createElement('div');
+      dragEl.className = 'piece';
+      dragEl.innerHTML = shapeSVG(pal.dataset.shape, c, false);
+      host.appendChild(dragEl);
+      size = o.size();
     }
     if (dragEl) setRect(dragEl, { left: e.clientX - size / 2, top: e.clientY - size / 2, width: size, height: size * (pal.dataset.shape === 'tri' ? 0.9 : 1) });
   });
   const end = e => {
     if (!start) return;
-    if (e.type === 'pointercancel') { dragEl?.remove(); }
-    else if (dragEl) place(pal.dataset.shape, null, { x: e.clientX, y: e.clientY }, dragEl);
-    else place(pal.dataset.shape, pal.getBoundingClientRect());
+    if (e.type === 'pointercancel') dragEl?.remove();
+    else if (dragEl) o.drop(pal.dataset.shape, { x: e.clientX, y: e.clientY }, dragEl);
+    else o.tap(pal.dataset.shape, pal.getBoundingClientRect());
     start = null; dragEl = null;
   };
   pal.addEventListener('pointerup', end);
   pal.addEventListener('pointercancel', end);
-});
+}
+pals.forEach(pal => setupPalette(pal, bauen, {
+  isDone: () => houseDone, onDone: tumble, size: () => unit,
+  tap: (type, from) => place(type, from),
+  drop: (type, point, el) => place(type, null, point, el),
+}));
 
 screens.bauen = {
   enter() { if (!slots.length) newHouse(); else layoutHouse(); say('Wir bauen ein Haus!'); },
 };
 addEventListener('resize', () => { if (current === 'bauen' && slots.length) layoutHouse(); });
+
+/* ---------- 3D bauen (Würfelhaus mit Pyramidendach) ---------- */
+const b3 = document.getElementById('bauen3d');
+const scene = document.getElementById('scene3d');
+const stage = document.getElementById('stage3d');
+const pals3 = [...b3.querySelectorAll('.pal')];
+const HOUSES3D = [[1, 1], [1, 2], [2, 1], [1, 3], [2, 2], [1, 4]]; // [Breite, Stockwerke]
+let h3Idx = 0, slots3 = [], done3 = false, busy3 = false, S3 = 100, angle = -30, spin = 0.012;
+let raf3 = null, lastT = 0, dragRot = null, plate = null;
+
+function geom3(s) {
+  const [N, F] = HOUSES3D[h3Idx % HOUSES3D.length];
+  const L = N * S3;
+  if (s.type === 'sq') {
+    return { w: S3, h: S3, tf: `rotateY(${s.side * 90}deg) translate3d(${(s.x - (N - 1) / 2) * S3}px, ${-(s.f + 0.5) * S3}px, ${L / 2}px)` };
+  }
+  const H = L / Math.SQRT2, hs = L * Math.sqrt(3) / 2;
+  const tilt = Math.atan((L / 2) / H) * 180 / Math.PI;
+  return { w: L, h: hs, tf: `rotateY(${s.side * 90}deg) translate3d(0, ${-F * S3}px, ${L / 2}px) rotateX(${tilt}deg) translateY(${-hs / 2}px)` };
+}
+function applyGeom(el, g, extra = '') {
+  el.style.width = g.w + 'px'; el.style.height = g.h + 'px';
+  el.style.marginLeft = -g.w / 2 + 'px'; el.style.marginTop = -g.h / 2 + 'px';
+  el.style.transform = extra + g.tf;
+}
+function face3(type, color, ghost) {
+  const el = document.createElement('div');
+  el.className = 'face' + (ghost ? ' ghost' : '');
+  el.innerHTML = shapeSVG(type, color, ghost);
+  stage.appendChild(el);
+  return el;
+}
+function layout3d() {
+  const [N, F] = HOUSES3D[h3Idx % HOUSES3D.length];
+  const z = scene.getBoundingClientRect();
+  S3 = Math.min(z.height * 0.68 / (F + N * 0.71), z.width * 0.5 / (N * 1.42), 170);
+  const totalH = F * S3 + N * S3 / Math.SQRT2;
+  stage.style.top = (z.height / 2 + totalH / 2) + 'px';
+  slots3.forEach(s => {
+    const g = geom3(s);
+    applyGeom(s.ghost, g);
+    if (s.piece && s.landed) applyGeom(s.piece, g);
+    s.piece?.style.setProperty('--fs', S3 * 0.55 + 'px');
+  });
+  const pw = N * S3 + S3 * 0.8;
+  applyGeom(plate, { w: pw, h: pw, tf: 'rotateX(90deg)' });
+}
+function newHouse3d() {
+  stage.innerHTML = '';
+  b3.classList.remove('house-done');
+  done3 = false;
+  const [N, F] = HOUSES3D[h3Idx % HOUSES3D.length];
+  plate = document.createElement('div'); plate.className = 'plate'; stage.appendChild(plate);
+  slots3 = [];
+  for (let f = 0; f < F; f++) for (let side = 0; side < 4; side++) for (let x = 0; x < N; x++)
+    slots3.push({ type: 'sq', f, side, x });
+  for (let side = 0; side < 4; side++) slots3.push({ type: 'tri', f: F, side, x: 0 });
+  slots3.forEach(s => { s.ghost = face3(s.type, null, true); });
+  layout3d();
+  updatePalette();
+}
+function place3d(type, point, dragEl) {
+  dragEl?.remove();
+  if (done3) return;
+  const free = slots3.filter(s => !s.filled && s.type === type);
+  if (!free.length) {
+    tone(200, 0.25, 'sine', 0.25);
+    const pal = pals3.find(p => p.dataset.shape === type);
+    pal.classList.remove('wiggle'); void pal.offsetWidth; pal.classList.add('wiggle');
+    return;
+  }
+  let target = free[0];
+  if (point) {
+    const d = s => { const r = s.ghost.getBoundingClientRect(); return Math.hypot(r.left + r.width / 2 - point.x, r.top + r.height / 2 - point.y); };
+    target = free.reduce((a, b) => (d(b) < d(a) ? b : a));
+  }
+  const [color, colorName] = BUILD_COLORS[colorIdx++ % BUILD_COLORS.length];
+  updatePalette();
+  const el = face3(type, color, false);
+  target.filled = true; target.piece = el;
+  const g = geom3(target);
+  el.style.opacity = 0;
+  applyGeom(el, g, `translate3d(0, ${S3 * 2.5}px, ${S3 * 2}px) scale(.3) `);
+  void el.offsetWidth;
+  el.classList.add('fly');
+  el.style.opacity = 1;
+  applyGeom(el, g, `translate3d(0, 0, 0) scale(1) `);
+  vibrate(20);
+  setTimeout(() => {
+    el.classList.remove('fly');
+    applyGeom(el, g);
+    target.landed = true;
+    target.ghost.style.opacity = 0;
+    magnetClick();
+    const floor = slots3.filter(s => s.type === 'sq' && s.f === target.f);
+    if (type === 'sq' && floor.every(s => s.landed)) {
+      const n = target.f + 1;
+      say(n === 1 ? 'Ein Stockwerk!' : n + ' Stockwerke!');
+      [0, 1].forEach(i => pianoNote(freq(['C5', 'G5'][i]), i * 0.1, null, 0.3));
+    } else {
+      say(colorName + ' ' + SHAPE_NAME[type] + '!');
+    }
+    if (slots3.every(s => s.landed)) finish3d();
+  }, 480);
+}
+function finish3d() {
+  done3 = true;
+  const [N] = HOUSES3D[h3Idx % HOUSES3D.length];
+  slots3.filter(s => s.type === 'sq').forEach((s, i) => {
+    const d = document.createElement('div');
+    d.className = 'deco';
+    d.textContent = (s.f === 0 && s.side === 0 && s.x === Math.floor((N - 1) / 2)) ? '🚪' : '🪟';
+    d.style.animationDelay = (i * 0.05) + 's';
+    s.piece.appendChild(d);
+  });
+  setTimeout(() => {
+    b3.classList.add('house-done');
+    ['C5', 'E5', 'G5', 'C6'].forEach((n, i) => pianoNote(freq(n), i * 0.15));
+    say('Juhu! Das Haus ist fertig!');
+    spin = 0.09; setTimeout(() => { spin = 0.012; }, 1500);
+  }, 500);
+}
+function tumble3d() {
+  if (!done3 || busy3) return;
+  busy3 = true;
+  [0, 1, 2, 3, 4].forEach(i => tone(600 - i * 90, 0.15, 'triangle', 0.25, i * 0.09));
+  say('Bumm!');
+  slots3.forEach(s => {
+    const g = geom3(s);
+    s.piece.classList.add('tumble3d');
+    s.piece.style.transform = `translate3d(${Math.random() * 400 - 200}px, ${150 + Math.random() * 150}px, ${Math.random() * 300 - 100}px) rotateX(${Math.random() * 360}deg) rotateZ(${Math.random() * 360}deg) ` + g.tf;
+    s.piece.style.opacity = 0;
+    s.ghost.style.opacity = 0;
+  });
+  setTimeout(() => { h3Idx++; newHouse3d(); busy3 = false; }, 950);
+}
+function tick3d(t) {
+  const dt = lastT ? Math.min(t - lastT, 50) : 16;
+  lastT = t;
+  if (!dragRot) angle += dt * spin;
+  stage.style.transform = `rotateX(-16deg) rotateY(${angle}deg)`;
+  raf3 = requestAnimationFrame(tick3d);
+}
+// Wischen auf der Baustelle dreht das Haus
+scene.addEventListener('pointerdown', e => {
+  if (done3) { tumble3d(); return; }
+  scene.setPointerCapture(e.pointerId);
+  dragRot = { x: e.clientX, a: angle };
+});
+scene.addEventListener('pointermove', e => { if (dragRot) angle = dragRot.a + (e.clientX - dragRot.x) * 0.5; });
+['pointerup', 'pointercancel'].forEach(ev => scene.addEventListener(ev, () => { dragRot = null; }));
+
+pals3.forEach(pal => setupPalette(pal, b3, {
+  isDone: () => done3, onDone: tumble3d, size: () => S3 * 0.8,
+  tap: type => place3d(type),
+  drop: (type, point, el) => place3d(type, point, el),
+}));
+screens.bauen3d = {
+  enter() {
+    if (!slots3.length) newHouse3d(); else layout3d();
+    lastT = 0; raf3 = requestAnimationFrame(tick3d);
+    say('Wir bauen ein Haus in 3 D!');
+  },
+  leave() { cancelAnimationFrame(raf3); },
+};
+addEventListener('resize', () => { if (current === 'bauen3d' && slots3.length) layout3d(); });
 
 /* ---------- Klavier ---------- */
 const piano = document.getElementById('piano');
@@ -483,10 +657,27 @@ const SONGS = {
              'D4:1 D4:1 D4:1 D4:1 D4:1 E4:1 F4:2 E4:1 E4:1 E4:1 E4:1 E4:1 F4:1 G4:2 ' +
              'G4:1 E4:1 E4:2 F4:1 D4:1 D4:2 C4:1 E4:1 G4:1 G4:1 C4:4',
 };
+SONGS.funkel = 'C4:1 C4:1 G4:1 G4:1 A4:1 A4:1 G4:2 F4:1 F4:1 E4:1 E4:1 D4:1 D4:1 C4:2 ' +
+               'G4:1 G4:1 F4:1 F4:1 E4:1 E4:1 D4:2 G4:1 G4:1 F4:1 F4:1 E4:1 E4:1 D4:2 ' +
+               'C4:1 C4:1 G4:1 G4:1 A4:1 A4:1 G4:2 F4:1 F4:1 E4:1 E4:1 D4:1 D4:1 C4:2';
+// THW-Fahrzeug (dafür gibt es kein Emoji): blau mit weißem Streifen, fährt nach links
+const THW_SVG = `<svg class="thw" viewBox="0 0 130 100" aria-hidden="true">
+  <rect x="45" y="18" width="80" height="58" rx="6" fill="#1d4ed8"/>
+  <rect x="45" y="54" width="80" height="8" fill="#fff"/>
+  <text x="85" y="45" fill="#fff" font-size="21" font-weight="800" text-anchor="middle" font-family="Arial, sans-serif">THW</text>
+  <path d="M8 76 L8 46 L20 28 L48 28 L48 76 Z" fill="#1e40af"/>
+  <path d="M14 48 L23 35 L42 35 L42 48 Z" fill="#aee3ff"/>
+  <rect x="8" y="54" width="40" height="8" fill="#fff"/>
+  <rect x="24" y="20" width="16" height="8" rx="3" fill="#60a5fa"/>
+  <rect x="3" y="68" width="12" height="8" rx="2" fill="#9ca3af"/>
+  <circle cx="28" cy="78" r="13" fill="#333"/><circle cx="28" cy="78" r="5" fill="#bbb"/>
+  <circle cx="102" cy="78" r="13" fill="#333"/><circle cx="102" cy="78" r="5" fill="#bbb"/>
+</svg>`;
 const VEHICLES = [
   { car: '🚒', name: 'Tatü tata, die Feuerwehr!', siren: ['G4', 'C5'], song: 'jakob', title: 'Bruder Jakob' },
   { car: '🚑', name: 'Der Krankenwagen!', siren: ['A4', 'D5'], song: 'entchen', title: 'Alle meine Entchen' },
   { car: '🚓', name: 'Die Polizei!', siren: ['B4', 'E5'], song: 'haenschen', title: 'Hänschen klein' },
+  { car: THW_SVG, name: 'Das Technische Hilfswerk!', siren: ['F4', 'B4'], song: 'funkel', title: 'Funkel, funkel, kleiner Stern' },
 ];
 const garage = document.getElementById('garage');
 let songBus = null, songTimers = [], playingBtn = null;
@@ -519,6 +710,9 @@ function playVehicle(v, btn) {
   const a = audio();
   songBus = a.createGain(); songBus.connect(a.destination);
   playingBtn = btn; btn.classList.add('playing');
+  // wegfahren und mit dem Lied zurückkommen
+  const car = btn.querySelector('.car');
+  car.classList.remove('drive'); void car.offsetWidth; car.classList.add('drive');
   vibrate(40);
   // Tatü-tata (2x)
   for (let i = 0; i < 4; i++) sirenTone(freq(v.siren[i % 2]), i * 0.5, 0.48, songBus);
@@ -540,7 +734,7 @@ VEHICLES.forEach(v => {
   const b = document.createElement('button');
   b.className = 'vehicle';
   b.setAttribute('aria-label', v.name + ' – ' + v.title);
-  b.innerHTML = `<span class="light"></span><span class="car">${v.car}</span>`;
+  b.innerHTML = `<span class="car"><span class="light"></span><span class="body">${v.car}</span></span>`;
   b.addEventListener('pointerdown', () => playVehicle(v, b));
   garage.appendChild(b);
 });

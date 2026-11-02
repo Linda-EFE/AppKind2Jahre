@@ -16,6 +16,7 @@
   <!-- Hauptmenü -->
   <section id="menu" class="screen active">
     <button class="tile" data-go="bauen" style="--c:#06aed5" aria-label="Häuser bauen">🏡</button>
+    <button class="tile" data-go="bauen3d" style="--c:#7b2cbf" aria-label="3D bauen">🏰</button>
     <button class="tile" data-go="autos" style="--c:#ef476f" aria-label="Autos mit Liedern">🚒</button>
     <button class="tile" data-go="klavier" style="--c:#8d6e63" aria-label="Klavier">🎹</button>
     <button class="tile" data-go="tiere" style="--c:#ff9f1c" aria-label="Tiere">🐮</button>
@@ -47,7 +48,16 @@
   <!-- Bauen mit Magnetplatten -->
   <section id="bauen" class="screen">
     <div id="buildZone"><div class="ground"></div></div>
-    <div id="palette">
+    <div class="palette">
+      <button class="pal" data-shape="sq" aria-label="Viereck"></button>
+      <button class="pal" data-shape="tri" aria-label="Dreieck"></button>
+    </div>
+  </section>
+
+  <!-- 3D bauen -->
+  <section id="bauen3d" class="screen">
+    <div id="scene3d"><div id="stage3d"></div></div>
+    <div class="palette">
       <button class="pal" data-shape="sq" aria-label="Viereck"></button>
       <button class="pal" data-shape="tri" aria-label="Dreieck"></button>
     </div>

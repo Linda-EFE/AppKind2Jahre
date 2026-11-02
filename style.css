@@ -108,7 +108,7 @@ body.in-menu #toMenu { display: none; }
   position: absolute; left: 0; right: 0; bottom: 0; height: 14px;
   background: #7cc46a; border-top: 4px solid #5fa64f;
 }
-#palette {
+#bauen .palette, #bauen3d .palette {
   position: absolute; left: 0; right: 0; bottom: 0; height: 26vh;
   display: flex; justify-content: center; align-items: center; gap: 10vw;
   background: #f4e1c1; border-top: 6px solid #d9bf94;
@@ -169,26 +169,50 @@ body.in-menu #toMenu { display: none; }
   to { transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% - 22vh)) scale(1.3); opacity: 0; }
 }
 
+/* ---------- 3D bauen ---------- */
+#bauen3d { background: linear-gradient(#c8b6ff 0%, #e7e0ff 75%); }
+#scene3d {
+  position: absolute; left: 0; right: 0; top: 0; bottom: 26vh;
+  perspective: 1300px; perspective-origin: 50% 35%; touch-action: none;
+}
+#stage3d { position: absolute; left: 50%; width: 0; height: 0; transform-style: preserve-3d; }
+.face, .plate { position: absolute; left: 0; top: 0; }
+.face svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.face.fly { transition: transform .45s cubic-bezier(.3,1.3,.6,1), opacity .25s; }
+.face.tumble3d { transition: transform .9s ease-in, opacity .9s ease-in; }
+.face .deco { position: absolute; inset: 0; display: grid; place-items: center; font-size: var(--fs, 40px); animation: appear .4s backwards; }
+.plate { background: #8ac66d; border-radius: 16px; box-shadow: inset 0 0 0 6px #6aa84f; }
+#bauen3d.house-done .face:not(.ghost) svg { animation: glow .8s 2; }
+@keyframes glow { 50% { filter: brightness(1.3) drop-shadow(0 0 6px #fff); } }
+
 /* ---------- Autos mit Liedern ---------- */
 #autos { background: linear-gradient(#90e0ef 0 62%, #6c757d 62% 100%); }
 #garage {
-  height: 100%; display: flex; flex-direction: column; gap: 3vh;
-  justify-content: center; padding-top: 50px;
+  height: 100%; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
+  gap: 3vmin; padding-top: 64px;
 }
-@media (orientation: landscape) { #garage { flex-direction: row; align-items: flex-end; padding: 0 0 4vh; } }
 .vehicle {
-  flex: 1; position: relative; border-radius: 28px;
+  position: relative; border-radius: 28px;
   background: rgba(255,255,255,.55); box-shadow: 0 8px 0 rgba(0,0,0,.18);
-  font-size: min(20vh, 30vw); line-height: 1;
+  font-size: min(17vh, 22vw); line-height: 1;
 }
-@media (orientation: landscape) { .vehicle { font-size: min(24vw, 40vh); flex: 1; height: 60vh; } }
-.vehicle .car { display: inline-block; }
+.vehicle .car { display: inline-block; position: relative; }
+.vehicle .body { display: inline-block; }
+.vehicle .thw { width: 1.3em; height: 1em; vertical-align: middle; }
 .vehicle .light {
-  position: absolute; top: 10%; left: 50%; width: 9vmin; height: 9vmin; margin-left: -4.5vmin;
+  position: absolute; top: -12%; left: 50%; width: 8vmin; height: 8vmin; margin-left: -4vmin;
   border-radius: 50%; background: #1d4ed8; opacity: 0;
 }
-.vehicle.playing { background: rgba(255,255,255,.9); }
-.vehicle.playing .car { animation: rumble .3s infinite; }
+.vehicle.playing { background: rgba(255,255,255,.9); z-index: 3; }
+.vehicle.playing .body { animation: rumble .3s infinite; }
 .vehicle.playing .light { animation: blink .5s infinite; }
+.vehicle .car.drive { animation: driveAway 4s forwards; }
+@keyframes driveAway {
+  0%      { transform: translateX(0); animation-timing-function: ease-in; }
+  40%     { transform: translateX(-130vw); }
+  40.01%  { transform: translateX(130vw); }
+  70%     { transform: translateX(130vw); animation-timing-function: ease-out; }
+  100%    { transform: translateX(0); }
+}
 @keyframes rumble { 0%,100% { transform: translate(0,0); } 25% { transform: translate(-3px,-3px) rotate(-1deg); } 75% { transform: translate(3px,-1px) rotate(1deg); } }
 @keyframes blink { 0%,49% { opacity: 1; box-shadow: 0 0 30px 12px #4cc9f0; } 50%,100% { opacity: .15; box-shadow: none; } }
