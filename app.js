@@ -456,19 +456,31 @@ const b3 = document.getElementById('bauen3d');
 const scene = document.getElementById('scene3d');
 const stage = document.getElementById('stage3d');
 const pals3 = [...b3.querySelectorAll('.pal')];
-const HOUSES3D = [[1, 1], [1, 2], [2, 1], [1, 3], [2, 2], [1, 4]]; // [Breite, Stockwerke]
+// [Länge, Tiefe, Stockwerke] – quadratisch = Pyramidendach, länglich = Satteldach
+const HOUSES3D = [[1, 1, 1], [2, 1, 2], [1, 1, 3], [3, 1, 2], [2, 2, 2], [2, 1, 4], [4, 1, 3], [1, 1, 6], [3, 1, 5]];
 let h3Idx = 0, slots3 = [], done3 = false, busy3 = false, S3 = 100, angle = -30, spin = 0.012;
 let raf3 = null, lastT = 0, dragRot = null, plate = null;
 
+function house3() { return HOUSES3D[h3Idx % HOUSES3D.length]; }
 function geom3(s) {
-  const [N, F] = HOUSES3D[h3Idx % HOUSES3D.length];
-  const L = N * S3;
-  if (s.type === 'sq') {
-    return { w: S3, h: S3, tf: `rotateY(${s.side * 90}deg) translate3d(${(s.x - (N - 1) / 2) * S3}px, ${-(s.f + 0.5) * S3}px, ${L / 2}px)` };
+  const [W, D, F] = house3();
+  const sideLen = s.side % 2 === 0 ? W : D;          // Anzahl Platten auf dieser Seite
+  const dist = (s.side % 2 === 0 ? D : W) * S3 / 2;   // Abstand der Seite zur Mitte
+  const rot = `rotateY(${s.side * 90}deg)`;
+  if (s.type === 'sq' && !s.roof) {
+    return { w: S3, h: S3, tf: `${rot} translate3d(${(s.x - (sideLen - 1) / 2) * S3}px, ${-(s.f + 0.5) * S3}px, ${dist}px)` };
   }
-  const H = L / Math.SQRT2, hs = L * Math.sqrt(3) / 2;
-  const tilt = Math.atan((L / 2) / H) * 180 / Math.PI;
-  return { w: L, h: hs, tf: `rotateY(${s.side * 90}deg) translate3d(0, ${-F * S3}px, ${L / 2}px) rotateX(${tilt}deg) translateY(${-hs / 2}px)` };
+  if (W === D) { // Pyramidendach aus 4 Dreiecken
+    const L = W * S3, H = L / Math.SQRT2, hs = L * Math.sqrt(3) / 2;
+    const tilt = Math.atan((L / 2) / H) * 180 / Math.PI;
+    return { w: L, h: hs, tf: `${rot} translate3d(0, ${-F * S3}px, ${L / 2}px) rotateX(${tilt}deg) translateY(${-hs / 2}px)` };
+  }
+  // Satteldach: Dreiecke als Giebel, Vierecke als Dachschrägen
+  const G = D * S3, hs = G * Math.sqrt(3) / 2;
+  if (s.type === 'tri') {
+    return { w: G, h: hs, tf: `${rot} translate3d(0, ${-F * S3 - hs / 2}px, ${dist}px)` };
+  }
+  return { w: S3, h: G, tf: `${rot} translate3d(${(s.x - (W - 1) / 2) * S3}px, ${-F * S3}px, ${dist}px) rotateX(30deg) translateY(${-G / 2}px)` };
 }
 function applyGeom(el, g, extra = '') {
   el.style.width = g.w + 'px'; el.style.height = g.h + 'px';
@@ -483,30 +495,36 @@ function face3(type, color, ghost) {
   return el;
 }
 function layout3d() {
-  const [N, F] = HOUSES3D[h3Idx % HOUSES3D.length];
+  const [W, D, F] = house3();
   const z = scene.getBoundingClientRect();
-  S3 = Math.min(z.height * 0.68 / (F + N * 0.71), z.width * 0.5 / (N * 1.42), 170);
-  const totalH = F * S3 + N * S3 / Math.SQRT2;
-  stage.style.top = (z.height / 2 + totalH / 2) + 'px';
+  const roofH = W === D ? W * 0.71 : D * 0.87;
+  S3 = Math.min(z.height * 0.62 / (F + roofH), z.width * 0.72 / Math.hypot(W, D), 170);
+  const totalH = (F + roofH) * S3;
+  stage.style.top = (z.height * 0.44 + totalH / 2) + 'px';
   slots3.forEach(s => {
     const g = geom3(s);
     applyGeom(s.ghost, g);
     if (s.piece && s.landed) applyGeom(s.piece, g);
     s.piece?.style.setProperty('--fs', S3 * 0.55 + 'px');
   });
-  const pw = N * S3 + S3 * 0.8;
-  applyGeom(plate, { w: pw, h: pw, tf: 'rotateX(90deg)' });
+  const pw = (W + 0.8) * S3, pd = (D + 0.8) * S3;
+  applyGeom(plate, { w: pw, h: pd, tf: 'rotateX(90deg)' });
 }
 function newHouse3d() {
   stage.innerHTML = '';
   b3.classList.remove('house-done');
   done3 = false;
-  const [N, F] = HOUSES3D[h3Idx % HOUSES3D.length];
+  const [W, D, F] = house3();
   plate = document.createElement('div'); plate.className = 'plate'; stage.appendChild(plate);
   slots3 = [];
-  for (let f = 0; f < F; f++) for (let side = 0; side < 4; side++) for (let x = 0; x < N; x++)
-    slots3.push({ type: 'sq', f, side, x });
-  for (let side = 0; side < 4; side++) slots3.push({ type: 'tri', f: F, side, x: 0 });
+  for (let f = 0; f < F; f++) for (let side = 0; side < 4; side++)
+    for (let x = 0; x < (side % 2 === 0 ? W : D); x++) slots3.push({ type: 'sq', f, side, x });
+  if (W === D) {
+    for (let side = 0; side < 4; side++) slots3.push({ type: 'tri', f: F, side, x: 0 });
+  } else {
+    [0, 2].forEach(side => { for (let x = 0; x < W; x++) slots3.push({ type: 'sq', roof: true, f: F, side, x }); });
+    [1, 3].forEach(side => slots3.push({ type: 'tri', f: F, side, x: 0 }));
+  }
   slots3.forEach(s => { s.ghost = face3(s.type, null, true); });
   layout3d();
   updatePalette();
@@ -544,8 +562,8 @@ function place3d(type, point, dragEl) {
     target.landed = true;
     target.ghost.style.opacity = 0;
     magnetClick();
-    const floor = slots3.filter(s => s.type === 'sq' && s.f === target.f);
-    if (type === 'sq' && floor.every(s => s.landed)) {
+    const floor = slots3.filter(s => s.type === 'sq' && !s.roof && s.f === target.f);
+    if (type === 'sq' && !target.roof && floor.every(s => s.landed)) {
       const n = target.f + 1;
       say(n === 1 ? 'Ein Stockwerk!' : n + ' Stockwerke!');
       [0, 1].forEach(i => pianoNote(freq(['C5', 'G5'][i]), i * 0.1, null, 0.3));
@@ -557,11 +575,11 @@ function place3d(type, point, dragEl) {
 }
 function finish3d() {
   done3 = true;
-  const [N] = HOUSES3D[h3Idx % HOUSES3D.length];
-  slots3.filter(s => s.type === 'sq').forEach((s, i) => {
+  const [W] = house3();
+  slots3.filter(s => s.type === 'sq' && !s.roof).forEach((s, i) => {
     const d = document.createElement('div');
     d.className = 'deco';
-    d.textContent = (s.f === 0 && s.side === 0 && s.x === Math.floor((N - 1) / 2)) ? '🚪' : '🪟';
+    d.textContent = (s.f === 0 && s.side === 0 && s.x === Math.floor((W - 1) / 2)) ? '🚪' : '🪟';
     d.style.animationDelay = (i * 0.05) + 's';
     s.piece.appendChild(d);
   });
@@ -677,7 +695,7 @@ const THW_SVG = `<svg class="thw" viewBox="0 0 130 100" aria-hidden="true">
   <circle cx="102" cy="78" r="13" fill="#333"/><circle cx="102" cy="78" r="5" fill="#bbb"/>
 </svg>`;
 const VEHICLES = [
-  { car: '🚒', name: 'Tatü tata, die Feuerwehr!', siren: ['G4', 'C5'], song: 'jakob', title: 'Bruder Jakob' },
+  { car: '🚒', name: 'Ta tü, ta ta! Die Feuerwehr!', siren: ['G4', 'C5'], song: 'jakob', title: 'Bruder Jakob' },
   { car: '🚑', name: 'Der Krankenwagen!', siren: ['A4', 'D5'], song: 'entchen', title: 'Alle meine Entchen' },
   { car: '🚓', name: 'Die Polizei!', siren: ['B4', 'E5'], song: 'haenschen', title: 'Hänschen klein' },
   { car: THW_SVG, name: 'Das Technische Hilfswerk!', siren: ['F4', 'B4'], song: 'funkel', title: 'Funkel, funkel, kleiner Stern' },
