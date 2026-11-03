@@ -386,3 +386,8 @@ body.toddler-menu #voiceBtn { display: block; }
 .crow { display: flex; gap: 10px; align-items: center; margin: 8px 0; font-size: 13px; line-height: 1.35; word-break: break-word; }
 .crow img { width: 72px; height: 54px; object-fit: cover; border-radius: 8px; flex: none; }
 .crow a { color: #1d4ed8; }
+
+/* Fotos im Querformat: Karten quer, Raster scrollt bei vielen Fahrzeugen */
+.pickGrid.photos { grid-template-columns: repeat(auto-fill, minmax(min(44vw, 250px), 1fr)) !important; grid-auto-rows: auto !important; align-content: start; }
+.pickGrid.photos .nameCard { aspect-ratio: 4 / 3; height: auto; }
+.pickGrid.photos .hornCard img { width: 55% !important; height: auto !important; object-fit: contain !important; margin: 0 auto 14%; display: block; }

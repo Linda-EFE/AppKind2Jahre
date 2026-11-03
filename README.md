@@ -33,7 +33,7 @@ Spiele ohne Lesen, ohne Werbung, ohne Internet (nach dem ersten Laden).
 | 🚒 | **Autos & Lieder** | Feuerwehr, Krankenwagen, Polizei oder THW antippen → jemand ruft um Hilfe (🔥 „Feuer, es brennt!“, 🤕 „Ich brauche ein Pflaster!“, 😟 „Ich brauche Hilfe!“, 🌊 „Wasser kommt!“), dann Tatü-tata, Blaulicht, das Fahrzeug fährt zum Einsatz, kommt zurück, das Problem ist gelöst und es spielt ein Kinderlied (Bruder Jakob, Alle meine Entchen, Hänschen klein, Funkel funkel kleiner Stern) |
 | 🎹 | **Klavier** | Klavier mit weißen und schwarzen Tasten, farbige Punkte, Noten fliegen hoch |
 | 🦒 | **Wer ist das?** | 97 Tiere als 3D-Bilder in 9 Bereichen (🚜 Bauernhof, 🏠 Haustiere, 🌲 Wald, 🦁 Afrika, 🐼 Zoo, 🌊 Wasser, 🕊️ Vögel, 🐞 Krabbeltiere, 🦕 Dinos & Fabelwesen). Tier antippen → der Name wird vorgelesen |
-| ✈️ | **Fahrzeuge** | 37 Fahrzeuge als 3D-Bilder in 7 Kategorien (🚗 Autos, 🚚 Lastwagen & Busse, ✈️ Luft, 🚢 Wasser, 🏍️ Motorräder, 🚲 Fahrräder & Roller, 🚨 Einsatzfahrzeuge). Antippen liest den Namen vor. Bei den Einsatzfahrzeugen gibt es den Martinshorn-Knopf „Tatütata“ mit Blaulicht |
+| ✈️ | **Fahrzeuge** | 65 echte Fotos in 10 Kategorien: 🚗 Autos, 🚚 Lastwagen & Baustelle, ✈️ Luft, 🚢 Wasser, 🏍️ Motorräder, 🚲 Fahrräder & Roller sowie die Einsatzfahrzeuge 🚒 Feuerwehr, 🚑 Rettungsdienst, 🚓 Polizei, 🚧 THW & Helfer (32 Fahrzeuge, jeweils mit Martinshorn-Knopf „Tatütata“ und Blaulicht). Antippen liest den Namen vor. Fotonachweis über „ℹ️ Fotos“ |
 | 🐮 | **Tiere** | 12 Tiere als 3D-Bilder. Tier antippen → es springt und dreht sich und sagt z. B. „Die Kuh macht Muuuh!“ |
 | 🎈 | **Farben** | Luftballons steigen auf; antippen → Plopp! und die Farbe wird gesagt |
 | 🎵 | **Xylophon** | Bunte Xylophon-Stäbe, antippen oder mit dem Finger drüberwischen |
@@ -60,4 +60,5 @@ Die Sprachausgabe nutzt die eingebaute deutsche Stimme des Geräts.
 
 ## Bildnachweis
 Die echten Tierstimmen in `sounds/tiere/` stammen von Wikimedia Commons (Urheber und Lizenzen: `sounds/tiere/QUELLEN.md`).
+Die Fahrzeugfotos in `img/fahrzeuge/foto/` stammen von Wikimedia Commons (Urheber und Lizenzen: `img/fahrzeuge/foto/QUELLEN.md`, auch in der App unter „ℹ️ Fotos“).
 Die 3D-Tierbilder in `img/tiere/` stammen aus [Fluent Emoji](https://github.com/microsoft/fluentui-emoji) von Microsoft (MIT-Lizenz, siehe `img/tiere/LICENSE-fluentui-emoji.txt`).
