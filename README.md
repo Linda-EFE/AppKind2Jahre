@@ -28,8 +28,8 @@ Spiele ohne Lesen, ohne Werbung, ohne Internet (nach dem ersten Laden).
 ### Spiele
 | | Spiel | Was passiert |
 |---|---|---|
-| 🏡 | **Häuser bauen** | Magnetplatten (Vierecke & Dreiecke) antippen oder auf die Baustelle ziehen – sie „klicken“ magnetisch in die Lücke. Fertiges Haus antippen → es purzelt um, das nächste Haus kommt. Häuser mit 3 bis 8 Stockwerken, die Stockwerke werden mitgezählt |
-| 🏰 | **3D bauen** | Häuser aus Magnetplatten, die sich langsam drehen (mit dem Finger wischen zum Drehen): Würfelhäuser mit Pyramidendach und lange Häuser mit Satteldach, 1 bis 6 Stockwerke |
+| 🏡 | **Häuser bauen** | Magnetplatten in 4 Formen (Viereck, Rechteck, Dreieck, Halbkreis) antippen oder auf die Baustelle ziehen – sie „klicken“ magnetisch in die Lücke. 8 Bauwerke: Haus, Turm mit Kuppel, Kirche, Hochhaus, Burg, Schloss, große Kirche, großes Hochhaus. Fertiges Gebäude antippen → es purzelt um |
+| 🏰 | **3D bauen** | Gebäude aus mehreren Teilen, die sich langsam drehen (wischen zum Drehen): Haus, langes Haus, Turm mit Kuppel, Kirche (Kirchenschiff, Kirchturm mit Spitze und Glocken, runde Apsis), großes Haus, Burg, Schloss mit Kuppeltürmen, Hochhaus, hoher Turm |
 | 🚒 | **Autos & Lieder** | Feuerwehr, Krankenwagen, Polizei oder THW antippen → jemand ruft um Hilfe (🔥 „Feuer, es brennt!“, 🤕 „Ich brauche ein Pflaster!“, 😟 „Ich brauche Hilfe!“, 🌊 „Wasser kommt!“), dann Tatü-tata, Blaulicht, das Fahrzeug fährt zum Einsatz, kommt zurück, das Problem ist gelöst und es spielt ein Kinderlied (Bruder Jakob, Alle meine Entchen, Hänschen klein, Funkel funkel kleiner Stern) |
 | 🎹 | **Klavier** | Klavier mit weißen und schwarzen Tasten, farbige Punkte, Noten fliegen hoch |
 | 🐮 | **Tiere** | 12 Tiere als 3D-Bilder. Tier antippen → es springt und dreht sich und sagt z. B. „Die Kuh macht Muuuh!“ |

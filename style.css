@@ -125,14 +125,22 @@ body.in-menu #toMenu { display: none; }
 }
 #bauen .palette, #bauen3d .palette {
   position: absolute; left: 0; right: 0; bottom: 0; height: 26vh;
-  display: flex; justify-content: center; align-items: center; gap: 10vw;
+  display: flex; justify-content: center; align-items: center; gap: 3vw;
   background: #f4e1c1; border-top: 6px solid #d9bf94;
   padding-bottom: env(safe-area-inset-bottom);
 }
 .pal {
-  width: 19vh; height: 19vh; max-width: 38vw; max-height: 38vw;
-  background: none; padding: 0; touch-action: none;
+  width: min(17vh, 14vw); height: min(17vh, 14vw);
+  background: none; padding: 0; touch-action: none; flex: none;
 }
+.pal[hidden] { display: none; }
+.pal[data-shape=rect], .pal[data-shape=semi] { width: min(28vh, 23vw); height: min(14vh, 11.5vw); }
+/* Wenn nur zwei Formen gebraucht werden, dürfen sie größer sein */
+.palette.few .pal { width: min(19vh, 30vw); height: min(19vh, 30vw); }
+.palette.few .pal[data-shape=rect], .palette.few .pal[data-shape=semi] { width: min(30vh, 42vw); height: min(15vh, 21vw); }
+.topdeco svg, .topdeco3 svg { width: 1em; height: 1em; display: block; filter: drop-shadow(0 2px 2px rgba(0,0,0,.3)); }
+.topdeco { position: absolute; transform: translate(-50%, -50%); pointer-events: none; z-index: 3; animation: appear .5s; }
+.topdeco3 { display: grid; place-items: center; line-height: 1; }
 .pal svg, .piece svg { width: 100%; height: 100%; display: block; overflow: visible; }
 .pal.wiggle { animation: wiggle .4s; }
 @keyframes wiggle { 25% { transform: rotate(-12deg); } 75% { transform: rotate(12deg); } }
@@ -256,3 +264,9 @@ body.in-menu #toMenu { display: none; }
 .vehicle .need.solved { background: #d8f3dc; animation: appear .4s; }
 @keyframes shout { 0%,100% { transform: scale(1) rotate(-6deg); } 50% { transform: scale(1.15) rotate(6deg); } }
 .vehicle.calling { background: rgba(255,240,200,.9); }
+/* Hochformat: bei 3–4 Formen zweireihig und größer */
+@media (orientation: portrait) {
+  .palette:not(.few) { flex-wrap: wrap; align-content: center; gap: 2vh 5vw; }
+  .palette:not(.few) .pal { width: min(22vw, 10.5vh); height: min(22vw, 10.5vh); }
+  .palette:not(.few) .pal[data-shape=rect], .palette:not(.few) .pal[data-shape=semi] { width: min(40vw, 21vh); height: min(20vw, 10.5vh); }
+}

@@ -325,38 +325,25 @@ bubbleArea.addEventListener('pointerdown', e => bubble(e.clientX, e.clientY));
 bubbleArea.addEventListener('pointermove', e => { if (e.buttons || e.pointerType === 'touch') bubble(e.clientX, e.clientY, true); });
 
 /* ---------- Bauen mit Magnetplatten ---------- */
+// [Farbe, Adjektiv sächlich (das Viereck), Adjektiv männlich (der Halbkreis)]
 const BUILD_COLORS = [
-  ['#e63946', 'Rotes'], ['#1d4ed8', 'Blaues'], ['#ffc300', 'Gelbes'],
-  ['#2a9d4a', 'Grünes'], ['#ff8c00', 'Oranges'], ['#9b5de5', 'Lila'],
+  ['#e63946', 'Rotes', 'Roter'], ['#1d4ed8', 'Blaues', 'Blauer'], ['#ffc300', 'Gelbes', 'Gelber'],
+  ['#2a9d4a', 'Grünes', 'Grüner'], ['#ff8c00', 'Oranges', 'Oranger'], ['#9b5de5', 'Lila', 'Lila'],
 ];
-// [Form, Spalte, Reihe (0 = unten), Breite bei Dreiecken]
-function building(width, floors, roof) {
-  const parts = [];
-  for (let y = 0; y < floors; y++) for (let x = 0; x < width; x++) parts.push(['sq', x, y]);
-  if (roof === 'zack') for (let x = 0; x < width; x++) parts.push(['tri', x, floors, 1]);
-  else parts.push(['tri', 0, floors, width]);
-  return parts;
-}
-const HOUSES = [
-  building(2, 3),          // Haus mit 3 Stockwerken
-  building(1, 6),          // Turm mit 6 Stockwerken
-  building(2, 5),          // 5 Stockwerke
-  building(3, 4, 'zack'),  // breites Haus mit Zackendach
-  building(2, 8),          // Hochhaus mit 8 Stockwerken
-  building(3, 7),          // großes Hochhaus mit 7 Stockwerken
-];
-const SHAPE_NAME = { sq: 'Viereck', tri: 'Dreieck' };
-const bauen = document.getElementById('bauen');
-const zone = document.getElementById('buildZone');
-const pals = [...bauen.querySelectorAll('.pal')];
-let houseIdx = 0, slots = [], colorIdx = 0, houseDone = false, busy = false, sunEl = null;
-
-function triH(w) { return w === 1 ? 0.9 : 0.6 + 0.3 * w; }
+const SHAPE_NAME = { sq: 'Viereck', tri: 'Dreieck', rect: 'Rechteck', semi: 'Halbkreis' };
+const SHAPES = ['sq', 'rect', 'tri', 'semi'];
+// Seitenverhältnis der Formen (Breite, Höhe) – für Palette und Ziehen
+const SHAPE_DIM = { sq: [1, 1], tri: [1, 0.9], rect: [2, 1], semi: [2, 1] };
+function colorWord(c, type) { return type === 'semi' ? c[2] : c[1]; }
 
 function shapeSVG(type, color, ghost) {
-  const shape = type === 'sq'
-    ? (inset) => `<rect x="${inset}" y="${inset}" width="${100 - 2 * inset}" height="${100 - 2 * inset}" rx="${ghost ? 4 : 8}"/>`
-    : (inset) => `<polygon points="50,${inset * 1.6} ${100 - inset},${100 - inset} ${inset},${100 - inset}"/>`;
+  const shapes = {
+    sq: i => `<rect x="${i}" y="${i}" width="${100 - 2 * i}" height="${100 - 2 * i}" rx="${ghost ? 4 : 8}"/>`,
+    rect: i => `<rect x="${i / 2}" y="${i}" width="${100 - i}" height="${100 - 2 * i}" rx="${ghost ? 3 : 5}"/>`,
+    tri: i => `<polygon points="50,${i * 1.6} ${100 - i},${100 - i} ${i},${100 - i}"/>`,
+    semi: i => `<path d="M${i / 2},${100 - i} A${50 - i / 2} ${100 - 2 * i} 0 0 1 ${100 - i / 2},${100 - i} Z"/>`,
+  };
+  const shape = shapes[type];
   if (ghost) {
     return `<svg viewBox="0 0 100 100" preserveAspectRatio="none"><g fill="rgba(255,255,255,.35)" stroke="#fff"
       stroke-width="4" stroke-dasharray="10 8" vector-effect="non-scaling-stroke">${shape(3)}</g></svg>`;
@@ -367,6 +354,79 @@ function shapeSVG(type, color, ghost) {
     <g fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="3" vector-effect="non-scaling-stroke">${shape(16)}</g>
   </svg>`;
 }
+function setRect(el, r) {
+  el.style.left = r.left + 'px'; el.style.top = r.top + 'px';
+  el.style.width = r.width + 'px'; el.style.height = r.height + 'px';
+}
+function updatePalette() {
+  const c = BUILD_COLORS[colorIdx % BUILD_COLORS.length][0];
+  document.querySelectorAll('.pal').forEach(p => { p.innerHTML = shapeSVG(p.dataset.shape, c, false); });
+}
+// Nur die Formen zeigen, die für dieses Gebäude gebraucht werden
+function showPalette(palList, types) {
+  palList.forEach(p => { p.hidden = !types.has(p.dataset.shape); });
+  palList[0].parentNode.classList.toggle('few', types.size <= 2);
+}
+// Schmuck oben auf dem Gebäude: Kreuz als Zeichnung (das Emoji sieht je nach Gerät wie ein lila Kästchen aus)
+const CROSS_SVG = '<svg viewBox="0 0 40 60"><path d="M16 0h8v16h14v8H24v36h-8V24H2v-8h14z" fill="#f4c430" stroke="#b8860b" stroke-width="2"/></svg>';
+function topHTML(top) { return top === '✝️' ? CROSS_SVG : top; }
+function magnetClick() {
+  tone(1500, 0.05, 'square', 0.12);
+  tone(2200, 0.08, 'square', 0.08, 0.04);
+}
+function landedSpeech(list, target, colorEntry, isWall, level) {
+  const walls = list.filter(s => isWall(s) && level(s) === level(target));
+  if (isWall(target) && walls.every(s => s.landed)) {
+    const n = level(target) + 1;
+    say(n === 1 ? 'Ein Stockwerk!' : n + ' Stockwerke!');
+    [0, 1].forEach(i => pianoNote(freq(['C5', 'G5'][i]), i * 0.1, null, 0.3));
+  } else {
+    say(colorWord(colorEntry, target.type) + ' ' + SHAPE_NAME[target.type] + '!');
+  }
+}
+function celebrate(phrase) {
+  ['C5', 'E5', 'G5', 'C6'].forEach((n, i) => pianoNote(freq(n), i * 0.15));
+  say('Juhu! ' + phrase + ' ist fertig!');
+}
+function bumm() {
+  [0, 1, 2, 3, 4].forEach(i => tone(600 - i * 90, 0.15, 'triangle', 0.25, i * 0.09));
+  say('Bumm!');
+}
+
+/* ----- 2D ----- */
+// Teile: [Form, Spalte, Reihe (0 = unten), Breite, Höhe]  (Breite/Höhe in Plattengrößen)
+function P(type, x, y, w, h) {
+  const [dw, dh] = { sq: [1, 1], rect: [2, 1], tri: [1, null], semi: [1, null] }[type];
+  w = w || dw;
+  if (h == null) h = dh != null ? dh : type === 'semi' ? w / 2 : (w === 1 ? 0.9 : 0.6 + 0.3 * w);
+  return { type, x, y, w, h };
+}
+function stack(x, from, to) { const o = []; for (let y = from; y < to; y++) o.push(P('sq', x, y)); return o; }
+const HOUSES = [
+  { say: 'ein Haus', done: 'Das Haus', parts: [P('rect', 0, 0), P('sq', 0, 1), P('sq', 1, 1), P('tri', 0, 2, 2)] },
+  { say: 'einen Turm mit Kuppel', done: 'Der Turm', parts: [...stack(0, 0, 4), P('semi', 0, 4)] },
+  { say: 'eine Kirche', done: 'Die Kirche', top: '✝️', parts: [
+    P('rect', 0, 0), P('rect', 0, 1), P('tri', 0, 2, 2),
+    ...stack(2, 0, 4), P('tri', 2, 4, 1, 1.8)] },
+  { say: 'ein Hochhaus', done: 'Das Hochhaus', parts: [...stack(0, 0, 5), ...stack(1, 0, 5), P('tri', 0, 5, 2)] },
+  { say: 'eine Burg', done: 'Die Burg', top: '🚩', parts: [
+    ...stack(0, 0, 3), P('tri', 0, 3), P('rect', 1, 0), P('rect', 1, 1), P('semi', 1, 2, 2),
+    ...stack(3, 0, 3), P('tri', 3, 3)] },
+  { say: 'ein Schloss', done: 'Das Schloss', top: '👑', parts: [
+    P('rect', 0, 0), P('rect', 2, 0), P('rect', 0, 1), P('rect', 2, 1),
+    P('tri', 0, 2), P('semi', 1, 2, 2), P('tri', 3, 2)] },
+  { say: 'eine große Kirche', done: 'Die große Kirche', top: '✝️', parts: [
+    ...stack(0, 0, 5), P('tri', 0, 5, 1, 1.8),
+    P('rect', 1, 0), P('rect', 1, 1), P('rect', 1, 2), P('semi', 1, 3, 2),
+    ...stack(3, 0, 5), P('tri', 3, 5, 1, 1.8)] },
+  { say: 'ein großes Hochhaus', done: 'Das große Hochhaus', parts: [...stack(0, 0, 8), ...stack(1, 0, 8), P('semi', 0, 8, 2)] },
+];
+const bauen = document.getElementById('bauen');
+const zone = document.getElementById('buildZone');
+const pals = [...bauen.querySelectorAll('.pal')];
+let houseIdx = 0, slots = [], colorIdx = 0, houseDone = false, busy = false, sunEl = null, topEl = null;
+const isWall2 = s => s.type === 'sq' || s.type === 'rect';
+function house2() { return HOUSES[houseIdx % HOUSES.length]; }
 
 function makePiece(type, color, ghost) {
   const el = document.createElement('div');
@@ -375,72 +435,49 @@ function makePiece(type, color, ghost) {
   bauen.appendChild(el);
   return el;
 }
-
-function setRect(el, r) {
-  el.style.left = r.left + 'px'; el.style.top = r.top + 'px';
-  el.style.width = r.width + 'px'; el.style.height = r.height + 'px';
-}
-
 let unit = 100, originX = 0, groundY = 0;
 function layoutHouse() {
   const z = zone.getBoundingClientRect();
-  const cols = Math.max(...slots.map(s => s.x + (s.w || 1)));
-  const rows = Math.max(...slots.map(s => s.y + (s.type === 'tri' ? triH(s.w) : 1)));
+  const cols = Math.max(...slots.map(s => s.x + s.w));
+  const rows = Math.max(...slots.map(s => s.y + s.h)) + (house2().top ? 0.7 : 0);
   unit = Math.min(z.width * 0.8 / cols, (z.height - 30) * 0.95 / rows, z.width * 0.3);
   originX = z.left + (z.width - cols * unit) / 2;
   groundY = z.bottom - 14;
   slots.forEach(s => {
-    s.rect = slotRect(s);
+    s.rect = { left: originX + s.x * unit, top: groundY - s.y * unit - s.h * unit, width: s.w * unit, height: s.h * unit };
     setRect(s.ghost, s.rect);
     if (s.piece && s.landed) setRect(s.piece, s.rect);
     s.piece?.style.setProperty('--fs', unit * 0.55 + 'px');
   });
+  if (topEl) placeTop2();
 }
-function slotRect(s) {
-  const w = (s.type === 'tri' ? s.w : 1) * unit;
-  const h = (s.type === 'tri' ? triH(s.w) : 1) * unit;
-  return { left: originX + s.x * unit, top: groundY - s.y * unit - h, width: w, height: h };
-}
-
-function updatePalette() {
-  const [c] = BUILD_COLORS[colorIdx % BUILD_COLORS.length];
-  document.querySelectorAll('.pal').forEach(p => { p.innerHTML = shapeSVG(p.dataset.shape, c, false); });
-}
-
-function newHouse() {
-  bauen.querySelectorAll('.piece').forEach(p => p.remove());
-  sunEl?.remove(); sunEl = null;
+function newHouse(announce = true) {
+  bauen.querySelectorAll('.piece, .topdeco').forEach(p => p.remove());
+  sunEl?.remove(); sunEl = null; topEl = null;
   bauen.classList.remove('house-done');
   houseDone = false;
-  slots = HOUSES[houseIdx % HOUSES.length]
-    .map(([type, x, y, w]) => ({ type, x, y, w, filled: false, landed: false }))
+  slots = house2().parts.map(p => ({ ...p, filled: false, landed: false }))
     .sort((a, b) => a.y - b.y || a.x - b.x);
   slots.forEach(s => { s.ghost = makePiece(s.type, null, true); });
+  showPalette(pals, new Set(slots.map(s => s.type)));
   layoutHouse();
   updatePalette();
+  if (announce) say('Wir bauen ' + house2().say + '!');
 }
-
-function magnetClick() {
-  tone(1500, 0.05, 'square', 0.12);
-  tone(2200, 0.08, 'square', 0.08, 0.04);
-}
-
 function hintShape(type) {
   slots.filter(s => !s.filled && s.type === type).forEach(s => {
     s.ghost.classList.remove('hint'); void s.ghost.offsetWidth; s.ghost.classList.add('hint');
   });
 }
-
+function wiggle(pal) { pal.classList.remove('wiggle'); void pal.offsetWidth; pal.classList.add('wiggle'); }
 // Platte zur Lücke fliegen lassen. from = Startrechteck, point = Ablagepunkt (beim Ziehen)
 function place(type, from, point, dragEl) {
   if (houseDone) return;
   const free = slots.filter(s => !s.filled && s.type === type);
   if (!free.length) {
     tone(200, 0.25, 'sine', 0.25);
-    const other = type === 'sq' ? 'tri' : 'sq';
-    hintShape(other);
-    const pal = pals.find(p => p.dataset.shape === type);
-    pal.classList.remove('wiggle'); void pal.offsetWidth; pal.classList.add('wiggle');
+    SHAPES.filter(t => t !== type).forEach(hintShape);
+    wiggle(pals.find(p => p.dataset.shape === type));
     dragEl?.remove();
     return;
   }
@@ -449,9 +486,9 @@ function place(type, from, point, dragEl) {
     const d = s => Math.hypot(s.rect.left + s.rect.width / 2 - point.x, s.rect.top + s.rect.height / 2 - point.y);
     target = free.reduce((a, b) => (d(b) < d(a) ? b : a));
   }
-  const [color, colorName] = BUILD_COLORS[colorIdx++ % BUILD_COLORS.length];
+  const ce = BUILD_COLORS[colorIdx++ % BUILD_COLORS.length];
   updatePalette();
-  const el = dragEl || makePiece(type, color, false);
+  const el = dragEl || makePiece(type, ce[0], false);
   if (!dragEl) setRect(el, from);
   target.filled = true; target.piece = el;
   void el.offsetWidth;
@@ -462,43 +499,41 @@ function place(type, from, point, dragEl) {
     el.classList.remove('fly');
     target.landed = true;
     magnetClick();
-    const row = slots.filter(s => s.type === 'sq' && s.y === target.y);
-    if (type === 'sq' && row.every(s => s.landed)) {
-      const n = target.y + 1;
-      say(n === 1 ? 'Ein Stockwerk!' : n + ' Stockwerke!');
-      [0, 1].forEach(i => pianoNote(freq(['C5', 'G5'][i]), i * 0.1, null, 0.3));
-    } else {
-      say(colorName + ' ' + SHAPE_NAME[type] + '!');
-    }
+    landedSpeech(slots, target, ce, isWall2, s => s.y);
     if (slots.every(s => s.landed)) finishHouse();
   }, 360);
 }
-
+function placeTop2() {
+  const hi = slots.reduce((a, b) => (b.y + b.h > a.y + a.h ? b : a));
+  topEl.style.left = (hi.rect.left + hi.rect.width / 2) + 'px';
+  topEl.style.top = (hi.rect.top - unit * 0.35) + 'px';
+  topEl.style.fontSize = unit * 0.6 + 'px';
+}
 function finishHouse() {
   houseDone = true;
-  const bottom = slots.filter(s => s.type === 'sq' && s.y === 0);
+  const walls = slots.filter(isWall2);
+  const bottom = walls.filter(s => s.y === 0).sort((a, b) => a.x - b.x);
   const door = bottom[Math.floor((bottom.length - 1) / 2)];
-  slots.filter(s => s.type === 'sq').forEach((s, i) => {
+  walls.forEach((s, i) => {
     const d = document.createElement('div');
     d.className = 'deco'; d.textContent = s === door ? '🚪' : '🪟';
-    d.style.animationDelay = (i * 0.06) + 's';
+    d.style.animationDelay = (i * 0.05) + 's';
     s.piece.style.setProperty('--fs', unit * 0.55 + 'px');
     s.piece.appendChild(d);
   });
+  if (house2().top) {
+    topEl = document.createElement('div'); topEl.className = 'topdeco'; topEl.innerHTML = topHTML(house2().top);
+    bauen.appendChild(topEl); placeTop2();
+  }
   sunEl = document.createElement('div'); sunEl.className = 'sun'; sunEl.textContent = '☀️';
   zone.appendChild(sunEl);
-  setTimeout(() => {
-    bauen.classList.add('house-done');
-    ['C5', 'E5', 'G5', 'C6'].forEach((n, i) => pianoNote(freq(n), i * 0.15));
-    say('Juhu! Das Haus ist fertig!');
-  }, 500);
+  setTimeout(() => { bauen.classList.add('house-done'); celebrate(house2().done); }, 500);
 }
-
 function tumble() {
   if (!houseDone || busy) return;
   busy = true;
-  [0, 1, 2, 3, 4].forEach(i => tone(600 - i * 90, 0.15, 'triangle', 0.25, i * 0.09));
-  say('Bumm!');
+  bumm();
+  topEl?.remove(); topEl = null;
   slots.forEach(s => {
     const p = s.piece;
     p.classList.add('tumble');
@@ -520,15 +555,16 @@ function setupPalette(pal, host, o) {
   });
   pal.addEventListener('pointermove', e => {
     if (!start) return;
+    const [dw, dh] = SHAPE_DIM[pal.dataset.shape];
     if (!dragEl && Math.hypot(e.clientX - start.x, e.clientY - start.y) > 15) {
-      const [c] = BUILD_COLORS[colorIdx % BUILD_COLORS.length];
+      const c = BUILD_COLORS[colorIdx % BUILD_COLORS.length][0];
       dragEl = document.createElement('div');
       dragEl.className = 'piece';
       dragEl.innerHTML = shapeSVG(pal.dataset.shape, c, false);
       host.appendChild(dragEl);
       size = o.size();
     }
-    if (dragEl) setRect(dragEl, { left: e.clientX - size / 2, top: e.clientY - size / 2, width: size, height: size * (pal.dataset.shape === 'tri' ? 0.9 : 1) });
+    if (dragEl) setRect(dragEl, { left: e.clientX - size * dw / 2, top: e.clientY - size * dh / 2, width: size * dw, height: size * dh });
   });
   const end = e => {
     if (!start) return;
@@ -545,42 +581,101 @@ pals.forEach(pal => setupPalette(pal, bauen, {
   tap: (type, from) => place(type, from),
   drop: (type, point, el) => place(type, null, point, el),
 }));
-
 screens.bauen = {
-  enter() { if (!slots.length) newHouse(); else layoutHouse(); say('Wir bauen ein Haus!'); },
+  enter() { if (!slots.length) newHouse(); else { layoutHouse(); say('Wir bauen ' + house2().say + '!'); } },
 };
 addEventListener('resize', () => { if (current === 'bauen' && slots.length) layoutHouse(); });
 
-/* ---------- 3D bauen (Würfelhaus mit Pyramidendach) ---------- */
+/* ----- 3D: Gebäude aus mehreren Blöcken ----- */
 const b3 = document.getElementById('bauen3d');
 const scene = document.getElementById('scene3d');
 const stage = document.getElementById('stage3d');
 const pals3 = [...b3.querySelectorAll('.pal')];
-// [Länge, Tiefe, Stockwerke] – quadratisch = Pyramidendach, länglich = Satteldach
-const HOUSES3D = [[1, 1, 1], [2, 1, 2], [1, 1, 3], [3, 1, 2], [2, 2, 2], [2, 1, 4], [4, 1, 3], [1, 1, 6], [3, 1, 5]];
+// Block: x/z = Lage (in Plattengrößen), W = Länge, D = Tiefe, F = Stockwerke,
+// roof: pyramid | spire (Kirchturmspitze) | gable (Satteldach) | dome (Kuppel aus Halbkreisen) | none,
+// rect: lange Wände aus Rechtecken
+const HOUSES3D = [
+  { say: 'ein Haus', done: 'Das Haus', blocks: [{ W: 1, D: 1, F: 1, roof: 'pyramid' }] },
+  { say: 'ein langes Haus', done: 'Das lange Haus', blocks: [{ W: 2, D: 1, F: 2, roof: 'gable', rect: true }] },
+  { say: 'einen Turm mit Kuppel', done: 'Der Turm', blocks: [{ W: 1, D: 1, F: 3, roof: 'dome' }] },
+  { say: 'eine Kirche', done: 'Die Kirche', top: '✝️', blocks: [
+    { x: 0, W: 3, D: 1, F: 1, roof: 'gable', rect: true },     // Kirchenschiff
+    { x: 3, W: 1, D: 1, F: 3, roof: 'spire', top: true },      // Kirchturm
+    { x: -1, W: 1, D: 1, F: 1, roof: 'dome' }] },              // runde Apsis
+  { say: 'ein großes Haus', done: 'Das große Haus', blocks: [{ W: 2, D: 2, F: 2, roof: 'pyramid' }] },
+  { say: 'eine Burg', done: 'Die Burg', top: '🚩', blocks: [
+    { x: 0, z: 0, W: 2, D: 2, F: 1, roof: 'none' },
+    { x: -1, z: -1, W: 1, D: 1, F: 2, roof: 'spire', top: true },
+    { x: 2, z: 2, W: 1, D: 1, F: 2, roof: 'spire', top: true }] },
+  { say: 'ein Schloss', done: 'Das Schloss', top: '👑', blocks: [
+    { x: 0, W: 2, D: 1, F: 1, roof: 'gable', rect: true },
+    { x: -1, W: 1, D: 1, F: 2, roof: 'dome', top: true },
+    { x: 2, W: 1, D: 1, F: 2, roof: 'dome', top: true }] },
+  { say: 'ein Hochhaus', done: 'Das Hochhaus', blocks: [{ W: 3, D: 1, F: 5, roof: 'gable', rect: true }] },
+  { say: 'einen hohen Turm', done: 'Der Turm', blocks: [{ W: 1, D: 1, F: 6, roof: 'spire' }] },
+];
 let h3Idx = 0, slots3 = [], done3 = false, busy3 = false, S3 = 100, angle = -30, spin = 0.012;
-let raf3 = null, lastT = 0, dragRot = null, plate = null;
-
+let raf3 = null, lastT = 0, dragRot = null, plate = null, topEls3 = [];
 function house3() { return HOUSES3D[h3Idx % HOUSES3D.length]; }
+function blocks3() { return house3().blocks.map(b => ({ x: 0, z: 0, ...b })); }
+function roofH(b) { return { pyramid: b.W / Math.SQRT2, spire: b.W * 1.9, gable: b.D * 0.87, dome: b.W / 2, none: 0 }[b.roof]; }
+const sideLen = (b, side) => (side % 2 === 0 ? b.W : b.D);
+const sideDist = (b, side) => (side % 2 === 0 ? b.D : b.W) / 2;
+// Liegt ein Teil an der Wand eines anderen Blocks an? Dann wird es weggelassen.
+function hiddenBy(b, all, side, lx, level) {
+  const d = sideDist(b, side);
+  const rot = [[lx, d], [d, -lx], [-lx, -d], [-d, lx]][side];
+  const px = b.x + b.W / 2 + rot[0], pz = b.z + b.D / 2 + rot[1], e = 1e-6;
+  return all.some(c => c !== b && level < c.F &&
+    px >= c.x - e && px <= c.x + c.W + e && pz >= c.z - e && pz <= c.z + c.D + e);
+}
+function wallPieces(n, useRect) {
+  const out = []; let x = 0;
+  while (x < n) { if (useRect && n - x >= 2) { out.push([x, 2]); x += 2; } else { out.push([x, 1]); x += 1; } }
+  return out;
+}
+function buildSlots3(bs) {
+  const out = [];
+  bs.forEach(b => {
+    for (let f = 0; f < b.F; f++) for (let side = 0; side < 4; side++) {
+      const n = sideLen(b, side);
+      wallPieces(n, b.rect && side % 2 === 0).forEach(([x, w]) => {
+        if (!hiddenBy(b, bs, side, x + w / 2 - n / 2, f)) out.push({ kind: 'wall', type: w === 2 ? 'rect' : 'sq', b, side, x, w, f, lvl: f });
+      });
+    }
+    const L = b.F + 0.5;
+    if (b.roof === 'pyramid' || b.roof === 'spire') for (let side = 0; side < 4; side++) out.push({ kind: 'pyr', type: 'tri', b, side, lvl: L });
+    if (b.roof === 'gable') {
+      [0, 2].forEach(side => { for (let x = 0; x < b.W; x++) out.push({ kind: 'slope', type: 'sq', b, side, x, lvl: L }); });
+      [1, 3].forEach(side => { if (!hiddenBy(b, bs, side, 0, b.F)) out.push({ kind: 'gtri', type: 'tri', b, side, lvl: L }); });
+    }
+    if (b.roof === 'dome') for (let k = 0; k < 4; k++) out.push({ kind: 'dome', type: 'semi', b, k, lvl: L });
+  });
+  return out.sort((a, c) => a.lvl - c.lvl);
+}
 function geom3(s) {
-  const [W, D, F] = house3();
-  const sideLen = s.side % 2 === 0 ? W : D;          // Anzahl Platten auf dieser Seite
-  const dist = (s.side % 2 === 0 ? D : W) * S3 / 2;   // Abstand der Seite zur Mitte
-  const rot = `rotateY(${s.side * 90}deg)`;
-  if (s.type === 'sq' && !s.roof) {
-    return { w: S3, h: S3, tf: `${rot} translate3d(${(s.x - (sideLen - 1) / 2) * S3}px, ${-(s.f + 0.5) * S3}px, ${dist}px)` };
+  const b = s.b, S = S3;
+  const at = `translate3d(${b.ox}px, 0, ${b.oz}px) `;
+  const rot = `rotateY(${(s.side || 0) * 90}deg) `;
+  if (s.kind === 'wall') {
+    const n = sideLen(b, s.side);
+    return { w: s.w * S, h: S, tf: at + rot + `translate3d(${(s.x + s.w / 2 - n / 2) * S}px, ${-(s.f + 0.5) * S}px, ${sideDist(b, s.side) * S}px)` };
   }
-  if (W === D) { // Pyramidendach aus 4 Dreiecken
-    const L = W * S3, H = L / Math.SQRT2, hs = L * Math.sqrt(3) / 2;
+  if (s.kind === 'pyr') {
+    const L = b.W * S, H = roofH(b) * S, hs = Math.hypot(H, L / 2);
     const tilt = Math.atan((L / 2) / H) * 180 / Math.PI;
-    return { w: L, h: hs, tf: `${rot} translate3d(0, ${-F * S3}px, ${L / 2}px) rotateX(${tilt}deg) translateY(${-hs / 2}px)` };
+    return { w: L, h: hs, tf: at + rot + `translate3d(0, ${-b.F * S}px, ${L / 2}px) rotateX(${tilt}deg) translateY(${-hs / 2}px)` };
   }
-  // Satteldach: Dreiecke als Giebel, Vierecke als Dachschrägen
-  const G = D * S3, hs = G * Math.sqrt(3) / 2;
-  if (s.type === 'tri') {
-    return { w: G, h: hs, tf: `${rot} translate3d(0, ${-F * S3 - hs / 2}px, ${dist}px)` };
+  if (s.kind === 'gtri') {
+    const G = b.D * S, hs = G * Math.sqrt(3) / 2;
+    return { w: G, h: hs, tf: at + rot + `translate3d(0, ${-b.F * S - hs / 2}px, ${b.W * S / 2}px)` };
   }
-  return { w: S3, h: G, tf: `${rot} translate3d(${(s.x - (W - 1) / 2) * S3}px, ${-F * S3}px, ${dist}px) rotateX(30deg) translateY(${-G / 2}px)` };
+  if (s.kind === 'slope') {
+    const G = b.D * S;
+    return { w: S, h: G, tf: at + rot + `translate3d(${(s.x - (b.W - 1) / 2) * S}px, ${-b.F * S}px, ${G / 2}px) rotateX(30deg) translateY(${-G / 2}px)` };
+  }
+  const R = b.W * S / 2; // Kuppel: 4 Halbkreise, im Stern angeordnet
+  return { w: 2 * R, h: R, tf: at + `rotateY(${s.k * 45}deg) translate3d(0, ${-b.F * S - R / 2}px, 0)` };
 }
 function applyGeom(el, g, extra = '') {
   el.style.width = g.w + 'px'; el.style.height = g.h + 'px';
@@ -594,40 +689,41 @@ function face3(type, color, ghost) {
   stage.appendChild(el);
   return el;
 }
+let bs3 = [];
 function layout3d() {
-  const [W, D, F] = house3();
   const z = scene.getBoundingClientRect();
-  const roofH = W === D ? W * 0.71 : D * 0.87;
-  S3 = Math.min(z.height * 0.62 / (F + roofH), z.width * 0.72 / Math.hypot(W, D), 170);
-  const totalH = (F + roofH) * S3;
-  stage.style.top = (z.height * 0.44 + totalH / 2) + 'px';
+  const x0 = Math.min(...bs3.map(b => b.x)), x1 = Math.max(...bs3.map(b => b.x + b.W));
+  const z0 = Math.min(...bs3.map(b => b.z)), z1 = Math.max(...bs3.map(b => b.z + b.D));
+  const maxH = Math.max(...bs3.map(b => b.F + roofH(b))) + (house3().top ? 0.6 : 0);
+  S3 = Math.min(z.height * 0.62 / maxH, z.width * 0.72 / Math.hypot(x1 - x0, z1 - z0), 170);
+  bs3.forEach(b => { b.ox = (b.x + b.W / 2 - (x0 + x1) / 2) * S3; b.oz = (b.z + b.D / 2 - (z0 + z1) / 2) * S3; });
+  stage.style.top = (z.height * 0.44 + maxH * S3 / 2) + 'px';
   slots3.forEach(s => {
     const g = geom3(s);
     applyGeom(s.ghost, g);
     if (s.piece && s.landed) applyGeom(s.piece, g);
-    s.piece?.style.setProperty('--fs', S3 * 0.55 + 'px');
+    s.piece?.style.setProperty('--fs', S3 * 0.5 + 'px');
   });
-  const pw = (W + 0.8) * S3, pd = (D + 0.8) * S3;
-  applyGeom(plate, { w: pw, h: pd, tf: 'rotateX(90deg)' });
+  applyGeom(plate, { w: (x1 - x0 + 0.8) * S3, h: (z1 - z0 + 0.8) * S3, tf: 'rotateX(90deg)' });
+  topEls3.forEach(t => {
+    const b = t.b, y = -(b.F + roofH(b)) * S3 - S3 * 0.35;
+    applyGeom(t.el, { w: S3 * 0.7, h: S3 * 0.7, tf: `translate3d(${b.ox}px, ${y}px, ${b.oz}px) rotateY(${t.r}deg)` });
+    t.el.style.fontSize = S3 * 0.55 + 'px';
+  });
 }
-function newHouse3d() {
+function newHouse3d(announce = true) {
   stage.innerHTML = '';
+  topEls3 = [];
   b3.classList.remove('house-done');
   done3 = false;
-  const [W, D, F] = house3();
+  bs3 = blocks3();
   plate = document.createElement('div'); plate.className = 'plate'; stage.appendChild(plate);
-  slots3 = [];
-  for (let f = 0; f < F; f++) for (let side = 0; side < 4; side++)
-    for (let x = 0; x < (side % 2 === 0 ? W : D); x++) slots3.push({ type: 'sq', f, side, x });
-  if (W === D) {
-    for (let side = 0; side < 4; side++) slots3.push({ type: 'tri', f: F, side, x: 0 });
-  } else {
-    [0, 2].forEach(side => { for (let x = 0; x < W; x++) slots3.push({ type: 'sq', roof: true, f: F, side, x }); });
-    [1, 3].forEach(side => slots3.push({ type: 'tri', f: F, side, x: 0 }));
-  }
+  slots3 = buildSlots3(bs3);
   slots3.forEach(s => { s.ghost = face3(s.type, null, true); });
+  showPalette(pals3, new Set(slots3.map(s => s.type)));
   layout3d();
   updatePalette();
+  if (announce) say('Wir bauen ' + house3().say + '!');
 }
 function place3d(type, point, dragEl) {
   dragEl?.remove();
@@ -635,8 +731,7 @@ function place3d(type, point, dragEl) {
   const free = slots3.filter(s => !s.filled && s.type === type);
   if (!free.length) {
     tone(200, 0.25, 'sine', 0.25);
-    const pal = pals3.find(p => p.dataset.shape === type);
-    pal.classList.remove('wiggle'); void pal.offsetWidth; pal.classList.add('wiggle');
+    wiggle(pals3.find(p => p.dataset.shape === type));
     return;
   }
   let target = free[0];
@@ -644,9 +739,9 @@ function place3d(type, point, dragEl) {
     const d = s => { const r = s.ghost.getBoundingClientRect(); return Math.hypot(r.left + r.width / 2 - point.x, r.top + r.height / 2 - point.y); };
     target = free.reduce((a, b) => (d(b) < d(a) ? b : a));
   }
-  const [color, colorName] = BUILD_COLORS[colorIdx++ % BUILD_COLORS.length];
+  const ce = BUILD_COLORS[colorIdx++ % BUILD_COLORS.length];
   updatePalette();
-  const el = face3(type, color, false);
+  const el = face3(type, ce[0], false);
   target.filled = true; target.piece = el;
   const g = geom3(target);
   el.style.opacity = 0;
@@ -662,39 +757,40 @@ function place3d(type, point, dragEl) {
     target.landed = true;
     target.ghost.style.opacity = 0;
     magnetClick();
-    const floor = slots3.filter(s => s.type === 'sq' && !s.roof && s.f === target.f);
-    if (type === 'sq' && !target.roof && floor.every(s => s.landed)) {
-      const n = target.f + 1;
-      say(n === 1 ? 'Ein Stockwerk!' : n + ' Stockwerke!');
-      [0, 1].forEach(i => pianoNote(freq(['C5', 'G5'][i]), i * 0.1, null, 0.3));
-    } else {
-      say(colorName + ' ' + SHAPE_NAME[type] + '!');
-    }
+    landedSpeech(slots3, target, ce, s => s.kind === 'wall', s => s.lvl);
     if (slots3.every(s => s.landed)) finish3d();
   }, 480);
 }
 function finish3d() {
   done3 = true;
-  const [W] = house3();
-  slots3.filter(s => s.type === 'sq' && !s.roof).forEach((s, i) => {
+  const walls = slots3.filter(s => s.kind === 'wall');
+  const front = walls.filter(s => s.b === bs3[0] && s.side === 0 && s.f === 0);
+  const door = front[Math.floor((front.length - 1) / 2)];
+  walls.forEach((s, i) => {
     const d = document.createElement('div');
     d.className = 'deco';
-    d.textContent = (s.f === 0 && s.side === 0 && s.x === Math.floor((W - 1) / 2)) ? '🚪' : '🪟';
-    d.style.animationDelay = (i * 0.05) + 's';
+    d.textContent = s === door ? '🚪' : (s.b.top && s.f === s.b.F - 1 && house3().top === '✝️' ? '🔔' : '🪟');
+    d.style.animationDelay = (i * 0.04) + 's';
     s.piece.appendChild(d);
   });
+  // Kreuz, Fahne oder Krone oben auf den Türmen (zwei gekreuzte Ebenen, damit man es von allen Seiten sieht)
+  if (house3().top) bs3.filter(b => b.top || bs3.length === 1).forEach(b => [0, 90].forEach(r => {
+    const el = document.createElement('div');
+    el.className = 'face topdeco3'; el.innerHTML = topHTML(house3().top);
+    stage.appendChild(el); topEls3.push({ el, b, r });
+  }));
+  layout3d();
   setTimeout(() => {
     b3.classList.add('house-done');
-    ['C5', 'E5', 'G5', 'C6'].forEach((n, i) => pianoNote(freq(n), i * 0.15));
-    say('Juhu! Das Haus ist fertig!');
+    celebrate(house3().done);
     spin = 0.09; setTimeout(() => { spin = 0.012; }, 1500);
   }, 500);
 }
 function tumble3d() {
   if (!done3 || busy3) return;
   busy3 = true;
-  [0, 1, 2, 3, 4].forEach(i => tone(600 - i * 90, 0.15, 'triangle', 0.25, i * 0.09));
-  say('Bumm!');
+  bumm();
+  topEls3.forEach(t => t.el.remove()); topEls3 = [];
   slots3.forEach(s => {
     const g = geom3(s);
     s.piece.classList.add('tumble3d');
@@ -719,7 +815,6 @@ scene.addEventListener('pointerdown', e => {
 });
 scene.addEventListener('pointermove', e => { if (dragRot) angle = dragRot.a + (e.clientX - dragRot.x) * 0.5; });
 ['pointerup', 'pointercancel'].forEach(ev => scene.addEventListener(ev, () => { dragRot = null; }));
-
 pals3.forEach(pal => setupPalette(pal, b3, {
   isDone: () => done3, onDone: tumble3d, size: () => S3 * 0.8,
   tap: type => place3d(type),
@@ -727,9 +822,8 @@ pals3.forEach(pal => setupPalette(pal, b3, {
 }));
 screens.bauen3d = {
   enter() {
-    if (!slots3.length) newHouse3d(); else layout3d();
+    if (!slots3.length) newHouse3d(); else { layout3d(); say('Wir bauen ' + house3().say + ' in 3 D!'); }
     lastT = 0; raf3 = requestAnimationFrame(tick3d);
-    say('Wir bauen ein Haus in 3 D!');
   },
   leave() { cancelAnimationFrame(raf3); },
 };
