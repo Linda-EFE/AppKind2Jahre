@@ -53,4 +53,5 @@ Tipp: Am iPhone/iPad den **Geführten Zugriff**, unter Android die **App-Fixieru
 Die Sprachausgabe nutzt die eingebaute deutsche Stimme des Geräts.
 
 ## Bildnachweis
+Die echten Tierstimmen in `sounds/tiere/` stammen von Wikimedia Commons (Urheber und Lizenzen: `sounds/tiere/QUELLEN.md`).
 Die 3D-Tierbilder in `img/tiere/` stammen aus [Fluent Emoji](https://github.com/microsoft/fluentui-emoji) von Microsoft (MIT-Lizenz, siehe `img/tiere/LICENSE-fluentui-emoji.txt`).

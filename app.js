@@ -145,7 +145,7 @@ const ANIMALS = [
   ['pferd', 'Das Pferd macht Hüüü!', [500, 700, 400], '#e9dcc9'],
   ['frosch', 'Der Frosch macht Quak!', [180, 220], '#d8f3dc'],
   ['loewe', 'Der Löwe brüllt ganz laut!', 'roar', '#ffe8a3'],
-  ['biene', 'Die Biene macht Summ summ!', [240, 245], '#fdf0c4'],
+  ['biene', 'Die Biene macht Summ summ!', 'buzz', '#fdf0c4'],
   ['elefant', 'Der Elefant macht Törööö!', [300, 450, 350], '#e0e7ff'],
 ];
 // Löwengebrüll: tiefes, knurrendes Rauschen mit anschwellender Lautstärke
@@ -186,6 +186,41 @@ function roar() {
 }
 
 const grid = document.getElementById('animalGrid');
+// Echte Tieraufnahmen (Wikimedia Commons, Quellen: sounds/tiere/QUELLEN.md).
+// Werden beim Öffnen des Spiels geladen; fehlt eine Datei, gibt es den künstlichen Ersatzton.
+const animalSounds = {};
+function loadAnimalSounds() {
+  ANIMALS.forEach(([name]) => {
+    if (name in animalSounds) return;
+    animalSounds[name] = null;
+    fetch(`sounds/tiere/${name}.mp3`)
+      .then(r => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
+      .then(ab => new Promise((ok, fail) => audio().decodeAudioData(ab, ok, fail)))
+      .then(buf => { animalSounds[name] = buf; })
+      .catch(() => { animalSounds[name] = false; });
+  });
+}
+function playAnimalSound(name) {
+  const buf = animalSounds[name];
+  if (!buf) return 0;
+  const a = audio(), src = a.createBufferSource();
+  src.buffer = buf; src.connect(a.destination); src.start();
+  return buf.duration;
+}
+// Bienensummen (Ersatz, falls keine Aufnahme da ist)
+function buzz() {
+  const a = audio(), t = a.currentTime, dur = 1.3;
+  const o = a.createOscillator(), g = a.createGain(), f = a.createBiquadFilter();
+  o.type = 'sawtooth'; o.frequency.setValueAtTime(220, t);
+  const lfo = a.createOscillator(), amt = a.createGain();
+  lfo.frequency.value = 9; amt.gain.value = 12; lfo.connect(amt).connect(o.frequency);
+  f.type = 'bandpass'; f.frequency.value = 700; f.Q.value = 1.2;
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.35, t + 0.15);
+  g.gain.setValueAtTime(0.35, t + dur - 0.3); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(f).connect(g).connect(a.destination);
+  [o, lfo].forEach(n => { n.start(t); n.stop(t + dur + 0.05); });
+}
+let animalTalk = null;
 ANIMALS.forEach(([img, text, notes, bg], i) => {
   const b = document.createElement('button');
   b.className = 'animal';
@@ -195,13 +230,20 @@ ANIMALS.forEach(([img, text, notes, bg], i) => {
   b.innerHTML = `<img src="img/tiere/${img}.png" alt="" draggable="false">`;
   b.addEventListener('pointerdown', () => {
     b.classList.remove('jump'); void b.offsetWidth; b.classList.add('jump');
-    if (notes === 'roar') { roar(); setTimeout(() => say(text), 1500); return; }
-    notes.forEach((f, i) => setTimeout(() => tone(f, 0.18, 'square', 0.12), i * 140));
-    setTimeout(() => say(text), notes.length * 140);
     vibrate();
+    clearTimeout(animalTalk);
+    if ('speechSynthesis' in window) speechSynthesis.cancel();
+    let dur = playAnimalSound(img);
+    if (!dur) { // Ersatz: künstlicher Ton
+      if (notes === 'roar') { roar(); dur = 1.4; }
+      else if (notes === 'buzz') { buzz(); dur = 1.3; }
+      else { notes.forEach((f, k) => setTimeout(() => tone(f, 0.18, 'square', 0.12), k * 140)); dur = notes.length * 0.14; }
+    }
+    animalTalk = setTimeout(() => say(text), dur * 1000 + 150);
   });
   grid.appendChild(b);
 });
+screens.tiere = { enter: loadAnimalSounds, leave() { clearTimeout(animalTalk); } };
 
 /* ---------- Farben / Ballons ---------- */
 const COLORS = [
