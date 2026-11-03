@@ -1348,7 +1348,7 @@ hornBtn.addEventListener('click', () => {
 paintHornMode();
 pv.addEventListener('play', startHornLoop);
 pv.addEventListener('pause', stopHornLoop);
-pv.addEventListener('ended', stopHornLoop);
+
 function playVideo(i) {
   vIdx = (i + VIDEOS.length) % VIDEOS.length;
   const v = VIDEOS[vIdx];
@@ -1365,7 +1365,8 @@ player.querySelector('.vagain').addEventListener('click', () => { pv.currentTime
 player.querySelector('.vnext').addEventListener('click', () => playVideo(vIdx + 1));
 player.querySelector('.vhorn').addEventListener('click', () => martinshorn());
 pv.addEventListener('click', () => (pv.paused ? pv.play() : pv.pause()));
-pv.addEventListener('ended', () => { player.querySelector('.vagain').classList.add('pulse'); setTimeout(() => player.querySelector('.vagain').classList.remove('pulse'), 3000); });
+// Endlos im Kreis: Am Ende sofort das nächste Video (nach dem letzten wieder das erste)
+pv.addEventListener('ended', () => { if (!player.hidden) playVideo(vIdx + 1); });
 function renderVideos(grid) {
   VIDEOS.forEach((v, k) => {
     const b = document.createElement('button');
