@@ -52,7 +52,16 @@
   <!-- Fahrzeuge -->
   <section id="fahrzeuge" class="screen">
     <div id="fzBar" class="pickBar"></div>
-    <div id="fzGrid" class="pickGrid"></div>
+    <div id="fzGrid" class="pickGrid photos"></div>
+    <button id="creditBtn" aria-label="Fotonachweis">ℹ️ Fotos</button>
+    <div id="creditPanel" hidden>
+      <div class="vbox">
+        <h2>Fotonachweis</h2>
+        <p class="vhint">Alle Fotos stammen von Wikimedia Commons und stehen unter freien Lizenzen (CC0, gemeinfrei, CC BY, CC BY-SA). Sie wurden für die App verkleinert.</p>
+        <div id="creditList"></div>
+        <button class="vclose">Schließen</button>
+      </div>
+    </div>
   </section>
 
   <!-- Farben / Ballons -->
@@ -135,6 +144,7 @@
     </div>
   </div>
 
+  <script src="fotos.js"></script>
   <script src="app.js"></script>
   <script src="kids7.js"></script>
   <script src="teen17.js"></script>

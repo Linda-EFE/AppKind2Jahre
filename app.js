@@ -1251,29 +1251,66 @@ function hornCard() {
   b.addEventListener('pointerdown', () => { b.classList.remove('jump'); void b.offsetWidth; b.classList.add('jump'); martinshorn(); });
   return b;
 }
-const VEHICLE_CATS = [
+// Echte Fotos (Wikimedia Commons). Urheber/Lizenz stehen in fotos.js (FOTO_CREDITS) und im Fotonachweis.
+const VEHICLE_CATS_ALL = [
   { icon: '🚗', de: 'Die Autos', ru: 'Легковые машины', bg: 'linear-gradient(#e0f2fe, #f1f5f9 60%, #cbd5e1)', items: [
     ['auto', 'das Auto', 'Машина'], ['gelaendewagen', 'der Geländewagen', 'Внедорожник'], ['taxi', 'das Taxi', 'Такси'],
     ['rennwagen', 'der Rennwagen', 'Гоночная машина'], ['pickup', 'der Pick-up', 'Пикап'], ['kleinbus', 'der Kleinbus', 'Микроавтобус']] },
-  { icon: '🚚', de: 'Lastwagen und Busse', ru: 'Грузовики и автобусы', bg: 'linear-gradient(#fef3c7, #fde68a 60%, #d6d3d1)', items: [
-    ['lastwagen', 'der Lastwagen', 'Грузовик'], ['sattelzug', 'der Sattelzug', 'Фура'], ['traktor', 'der Traktor', 'Трактор'],
+  { icon: '🚚', de: 'Lastwagen und Baustelle', ru: 'Грузовики и стройка', bg: 'linear-gradient(#fef3c7, #fde68a 60%, #d6d3d1)', items: [
+    ['lastwagen', 'der Lastwagen', 'Грузовик'], ['sattelzug', 'der Sattelzug', 'Фура'], ['betonmischer', 'der Betonmischer', 'Бетономешалка'],
+    ['muellauto', 'das Müllauto', 'Мусоровоз'], ['bagger', 'der Bagger', 'Экскаватор'], ['traktor', 'der Traktor', 'Трактор'],
     ['bus', 'der Bus', 'Автобус'], ['obus', 'der Oberleitungsbus', 'Троллейбус']] },
   { icon: '✈️', de: 'In der Luft', ru: 'В небе', bg: 'linear-gradient(#bae6fd, #e0f2fe 70%, #fff)', items: [
     ['flugzeug', 'das Flugzeug', 'Самолёт'], ['kleinflugzeug', 'das kleine Flugzeug', 'Маленький самолёт'], ['hubschrauber', 'der Hubschrauber', 'Вертолёт'],
-    ['rakete', 'die Rakete', 'Ракета'], ['satellit', 'der Satellit', 'Спутник'], ['ufo', 'das Ufo', 'Летающая тарелка']] },
+    ['segelflugzeug', 'das Segelflugzeug', 'Планер'], ['heissluftballon', 'der Heißluftballon', 'Воздушный шар'],
+    ['rakete', 'die Rakete', 'Ракета'], ['raumstation', 'die Raumstation', 'Космическая станция']] },
   { icon: '🚢', de: 'Auf dem Wasser', ru: 'На воде', bg: 'linear-gradient(#e0f2fe, #90e0ef 55%, #0096c7)', items: [
-    ['schiff', 'das Schiff', 'Корабль'], ['kreuzfahrtschiff', 'das Kreuzfahrtschiff', 'Лайнер'], ['faehre', 'die Fähre', 'Паром'],
-    ['motorboot', 'das Motorboot', 'Моторная лодка'], ['schnellboot', 'das Schnellboot', 'Катер'], ['segelboot', 'das Segelboot', 'Парусная лодка'], ['kanu', 'das Kanu', 'Каноэ']] },
+    ['containerschiff', 'das Containerschiff', 'Контейнеровоз'], ['kreuzfahrtschiff', 'das Kreuzfahrtschiff', 'Лайнер'], ['faehre', 'die Fähre', 'Паром'],
+    ['motorboot', 'das Motorboot', 'Моторная лодка'], ['segelboot', 'das Segelboot', 'Парусная лодка'], ['kanu', 'das Kanu', 'Каноэ']] },
   { icon: '🏍️', de: 'Die Motorräder', ru: 'Мотоциклы', bg: 'linear-gradient(#fee2e2, #fecaca 60%, #e5e7eb)', items: [
-    ['motorrad', 'das Motorrad', 'Мотоцикл'], ['motorroller', 'der Motorroller', 'Мотороллер'], ['rikscha', 'die Rikscha', 'Тук-тук']] },
+    ['motorrad', 'das Motorrad', 'Мотоцикл'], ['motorroller', 'der Motorroller', 'Мотороллер'], ['quad', 'das Quad', 'Квадроцикл'], ['rikscha', 'die Rikscha', 'Тук-тук']] },
   { icon: '🚲', de: 'Fahrräder und Roller', ru: 'Велосипеды и самокаты', bg: 'linear-gradient(#dcfce7, #bbf7d0 60%, #86efac)', items: [
     ['fahrrad', 'das Fahrrad', 'Велосипед'], ['radfahrer', 'der Radfahrer', 'Велосипедист'], ['mountainbike', 'das Mountainbike', 'Горный велосипед'],
-    ['tretroller', 'der Tretroller', 'Самокат'], ['skateboard', 'das Skateboard', 'Скейтборд'], ['rollschuh', 'der Rollschuh', 'Ролики']] },
-  { icon: '🚨', de: 'Die Einsatzfahrzeuge', ru: 'Спецмашины', bg: 'linear-gradient(#dbeafe, #fee2e2 70%)', extra: hornCard, items: [
-    ['feuerwehr', 'die Feuerwehr', 'Пожарная машина'], ['krankenwagen', 'der Krankenwagen', 'Скорая помощь'],
-    ['polizei', 'das Polizeiauto', 'Полицейская машина'], ['thw', 'das Auto vom THW', 'Машина службы спасения', THW_SVG],
-    ['hubschrauber', 'der Rettungshubschrauber', 'Вертолёт спасателей']] },
+    ['laufrad', 'das Laufrad', 'Беговел'], ['tretroller', 'der Tretroller', 'Самокат'], ['skateboard', 'das Skateboard', 'Скейтборд'], ['rollschuh', 'der Rollschuh', 'Ролики']] },
+  { icon: '🚒', de: 'Die Feuerwehr', ru: 'Пожарные', bg: 'linear-gradient(#fee2e2, #fecaca 60%, #fca5a5)', extra: hornCard, items: [
+    ['loeschfahrzeug', 'das Löschfahrzeug', 'Пожарная машина'], ['drehleiter', 'die Drehleiter', 'Пожарная автолестница'],
+    ['tankloeschfahrzeug', 'das Tanklöschfahrzeug', 'Пожарная автоцистерна'], ['ruestwagen', 'der Rüstwagen', 'Аварийно-спасательная машина'],
+    ['flughafenfeuerwehr', 'die Flughafenfeuerwehr', 'Аэродромная пожарная машина'], ['feuerloeschboot', 'das Feuerlöschboot', 'Пожарный катер'],
+    ['loeschflugzeug', 'das Löschflugzeug', 'Пожарный самолёт'], ['feuerwehrauto_alt', 'das alte Feuerwehrauto', 'Старая пожарная машина']] },
+  { icon: '🚑', de: 'Der Rettungsdienst', ru: 'Скорая помощь и спасатели', bg: 'linear-gradient(#fff, #fee2e2 60%, #fde68a)', extra: hornCard, items: [
+    ['rettungswagen', 'der Rettungswagen', 'Скорая помощь'], ['notarzt', 'das Notarztauto', 'Машина врача'],
+    ['rettungshubschrauber', 'der Rettungshubschrauber', 'Вертолёт спасателей'], ['seenotrettungskreuzer', 'der Seenotrettungskreuzer', 'Спасательное судно'],
+    ['bergrettung', 'die Bergwacht', 'Горные спасатели']] },
+  { icon: '🚓', de: 'Die Polizei', ru: 'Полиция', bg: 'linear-gradient(#dbeafe, #bfdbfe 60%, #e5e7eb)', extra: hornCard, items: [
+    ['streifenwagen', 'das Polizeiauto', 'Полицейская машина'], ['polizeimotorrad', 'das Polizeimotorrad', 'Полицейский мотоцикл'],
+    ['polizeibus', 'der Polizeibus', 'Полицейский автобус'], ['polizeihubschrauber', 'der Polizeihubschrauber', 'Полицейский вертолёт'],
+    ['polizeiboot', 'das Polizeiboot', 'Полицейский катер'], ['polizeipferd', 'das Polizeipferd', 'Полицейская лошадь']] },
+  { icon: '🚧', de: 'THW und Helfer', ru: 'Спасатели и помощники', bg: 'linear-gradient(#dbeafe, #fef9c3 70%)', extra: hornCard, items: [
+    ['thw_gkw', 'der Gerätewagen vom THW', 'Машина службы спасения'], ['thw_mtw', 'der Mannschaftswagen vom THW', 'Микроавтобус спасателей'],
+    ['thw_lkw', 'der Lastwagen vom THW', 'Грузовик спасателей'], ['thw_radlader', 'der Radlader vom THW', 'Погрузчик спасателей'],
+    ['abschleppwagen', 'der Abschleppwagen', 'Эвакуатор'], ['pannenhilfe', 'die Pannenhilfe', 'Техпомощь'],
+    ['winterdienst', 'der Schneepflug', 'Снегоуборочная машина'], ['kehrmaschine', 'die Kehrmaschine', 'Подметальная машина']] },
 ];
+const CREDITS = window.FOTO_CREDITS || {};
+// Nur Fahrzeuge mit vorhandenem Foto anzeigen
+const VEHICLE_CATS = VEHICLE_CATS_ALL
+  .map(c => ({ ...c, items: c.items.filter(([k]) => CREDITS[k]).map(([k, de, ru]) => [k, de, ru, `<img class="photo" src="img/fahrzeuge/foto/${k}.jpg" alt="" draggable="false">`]) }))
+  .filter(c => c.items.length);
+// Fotonachweis (Pflicht bei CC-Lizenzen)
+function showCredits() {
+  const box = document.getElementById('creditList');
+  box.innerHTML = '';
+  VEHICLE_CATS.forEach(c => c.items.forEach(([k, de]) => {
+    const f = CREDITS[k];
+    const row = document.createElement('div');
+    row.className = 'crow';
+    row.innerHTML = `<img src="img/fahrzeuge/foto/${k}.jpg" alt=""><div><b>${de}</b><br><a href="https://commons.wikimedia.org/wiki/${encodeURIComponent(f.title.replace(/ /g, '_'))}" target="_blank" rel="noopener">${f.title.replace(/^File:/, '')}</a><br>${f.artist} · ${f.license}</div>`;
+    box.appendChild(row);
+  }));
+  document.getElementById('creditPanel').hidden = false;
+}
+document.getElementById('creditBtn').addEventListener('click', showCredits);
+document.getElementById('creditPanel').querySelector('.vclose').addEventListener('click', () => { document.getElementById('creditPanel').hidden = true; });
 const fzGame = makePicker(document.getElementById('fahrzeuge'), document.getElementById('fzBar'), document.getElementById('fzGrid'), VEHICLE_CATS, 'img/fahrzeuge');
 screens.fahrzeuge = { enter: fzGame.enter, leave() { document.body.classList.remove('blaulicht'); } };
 

@@ -373,3 +373,16 @@ body.toddler-menu #voiceBtn { display: block; }
 .vclose { margin-top: 16px; width: 100%; padding: 14px; border-radius: 14px; background: #3a86ff; color: #fff; font-size: 18px; font-weight: 700; }
 .nameCard svg { width: 100%; height: 100%; max-height: 22vh; pointer-events: none; filter: drop-shadow(0 8px 6px rgba(0,0,0,.25)); }
 .nameCard.jump svg { animation: jump3d .9s cubic-bezier(.3,1.3,.5,1); }
+
+/* ---------- Fahrzeug-Fotos ---------- */
+.pickGrid { grid-auto-rows: minmax(clamp(90px, 19vh, 190px), 1fr) !important; }
+.pickGrid.photos .nameCard { padding: 6px; overflow: hidden; }
+.pickGrid.photos .nameCard img.photo { width: 100%; height: 100%; max-height: none; object-fit: cover; border-radius: 20px; filter: none; }
+.pickGrid.photos .nameCard.jump img.photo { animation: photoJump .6s cubic-bezier(.3,1.4,.5,1); }
+@keyframes photoJump { 40% { transform: scale(1.08) rotate(-2deg); } 70% { transform: scale(.97) rotate(1deg); } }
+#creditBtn { position: absolute; right: 12px; bottom: 10px; z-index: 5; background: rgba(255,255,255,.85); border-radius: 14px; padding: 6px 10px; font-size: 13px; box-shadow: 0 2px 6px rgba(0,0,0,.15); }
+#creditPanel { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.45); display: grid; place-items: center; padding: 16px; }
+#creditPanel[hidden] { display: none; }
+.crow { display: flex; gap: 10px; align-items: center; margin: 8px 0; font-size: 13px; line-height: 1.35; word-break: break-word; }
+.crow img { width: 72px; height: 54px; object-fit: cover; border-radius: 8px; flex: none; }
+.crow a { color: #1d4ed8; }
