@@ -32,10 +32,15 @@ Spiele ohne Lesen, ohne Werbung, ohne Internet (nach dem ersten Laden).
 | 🏰 | **3D bauen** | Gebäude aus mehreren Teilen, die sich langsam drehen (wischen zum Drehen): Haus, langes Haus, Turm mit Kuppel, Kirche (Kirchenschiff, Kirchturm mit Spitze und Glocken, runde Apsis), großes Haus, Burg, Schloss mit Kuppeltürmen, Hochhaus, hoher Turm |
 | 🚒 | **Autos & Lieder** | Feuerwehr, Krankenwagen, Polizei oder THW antippen → jemand ruft um Hilfe (🔥 „Feuer, es brennt!“, 🤕 „Ich brauche ein Pflaster!“, 😟 „Ich brauche Hilfe!“, 🌊 „Wasser kommt!“), dann Tatü-tata, Blaulicht, das Fahrzeug fährt zum Einsatz, kommt zurück, das Problem ist gelöst und es spielt ein Kinderlied (Bruder Jakob, Alle meine Entchen, Hänschen klein, Funkel funkel kleiner Stern) |
 | 🎹 | **Klavier** | Klavier mit weißen und schwarzen Tasten, farbige Punkte, Noten fliegen hoch |
+| 🦒 | **Wer ist das?** | 50 Tiere als 3D-Bilder in 5 Lebensräumen (🚜 Bauernhof, 🌲 Wald, 🦁 Zoo, 🌊 Wasser, 🐞 Krabbeltiere). Tier antippen → der Name wird vorgelesen |
 | 🐮 | **Tiere** | 12 Tiere als 3D-Bilder. Tier antippen → es springt und dreht sich und sagt z. B. „Die Kuh macht Muuuh!“ |
 | 🎈 | **Farben** | Luftballons steigen auf; antippen → Plopp! und die Farbe wird gesagt |
 | 🎵 | **Xylophon** | Bunte Xylophon-Stäbe, antippen oder mit dem Finger drüberwischen |
 | 🫧 | **Seifenblasen** | Überall tippen/malen → Blasen und Töne (oben = hoch, unten = tief) |
+
+**Sprache Deutsch/Russisch:** Oben rechts in allen Spielen der 2-Jährigen schaltet die Flagge die Sprachausgabe zwischen Deutsch und Russisch um (wird gespeichert). Dafür muss auf dem Gerät eine russische Stimme installiert sein. Die Bereiche für 7 und 17 Jahre bleiben Deutsch.
+
+**Bauwerk wählen:** In beiden Bauspielen wechseln ◀ ▶ oben in der Mitte zum vorherigen bzw. nächsten Bauwerk.
 
 **Zurück:** Bei den 2-Jährigen den ⬅️-Knopf oben links antippen, dann den gelben Knopf **„🏠 Zum Menü“** bzw. **„👪 Zur Startseite“** (verschwindet nach 4 Sekunden wieder). So landet das Kind nicht aus Versehen woanders. Bei 7 und 17 Jahren führt ⬅️ direkt zurück. Am PC geht überall auch die **Esc**-Taste.
 

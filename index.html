@@ -31,6 +31,7 @@
     <button class="tile" data-go="autos" style="--c:#ef476f" aria-label="Autos mit Liedern">🚒</button>
     <button class="tile" data-go="klavier" style="--c:#8d6e63" aria-label="Klavier">🎹</button>
     <button class="tile" data-go="tiere" style="--c:#ff9f1c" aria-label="Tiere">🐮</button>
+    <button class="tile" data-go="namen" style="--c:#80b918" aria-label="Wer ist das? Tiernamen">🦒</button>
     <button class="tile" data-go="musik" style="--c:#e71d73" aria-label="Xylophon">🎵</button>
     <button class="tile" data-go="farben" style="--c:#2ec4b6" aria-label="Farben">🎈</button>
     <button class="tile" data-go="blasen" style="--c:#5e60ce" aria-label="Seifenblasen">🫧</button>
@@ -39,6 +40,12 @@
   <!-- Tiere -->
   <section id="tiere" class="screen">
     <div class="grid" id="animalGrid"></div>
+  </section>
+
+  <!-- Wer ist das? Tiernamen -->
+  <section id="namen" class="screen">
+    <div id="habitats"></div>
+    <div id="nameGrid"></div>
   </section>
 
   <!-- Farben / Ballons -->
@@ -59,6 +66,7 @@
   <!-- Bauen mit Magnetplatten -->
   <section id="bauen" class="screen">
     <button class="modeSwitch" data-mode="bauen3d" aria-label="In 3D bauen">🏰 3D</button>
+    <div class="navBuild"><button data-dir="-1" aria-label="Vorheriges Bauwerk">◀</button><button data-dir="1" aria-label="Nächstes Bauwerk">▶</button></div>
     <div id="buildZone"><div class="ground"></div></div>
     <div class="palette">
       <button class="pal" data-shape="sq" aria-label="Viereck"></button>
@@ -71,6 +79,7 @@
   <!-- 3D bauen -->
   <section id="bauen3d" class="screen">
     <button class="modeSwitch" data-mode="bauen" aria-label="Flach bauen">🏡 2D</button>
+    <div class="navBuild"><button data-dir="-1" aria-label="Vorheriges Bauwerk">◀</button><button data-dir="1" aria-label="Nächstes Bauwerk">▶</button></div>
     <div id="scene3d"><div id="stage3d"></div></div>
     <div class="palette">
       <button class="pal" data-shape="sq" aria-label="Viereck"></button>
@@ -98,6 +107,8 @@
 
   <button id="home" aria-label="Zurück">⬅️</button>
   <button id="toMenu" aria-label="Zum Menü">🏠 Zum Menü</button>
+  <button id="lang" aria-label="Sprache umschalten"><i class="flag"></i><b>DE</b></button>
+  <div id="toast" role="status"></div>
 
   <script src="app.js"></script>
   <script src="kids7.js"></script>

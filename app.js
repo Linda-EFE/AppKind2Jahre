@@ -64,10 +64,22 @@ function popSound() {
   o.start(t); o.stop(t + 0.2);
 }
 
-let germanVoice = null;
+// Sprache der 2-Jährigen-Spiele: 'de' oder 'ru' (die Bereiche 7 und 17 Jahre bleiben Deutsch)
+let LANG = 'de';
+try { LANG = localStorage.getItem('fe_lang') === 'ru' ? 'ru' : 'de'; } catch { /* egal */ }
+const voices = { de: null, ru: null };
 function pickVoice() {
   const vs = speechSynthesis.getVoices();
-  germanVoice = vs.find(v => v.lang === 'de-DE') || vs.find(v => v.lang.startsWith('de')) || null;
+  const find = (full, short) => vs.find(v => v.lang.replace('_', '-') === full) || vs.find(v => v.lang.startsWith(short)) || null;
+  voices.de = find('de-DE', 'de');
+  voices.ru = find('ru-RU', 'ru');
+}
+// Text in der aktuellen Sprache (nur im Bereich der 2-Jährigen wird übersetzt)
+function speechLang() { return isToddlerArea(current) ? LANG : 'de'; }
+function T(de, ru) { return speechLang() === 'ru' ? ru : de; }
+function ruFloors(n) {
+  const w = n % 10 === 1 && n % 100 !== 11 ? 'этаж' : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? 'этажа' : 'этажей';
+  return n === 1 ? 'Один этаж!' : `${n} ${w}!`;
 }
 if ('speechSynthesis' in window) {
   pickVoice();
@@ -75,15 +87,16 @@ if ('speechSynthesis' in window) {
 }
 let lastUtterance = null;
 // Spricht text; ruft done() auf, wenn fertig (mit Zeit-Notbremse, falls der Browser kein Ende meldet)
-function say(text, { pitch = 1.25, rate = 0.85, done = null } = {}) {
+function say(text, { pitch = 1.25, rate = 0.85, done = null, lang = null } = {}) {
+  const L = lang || speechLang();
   let called = false;
   const finish = () => { if (!called) { called = true; done && done(); } };
   if (done) setTimeout(finish, Math.min(6000, 1200 + text.length * 85));
   if (!('speechSynthesis' in window)) { if (done) setTimeout(finish, 800); return; }
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'de-DE'; u.rate = rate; u.pitch = pitch;
-  if (germanVoice) u.voice = germanVoice;
+  u.lang = L === 'ru' ? 'ru-RU' : 'de-DE'; u.rate = rate; u.pitch = pitch;
+  if (voices[L]) u.voice = voices[L];
   u.onend = () => setTimeout(finish, 250);
   lastUtterance = u; // Chrome: Referenz halten, sonst feuert onend manchmal nicht
   speechSynthesis.speak(u);
@@ -97,6 +110,7 @@ let current = 'start';
 function go(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === name));
   document.body.classList.toggle('in-menu', name === 'start');
+  document.body.classList.toggle('toddler', isToddlerArea(name));
   if (screens[current]?.leave) screens[current].leave();
   if ('speechSynthesis' in window) speechSynthesis.cancel();
   current = name;
@@ -108,7 +122,7 @@ document.querySelectorAll('[data-go]').forEach(b =>
 // Wohin führt "Zurück"? Spiele der 2-Jährigen -> Menü, Menüs -> Startseite
 const PARENT = { menu: 'start', menu7: 'start', menu17: 'start', game7: 'menu7', game17: 'menu17' };
 function parentOf(n) { return PARENT[n] || 'menu'; }
-function isToddlerArea(n) { return n === 'menu' || parentOf(n) === 'menu'; }
+function isToddlerArea(n) { return n !== 'start' && (n === 'menu' || parentOf(n) === 'menu'); }
 
 // Zurück: Im Bereich der 2-Jährigen mit Bestätigung (⬅️ antippen -> "Zum Menü" erscheint 4 s),
 // bei 7 und 17 Jahren direkt. Am PC zusätzlich Esc.
@@ -135,18 +149,18 @@ document.addEventListener('contextmenu', e => e.preventDefault());
 /* ---------- Tiere ---------- */
 // 3D-Tierbilder: Microsoft Fluent Emoji (MIT-Lizenz, siehe img/tiere/LICENSE-fluentui-emoji.txt)
 const ANIMALS = [
-  ['kuh', 'Die Kuh macht Muuuh!', [130, 110], '#c7f0bd'],
-  ['hund', 'Der Hund macht Wau wau!', [400, 300], '#ffe0b3'],
-  ['katze', 'Die Katze macht Miau!', [700, 900, 600], '#ffd6e0'],
-  ['schwein', 'Das Schwein macht Oink oink!', [220, 180], '#ffe5ec'],
-  ['schaf', 'Das Schaf macht Määäh!', [320, 330, 320], '#d7ecff'],
-  ['huhn', 'Das Huhn macht Gack gack!', [800, 650], '#fff3b0'],
-  ['ente', 'Die Ente macht Quak quak!', [500, 450], '#bde0fe'],
-  ['pferd', 'Das Pferd macht Hüüü!', [500, 700, 400], '#e9dcc9'],
-  ['frosch', 'Der Frosch macht Quak!', [180, 220], '#d8f3dc'],
-  ['loewe', 'Der Löwe brüllt ganz laut!', 'roar', '#ffe8a3'],
-  ['biene', 'Die Biene macht Summ summ!', 'buzz', '#fdf0c4'],
-  ['elefant', 'Der Elefant macht Törööö!', [300, 450, 350], '#e0e7ff'],
+  ['kuh', 'Die Kuh macht Muuuh!', [130, 110], '#c7f0bd', 'Корова говорит: му-у!'],
+  ['hund', 'Der Hund macht Wau wau!', [400, 300], '#ffe0b3', 'Собака говорит: гав-гав!'],
+  ['katze', 'Die Katze macht Miau!', [700, 900, 600], '#ffd6e0', 'Кошка говорит: мяу!'],
+  ['schwein', 'Das Schwein macht Oink oink!', [220, 180], '#ffe5ec', 'Свинья говорит: хрю-хрю!'],
+  ['schaf', 'Das Schaf macht Määäh!', [320, 330, 320], '#d7ecff', 'Овечка говорит: бе-е!'],
+  ['huhn', 'Das Huhn macht Gack gack!', [800, 650], '#fff3b0', 'Курочка говорит: ко-ко-ко!'],
+  ['ente', 'Die Ente macht Quak quak!', [500, 450], '#bde0fe', 'Утка говорит: кря-кря!'],
+  ['pferd', 'Das Pferd macht Hüüü!', [500, 700, 400], '#e9dcc9', 'Лошадка говорит: иго-го!'],
+  ['frosch', 'Der Frosch macht Quak!', [180, 220], '#d8f3dc', 'Лягушка говорит: ква-ква!'],
+  ['loewe', 'Der Löwe brüllt ganz laut!', 'roar', '#ffe8a3', 'Лев громко рычит!'],
+  ['biene', 'Die Biene macht Summ summ!', 'buzz', '#fdf0c4', 'Пчёлка жужжит: ж-ж-ж!'],
+  ['elefant', 'Der Elefant macht Törööö!', [300, 450, 350], '#e0e7ff', 'Слон трубит: ту-ту-у!'],
 ];
 // Löwengebrüll: tiefes, knurrendes Rauschen mit anschwellender Lautstärke
 function roar() {
@@ -190,8 +204,9 @@ const grid = document.getElementById('animalGrid');
 // Werden beim Öffnen des Spiels geladen; fehlt eine Datei, gibt es den künstlichen Ersatzton.
 const animalSounds = {};
 function loadAnimalSounds() {
-  ANIMALS.forEach(([name]) => {
+  ANIMALS.forEach(([name, , notes]) => {
     if (name in animalSounds) return;
+    if (notes === 'buzz') { animalSounds[name] = false; return; } // Biene: keine Aufnahme, künstliches Summen
     animalSounds[name] = null;
     fetch(`sounds/tiere/${name}.mp3`)
       .then(r => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
@@ -221,7 +236,7 @@ function buzz() {
   [o, lfo].forEach(n => { n.start(t); n.stop(t + dur + 0.05); });
 }
 let animalTalk = null;
-ANIMALS.forEach(([img, text, notes, bg], i) => {
+ANIMALS.forEach(([img, text, notes, bg, textRu], i) => {
   const b = document.createElement('button');
   b.className = 'animal';
   b.style.setProperty('--bg', bg);
@@ -239,7 +254,7 @@ ANIMALS.forEach(([img, text, notes, bg], i) => {
       else if (notes === 'buzz') { buzz(); dur = 1.3; }
       else { notes.forEach((f, k) => setTimeout(() => tone(f, 0.18, 'square', 0.12), k * 140)); dur = notes.length * 0.14; }
     }
-    animalTalk = setTimeout(() => say(text), dur * 1000 + 150);
+    animalTalk = setTimeout(() => say(T(text, textRu)), dur * 1000 + 150);
   });
   grid.appendChild(b);
 });
@@ -247,14 +262,14 @@ screens.tiere = { enter: loadAnimalSounds, leave() { clearTimeout(animalTalk); }
 
 /* ---------- Farben / Ballons ---------- */
 const COLORS = [
-  ['#e63946', 'Rot'], ['#1d4ed8', 'Blau'], ['#ffd60a', 'Gelb'], ['#2a9d4a', 'Grün'],
-  ['#ff8c00', 'Orange'], ['#9b5de5', 'Lila'], ['#ff70a6', 'Rosa'],
+  ['#e63946', 'Rot', 'Красный'], ['#1d4ed8', 'Blau', 'Синий'], ['#ffd60a', 'Gelb', 'Жёлтый'], ['#2a9d4a', 'Grün', 'Зелёный'],
+  ['#ff8c00', 'Orange', 'Оранжевый'], ['#9b5de5', 'Lila', 'Фиолетовый'], ['#ff70a6', 'Rosa', 'Розовый'],
 ];
 const balloonArea = document.getElementById('balloonArea');
 let balloonTimer;
 function spawnBalloon() {
   if (balloonArea.childElementCount > 8) return;
-  const [c, name] = COLORS[Math.floor(Math.random() * COLORS.length)];
+  const [c, name, nameRu] = COLORS[Math.floor(Math.random() * COLORS.length)];
   const b = document.createElement('div');
   b.className = 'balloon';
   b.style.setProperty('--c', c);
@@ -264,7 +279,7 @@ function spawnBalloon() {
   b.addEventListener('animationend', () => b.remove());
   b.addEventListener('pointerdown', e => {
     popSound(); vibrate(40);
-    say(name + '!');
+    say(T(name, nameRu) + '!');
     const p = document.createElement('div');
     p.className = 'pop'; p.textContent = '✨';
     p.style.left = e.clientX + 'px'; p.style.top = e.clientY + 'px';
@@ -327,10 +342,11 @@ bubbleArea.addEventListener('pointermove', e => { if (e.buttons || e.pointerType
 /* ---------- Bauen mit Magnetplatten ---------- */
 // [Farbe, Adjektiv sächlich (das Viereck), Adjektiv männlich (der Halbkreis)]
 const BUILD_COLORS = [
-  ['#e63946', 'Rotes', 'Roter'], ['#1d4ed8', 'Blaues', 'Blauer'], ['#ffc300', 'Gelbes', 'Gelber'],
-  ['#2a9d4a', 'Grünes', 'Grüner'], ['#ff8c00', 'Oranges', 'Oranger'], ['#9b5de5', 'Lila', 'Lila'],
+  ['#e63946', 'Rotes', 'Roter', 'Красный'], ['#1d4ed8', 'Blaues', 'Blauer', 'Синий'], ['#ffc300', 'Gelbes', 'Gelber', 'Жёлтый'],
+  ['#2a9d4a', 'Grünes', 'Grüner', 'Зелёный'], ['#ff8c00', 'Oranges', 'Oranger', 'Оранжевый'], ['#9b5de5', 'Lila', 'Lila', 'Фиолетовый'],
 ];
 const SHAPE_NAME = { sq: 'Viereck', tri: 'Dreieck', rect: 'Rechteck', semi: 'Halbkreis' };
+const SHAPE_NAME_RU = { sq: 'квадрат', tri: 'треугольник', rect: 'прямоугольник', semi: 'полукруг' };
 const SHAPES = ['sq', 'rect', 'tri', 'semi'];
 // Seitenverhältnis der Formen (Breite, Höhe) – für Palette und Ziehen
 const SHAPE_DIM = { sq: [1, 1], tri: [1, 0.9], rect: [2, 1], semi: [2, 1] };
@@ -378,19 +394,20 @@ function landedSpeech(list, target, colorEntry, isWall, level) {
   const walls = list.filter(s => isWall(s) && level(s) === level(target));
   if (isWall(target) && walls.every(s => s.landed)) {
     const n = level(target) + 1;
-    say(n === 1 ? 'Ein Stockwerk!' : n + ' Stockwerke!');
+    say(T(n === 1 ? 'Ein Stockwerk!' : n + ' Stockwerke!', ruFloors(n)));
     [0, 1].forEach(i => pianoNote(freq(['C5', 'G5'][i]), i * 0.1, null, 0.3));
   } else {
-    say(colorWord(colorEntry, target.type) + ' ' + SHAPE_NAME[target.type] + '!');
+    say(T(colorWord(colorEntry, target.type) + ' ' + SHAPE_NAME[target.type], colorEntry[3] + ' ' + SHAPE_NAME_RU[target.type]) + '!');
   }
 }
-function celebrate(phrase) {
+function celebrate(h) {
   ['C5', 'E5', 'G5', 'C6'].forEach((n, i) => pianoNote(freq(n), i * 0.15));
-  say('Juhu! ' + phrase + ' ist fertig!');
+  say(T('Juhu! ' + h.done + ' ist fertig!', 'Ура! ' + h.doneRu + '!'));
 }
+function announce(h) { say(T('Wir bauen ' + h.say + '!', 'Строим ' + h.sayRu + '!')); }
 function bumm() {
   [0, 1, 2, 3, 4].forEach(i => tone(600 - i * 90, 0.15, 'triangle', 0.25, i * 0.09));
-  say('Bumm!');
+  say(T('Bumm!', 'Бум!'));
 }
 
 /* ----- 2D ----- */
@@ -403,23 +420,23 @@ function P(type, x, y, w, h) {
 }
 function stack(x, from, to) { const o = []; for (let y = from; y < to; y++) o.push(P('sq', x, y)); return o; }
 const HOUSES = [
-  { say: 'ein Haus', done: 'Das Haus', parts: [P('rect', 0, 0), P('sq', 0, 1), P('sq', 1, 1), P('tri', 0, 2, 2)] },
-  { say: 'einen Turm mit Kuppel', done: 'Der Turm', parts: [...stack(0, 0, 4), P('semi', 0, 4)] },
-  { say: 'eine Kirche', done: 'Die Kirche', top: '✝️', parts: [
+  { say: 'ein Haus', done: 'Das Haus', sayRu: 'дом', doneRu: 'Дом готов', parts: [P('rect', 0, 0), P('sq', 0, 1), P('sq', 1, 1), P('tri', 0, 2, 2)] },
+  { say: 'einen Turm mit Kuppel', done: 'Der Turm', sayRu: 'башню с куполом', doneRu: 'Башня готова', parts: [...stack(0, 0, 4), P('semi', 0, 4)] },
+  { say: 'eine Kirche', done: 'Die Kirche', sayRu: 'церковь', doneRu: 'Церковь готова', top: '✝️', parts: [
     P('rect', 0, 0), P('rect', 0, 1), P('tri', 0, 2, 2),
     ...stack(2, 0, 4), P('tri', 2, 4, 1, 1.8)] },
-  { say: 'ein Hochhaus', done: 'Das Hochhaus', parts: [...stack(0, 0, 5), ...stack(1, 0, 5), P('tri', 0, 5, 2)] },
-  { say: 'eine Burg', done: 'Die Burg', top: '🚩', parts: [
+  { say: 'ein Hochhaus', done: 'Das Hochhaus', sayRu: 'высокий дом', doneRu: 'Высокий дом готов', parts: [...stack(0, 0, 5), ...stack(1, 0, 5), P('tri', 0, 5, 2)] },
+  { say: 'eine Burg', done: 'Die Burg', sayRu: 'крепость', doneRu: 'Крепость готова', top: '🚩', parts: [
     ...stack(0, 0, 3), P('tri', 0, 3), P('rect', 1, 0), P('rect', 1, 1), P('semi', 1, 2, 2),
     ...stack(3, 0, 3), P('tri', 3, 3)] },
-  { say: 'ein Schloss', done: 'Das Schloss', top: '👑', parts: [
+  { say: 'ein Schloss', done: 'Das Schloss', sayRu: 'замок', doneRu: 'Замок готов', top: '👑', parts: [
     P('rect', 0, 0), P('rect', 2, 0), P('rect', 0, 1), P('rect', 2, 1),
     P('tri', 0, 2), P('semi', 1, 2, 2), P('tri', 3, 2)] },
-  { say: 'eine große Kirche', done: 'Die große Kirche', top: '✝️', parts: [
+  { say: 'eine große Kirche', done: 'Die große Kirche', sayRu: 'большую церковь', doneRu: 'Большая церковь готова', top: '✝️', parts: [
     ...stack(0, 0, 5), P('tri', 0, 5, 1, 1.8),
     P('rect', 1, 0), P('rect', 1, 1), P('rect', 1, 2), P('semi', 1, 3, 2),
     ...stack(3, 0, 5), P('tri', 3, 5, 1, 1.8)] },
-  { say: 'ein großes Hochhaus', done: 'Das große Hochhaus', parts: [...stack(0, 0, 8), ...stack(1, 0, 8), P('semi', 0, 8, 2)] },
+  { say: 'ein großes Hochhaus', done: 'Das große Hochhaus', sayRu: 'очень высокий дом', doneRu: 'Очень высокий дом готов', parts: [...stack(0, 0, 8), ...stack(1, 0, 8), P('semi', 0, 8, 2)] },
 ];
 const bauen = document.getElementById('bauen');
 const zone = document.getElementById('buildZone');
@@ -451,7 +468,7 @@ function layoutHouse() {
   });
   if (topEl) placeTop2();
 }
-function newHouse(announce = true) {
+function newHouse(doAnnounce = true) {
   bauen.querySelectorAll('.piece, .topdeco').forEach(p => p.remove());
   sunEl?.remove(); sunEl = null; topEl = null;
   bauen.classList.remove('house-done');
@@ -462,7 +479,7 @@ function newHouse(announce = true) {
   showPalette(pals, new Set(slots.map(s => s.type)));
   layoutHouse();
   updatePalette();
-  if (announce) say('Wir bauen ' + house2().say + '!');
+  if (doAnnounce) announce(house2());
 }
 function hintShape(type) {
   slots.filter(s => !s.filled && s.type === type).forEach(s => {
@@ -527,7 +544,7 @@ function finishHouse() {
   }
   sunEl = document.createElement('div'); sunEl.className = 'sun'; sunEl.textContent = '☀️';
   zone.appendChild(sunEl);
-  setTimeout(() => { bauen.classList.add('house-done'); celebrate(house2().done); }, 500);
+  setTimeout(() => { bauen.classList.add('house-done'); celebrate(house2()); }, 500);
 }
 function tumble() {
   if (!houseDone || busy) return;
@@ -543,6 +560,13 @@ function tumble() {
   setTimeout(() => { houseIdx++; newHouse(); busy = false; }, 950);
 }
 zone.addEventListener('pointerdown', tumble);
+// Vor/Zurück: anderes Bauwerk auswählen
+function switchHouse(dir) {
+  if (busy) return;
+  houseIdx = (houseIdx + dir + HOUSES.length) % HOUSES.length;
+  tone(dir > 0 ? 760 : 560, 0.15, 'triangle', 0.2);
+  newHouse();
+}
 
 // Palette: antippen ODER auf die Baustelle ziehen (für 2D und 3D)
 function setupPalette(pal, host, o) {
@@ -582,7 +606,7 @@ pals.forEach(pal => setupPalette(pal, bauen, {
   drop: (type, point, el) => place(type, null, point, el),
 }));
 screens.bauen = {
-  enter() { if (!slots.length) newHouse(); else { layoutHouse(); say('Wir bauen ' + house2().say + '!'); } },
+  enter() { if (!slots.length) newHouse(); else { layoutHouse(); announce(house2()); } },
 };
 addEventListener('resize', () => { if (current === 'bauen' && slots.length) layoutHouse(); });
 
@@ -595,24 +619,24 @@ const pals3 = [...b3.querySelectorAll('.pal')];
 // roof: pyramid | spire (Kirchturmspitze) | gable (Satteldach) | dome (Kuppel aus Halbkreisen) | none,
 // rect: lange Wände aus Rechtecken
 const HOUSES3D = [
-  { say: 'ein Haus', done: 'Das Haus', blocks: [{ W: 1, D: 1, F: 1, roof: 'pyramid' }] },
-  { say: 'ein langes Haus', done: 'Das lange Haus', blocks: [{ W: 2, D: 1, F: 2, roof: 'gable', rect: true }] },
-  { say: 'einen Turm mit Kuppel', done: 'Der Turm', blocks: [{ W: 1, D: 1, F: 3, roof: 'dome' }] },
-  { say: 'eine Kirche', done: 'Die Kirche', top: '✝️', blocks: [
+  { say: 'ein Haus', done: 'Das Haus', sayRu: 'дом', doneRu: 'Дом готов', blocks: [{ W: 1, D: 1, F: 1, roof: 'pyramid' }] },
+  { say: 'ein langes Haus', done: 'Das lange Haus', sayRu: 'длинный дом', doneRu: 'Длинный дом готов', blocks: [{ W: 2, D: 1, F: 2, roof: 'gable', rect: true }] },
+  { say: 'einen Turm mit Kuppel', done: 'Der Turm', sayRu: 'башню с куполом', doneRu: 'Башня готова', blocks: [{ W: 1, D: 1, F: 3, roof: 'dome' }] },
+  { say: 'eine Kirche', done: 'Die Kirche', sayRu: 'церковь', doneRu: 'Церковь готова', top: '✝️', blocks: [
     { x: 0, W: 3, D: 1, F: 1, roof: 'gable', rect: true },     // Kirchenschiff
     { x: 3, W: 1, D: 1, F: 3, roof: 'spire', top: true },      // Kirchturm
     { x: -1, W: 1, D: 1, F: 1, roof: 'dome' }] },              // runde Apsis
-  { say: 'ein großes Haus', done: 'Das große Haus', blocks: [{ W: 2, D: 2, F: 2, roof: 'pyramid' }] },
-  { say: 'eine Burg', done: 'Die Burg', top: '🚩', blocks: [
+  { say: 'ein großes Haus', done: 'Das große Haus', sayRu: 'большой дом', doneRu: 'Большой дом готов', blocks: [{ W: 2, D: 2, F: 2, roof: 'pyramid' }] },
+  { say: 'eine Burg', done: 'Die Burg', sayRu: 'крепость', doneRu: 'Крепость готова', top: '🚩', blocks: [
     { x: 0, z: 0, W: 2, D: 2, F: 1, roof: 'none' },
     { x: -1, z: -1, W: 1, D: 1, F: 2, roof: 'spire', top: true },
     { x: 2, z: 2, W: 1, D: 1, F: 2, roof: 'spire', top: true }] },
-  { say: 'ein Schloss', done: 'Das Schloss', top: '👑', blocks: [
+  { say: 'ein Schloss', done: 'Das Schloss', sayRu: 'замок', doneRu: 'Замок готов', top: '👑', blocks: [
     { x: 0, W: 2, D: 1, F: 1, roof: 'gable', rect: true },
     { x: -1, W: 1, D: 1, F: 2, roof: 'dome', top: true },
     { x: 2, W: 1, D: 1, F: 2, roof: 'dome', top: true }] },
-  { say: 'ein Hochhaus', done: 'Das Hochhaus', blocks: [{ W: 3, D: 1, F: 5, roof: 'gable', rect: true }] },
-  { say: 'einen hohen Turm', done: 'Der Turm', blocks: [{ W: 1, D: 1, F: 6, roof: 'spire' }] },
+  { say: 'ein Hochhaus', done: 'Das Hochhaus', sayRu: 'высокий дом', doneRu: 'Высокий дом готов', blocks: [{ W: 3, D: 1, F: 5, roof: 'gable', rect: true }] },
+  { say: 'einen hohen Turm', done: 'Der Turm', sayRu: 'высокую башню', doneRu: 'Башня готова', blocks: [{ W: 1, D: 1, F: 6, roof: 'spire' }] },
 ];
 let h3Idx = 0, slots3 = [], done3 = false, busy3 = false, S3 = 100, angle = -30, spin = 0.012;
 let raf3 = null, lastT = 0, dragRot = null, plate = null, topEls3 = [];
@@ -711,7 +735,7 @@ function layout3d() {
     t.el.style.fontSize = S3 * 0.55 + 'px';
   });
 }
-function newHouse3d(announce = true) {
+function newHouse3d(doAnnounce = true) {
   stage.innerHTML = '';
   topEls3 = [];
   b3.classList.remove('house-done');
@@ -723,7 +747,7 @@ function newHouse3d(announce = true) {
   showPalette(pals3, new Set(slots3.map(s => s.type)));
   layout3d();
   updatePalette();
-  if (announce) say('Wir bauen ' + house3().say + '!');
+  if (doAnnounce) announce(house3());
 }
 function place3d(type, point, dragEl) {
   dragEl?.remove();
@@ -782,7 +806,7 @@ function finish3d() {
   layout3d();
   setTimeout(() => {
     b3.classList.add('house-done');
-    celebrate(house3().done);
+    celebrate(house3());
     spin = 0.09; setTimeout(() => { spin = 0.012; }, 1500);
   }, 500);
 }
@@ -822,12 +846,23 @@ pals3.forEach(pal => setupPalette(pal, b3, {
 }));
 screens.bauen3d = {
   enter() {
-    if (!slots3.length) newHouse3d(); else { layout3d(); say('Wir bauen ' + house3().say + ' in 3 D!'); }
+    if (!slots3.length) newHouse3d(); else { layout3d(); announce(house3()); }
     lastT = 0; raf3 = requestAnimationFrame(tick3d);
   },
   leave() { cancelAnimationFrame(raf3); },
 };
 addEventListener('resize', () => { if (current === 'bauen3d' && slots3.length) layout3d(); });
+function switchHouse3d(dir) {
+  if (busy3) return;
+  h3Idx = (h3Idx + dir + HOUSES3D.length) % HOUSES3D.length;
+  tone(dir > 0 ? 760 : 560, 0.15, 'triangle', 0.2);
+  newHouse3d();
+}
+document.querySelectorAll('.navBuild button').forEach(btn => btn.addEventListener('click', e => {
+  e.stopPropagation();
+  const dir = +btn.dataset.dir;
+  if (current === 'bauen3d') switchHouse3d(dir); else switchHouse(dir);
+}));
 
 /* ---------- Klavier ---------- */
 const piano = document.getElementById('piano');
@@ -889,13 +924,13 @@ const THW_SVG = `<svg class="thw" viewBox="0 0 130 100" aria-hidden="true">
   <circle cx="102" cy="78" r="13" fill="#333"/><circle cx="102" cy="78" r="5" fill="#bbb"/>
 </svg>`;
 const VEHICLES = [
-  { car: '🚒', call: 'Hilfe! Feuer! Es brennt! Hilfe!', need: '🔥', solved: '💨',
+  { car: '🚒', call: 'Hilfe! Feuer! Es brennt! Hilfe!', callRu: 'Помогите! Пожар! Горит! Помогите!', nameRu: 'Та-ту, та-та! Едут пожарные!', need: '🔥', solved: '💨',
     name: 'Ta tü, ta ta! Die Feuerwehr kommt!', siren: ['G4', 'C5'], song: 'jakob', title: 'Bruder Jakob' },
-  { car: '🚑', call: 'Aua! Ich bin verletzt. Ich brauche ein Pflaster!', need: '🤕', solved: '🩹',
+  { car: '🚑', call: 'Aua! Ich bin verletzt. Ich brauche ein Pflaster!', callRu: 'Ай! Мне больно. Мне нужен пластырь!', nameRu: 'Едет скорая помощь!', need: '🤕', solved: '🩹',
     name: 'Der Krankenwagen kommt!', siren: ['A4', 'D5'], song: 'entchen', title: 'Alle meine Entchen' },
-  { car: '🚓', call: 'Hilfe! Ich brauche Hilfe!', need: '😟', solved: '😊',
+  { car: '🚓', call: 'Hilfe! Ich brauche Hilfe!', callRu: 'Помогите! Мне нужна помощь!', nameRu: 'Едет полиция!', need: '😟', solved: '😊',
     name: 'Die Polizei kommt!', siren: ['B4', 'E5'], song: 'haenschen', title: 'Hänschen klein' },
-  { car: THW_SVG, call: 'Hilfe! Wasser kommt!', need: '🌊', solved: '☀️',
+  { car: THW_SVG, call: 'Hilfe! Wasser kommt!', callRu: 'Помогите! Вода прибывает!', nameRu: 'Едет служба спасения!', need: '🌊', solved: '☀️',
     name: 'Das Technische Hilfswerk kommt!', siren: ['F4', 'B4'], song: 'funkel', title: 'Funkel, funkel, kleiner Stern' },
 ];
 const garage = document.getElementById('garage');
@@ -942,7 +977,7 @@ function playVehicle(v, btn) {
   need.classList.remove('show', 'solved'); void need.offsetWidth; need.classList.add('show');
   vibrate(40);
   // 1) Jemand ruft um Hilfe – danach kommt das Fahrzeug
-  say(v.call, { pitch: 1.6, rate: 0.95, done: () => { if (id === playId) rescue(v, btn, need); } });
+  say(T(v.call, v.callRu), { pitch: 1.6, rate: 0.95, done: () => { if (id === playId) rescue(v, btn, need); } });
 }
 function rescue(v, btn, need) {
   btn.classList.remove('calling'); btn.classList.add('playing');
@@ -950,7 +985,7 @@ function rescue(v, btn, need) {
   const car = btn.querySelector('.car');
   car.classList.remove('drive'); void car.offsetWidth; car.classList.add('drive');
   for (let i = 0; i < 4; i++) sirenTone(freq(v.siren[i % 2]), i * 0.5, 0.48, songBus);
-  songTimers.push(setTimeout(() => say(v.name), 2050));
+  songTimers.push(setTimeout(() => say(T(v.name, v.nameRu)), 2050));
   // 3) Geholfen! Problem gelöst
   songTimers.push(setTimeout(() => {
     need.textContent = v.solved; need.classList.add('solved');
@@ -981,6 +1016,88 @@ VEHICLES.forEach(v => {
   garage.appendChild(b);
 });
 screens.autos = { leave: stopSong };
+
+/* ---------- Wer ist das? Tiernamen nach Lebensräumen ---------- */
+// [Bild, deutscher Name mit Artikel, russischer Name]
+const HABITATS = [
+  { icon: '🚜', de: 'Auf dem Bauernhof', ru: 'На ферме', bg: 'linear-gradient(#bde0fe, #d8f3dc 55%, #b7e4c7)', animals: [
+    ['kuh', 'die Kuh', 'Корова'], ['schwein', 'das Schwein', 'Свинья'], ['schaf', 'das Schaf', 'Овца'], ['huhn', 'das Huhn', 'Курица'],
+    ['pferd', 'das Pferd', 'Лошадь'], ['ente', 'die Ente', 'Утка'], ['hund', 'der Hund', 'Собака'], ['katze', 'die Katze', 'Кошка'],
+    ['ziege', 'die Ziege', 'Коза'], ['esel', 'der Esel', 'Ослик'], ['hase', 'der Hase', 'Заяц']] },
+  { icon: '🌲', de: 'Im Wald', ru: 'В лесу', bg: 'linear-gradient(#cdeac0, #95d5b2 60%, #74c69d)', animals: [
+    ['fuchs', 'der Fuchs', 'Лиса'], ['baer', 'der Bär', 'Медведь'], ['eule', 'die Eule', 'Сова'], ['igel', 'der Igel', 'Ёжик'],
+    ['eichhoernchen', 'das Eichhörnchen', 'Белка'], ['hirsch', 'der Hirsch', 'Олень'], ['wolf', 'der Wolf', 'Волк'],
+    ['maus', 'die Maus', 'Мышка'], ['vogel', 'der Vogel', 'Птичка']] },
+  { icon: '🦁', de: 'Im Zoo', ru: 'В зоопарке', bg: 'linear-gradient(#ffe8a3, #ffd6a5 60%, #f4c27a)', animals: [
+    ['loewe', 'der Löwe', 'Лев'], ['elefant', 'der Elefant', 'Слон'], ['giraffe', 'die Giraffe', 'Жираф'], ['zebra', 'das Zebra', 'Зебра'],
+    ['affe', 'der Affe', 'Обезьяна'], ['tiger', 'der Tiger', 'Тигр'], ['nilpferd', 'das Nilpferd', 'Бегемот'], ['nashorn', 'das Nashorn', 'Носорог'],
+    ['kamel', 'das Kamel', 'Верблюд'], ['krokodil', 'das Krokodil', 'Крокодил'], ['panda', 'der Panda', 'Панда'], ['kaenguru', 'das Känguru', 'Кенгуру'],
+    ['koala', 'der Koala', 'Коала'], ['gorilla', 'der Gorilla', 'Горилла'], ['papagei', 'der Papagei', 'Попугай'], ['schlange', 'die Schlange', 'Змея']] },
+  { icon: '🌊', de: 'Im Wasser', ru: 'В воде', bg: 'linear-gradient(#caf0f8, #90e0ef 50%, #48cae4)', animals: [
+    ['fisch', 'der Fisch', 'Рыбка'], ['delfin', 'der Delfin', 'Дельфин'], ['wal', 'der Wal', 'Кит'], ['schildkroete', 'die Schildkröte', 'Черепаха'],
+    ['pinguin', 'der Pinguin', 'Пингвин'], ['krake', 'der Krake', 'Осьминог'], ['krebs', 'die Krabbe', 'Краб'], ['robbe', 'die Robbe', 'Тюлень'],
+    ['frosch', 'der Frosch', 'Лягушка']] },
+  { icon: '🐞', de: 'Kleine Krabbeltiere', ru: 'Букашки', bg: 'linear-gradient(#fff3b0, #d8f3dc 70%)', animals: [
+    ['biene', 'die Biene', 'Пчела'], ['schmetterling', 'der Schmetterling', 'Бабочка'], ['marienkaefer', 'der Marienkäfer', 'Божья коровка'],
+    ['schnecke', 'die Schnecke', 'Улитка'], ['ameise', 'die Ameise', 'Муравей']] },
+];
+const namen = document.getElementById('namen');
+const habBar = document.getElementById('habitats');
+const nameGrid = document.getElementById('nameGrid');
+let habIdx = 0;
+function showHabitat(i, speak = true) {
+  habIdx = i;
+  const H = HABITATS[i];
+  namen.style.background = H.bg;
+  [...habBar.children].forEach((b, k) => b.classList.toggle('on', k === i));
+  nameGrid.innerHTML = '';
+  nameGrid.style.setProperty('--n', H.animals.length);
+  H.animals.forEach(([img, de, ru], k) => {
+    const b = document.createElement('button');
+    b.className = 'nameCard';
+    b.style.animationDelay = (k * 0.04) + 's';
+    b.setAttribute('aria-label', de);
+    b.innerHTML = `<img src="img/tiere/${img}.png" alt="" draggable="false">`;
+    b.addEventListener('pointerdown', () => {
+      b.classList.remove('jump'); void b.offsetWidth; b.classList.add('jump');
+      tone(660 + k * 20, 0.12, 'triangle', 0.15);
+      vibrate();
+      say(T(de.charAt(0).toUpperCase() + de.slice(1), ru) + '!', { rate: 0.8 });
+    });
+    nameGrid.appendChild(b);
+  });
+  if (speak) say(T(H.de, H.ru));
+}
+HABITATS.forEach((H, i) => {
+  const b = document.createElement('button');
+  b.className = 'hab'; b.textContent = H.icon; b.setAttribute('aria-label', H.de);
+  b.addEventListener('pointerdown', () => { tone(520, 0.12, 'sine', 0.2); showHabitat(i); });
+  habBar.appendChild(b);
+});
+screens.namen = { enter() { showHabitat(habIdx); } };
+
+/* ---------- Sprach-Knopf Deutsch / Russisch (in allen Spielen der 2-Jährigen) ---------- */
+const langBtn = document.getElementById('lang');
+const toast = document.getElementById('toast');
+function paintLang() {
+  langBtn.dataset.lang = LANG;
+  langBtn.querySelector('b').textContent = LANG === 'ru' ? 'RU' : 'DE';
+  langBtn.setAttribute('aria-label', LANG === 'ru' ? 'Sprache: Russisch – umschalten auf Deutsch' : 'Sprache: Deutsch – umschalten auf Russisch');
+}
+function showToast(text) {
+  toast.textContent = text; toast.classList.add('show');
+  clearTimeout(showToast.t); showToast.t = setTimeout(() => toast.classList.remove('show'), 5000);
+}
+langBtn.addEventListener('click', () => {
+  LANG = LANG === 'ru' ? 'de' : 'ru';
+  try { localStorage.setItem('fe_lang', LANG); } catch { /* egal */ }
+  paintLang();
+  if ('speechSynthesis' in window) pickVoice();
+  say(LANG === 'ru' ? 'Русский' : 'Deutsch');
+  if (LANG === 'ru' && 'speechSynthesis' in window && !voices.ru)
+    showToast('Auf diesem Gerät ist keine russische Stimme installiert – die Aussprache kann falsch klingen. Russisch in den Spracheinstellungen des Geräts hinzufügen.');
+});
+paintLang();
 
 /* ---------- Start ---------- */
 document.body.classList.add('in-menu');
