@@ -127,11 +127,20 @@
   <div id="creditPanel" hidden>
       <div class="vbox">
         <h2>Fotonachweis</h2>
-        <p class="vhint">Alle Fotos stammen von Wikimedia Commons und stehen unter freien Lizenzen (CC0, gemeinfrei, CC BY, CC BY-SA). Sie wurden für die App verkleinert.</p>
+        <p class="vhint">Alle Fotos und Videos stammen von Wikimedia Commons und stehen unter freien Lizenzen (CC0, gemeinfrei, CC BY, CC BY-SA). Sie wurden für die App verkleinert bzw. gekürzt.</p>
         <div id="creditList"></div>
         <button class="vclose">Schließen</button>
       </div>
     </div>
+  <div id="videoPlayer" hidden>
+    <div class="vtop"><span class="vtitle"></span><button class="vx" aria-label="Video schließen">✖</button></div>
+    <video playsinline preload="auto"></video>
+    <div class="vbar">
+      <button class="vagain" aria-label="Nochmal">🔁</button>
+      <button class="vhorn" aria-label="Martinshorn">🚨 Tatütata</button>
+      <button class="vnext" aria-label="Nächstes Video">⏭</button>
+    </div>
+  </div>
   <div id="toast" role="status"></div>
   <button id="voiceBtn" aria-label="Stimme einstellen">⚙️</button>
   <div id="voicePanel" hidden>
@@ -145,6 +154,7 @@
   </div>
 
   <script src="fotos.js"></script>
+  <script src="videos.js"></script>
   <script src="app.js"></script>
   <script src="kids7.js"></script>
   <script src="teen17.js"></script>

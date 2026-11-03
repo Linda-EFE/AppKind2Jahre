@@ -1186,6 +1186,8 @@ function makePicker(section, bar, grid, cats, dir) {
     section.style.background = C.bg;
     [...bar.children].forEach((b, k) => b.classList.toggle('on', k === i));
     grid.innerHTML = '';
+    grid.classList.toggle('videos', !!C.render);
+    if (C.render) { C.render(grid); if (speak) say(T(C.de, C.ru)); return; }
     if (C.extra) grid.appendChild(C.extra());
     C.items.forEach(([img, de, ru, html], k) => {
       const b = document.createElement('button');
@@ -1307,12 +1309,55 @@ function showCredits() {
     row.innerHTML = `<img src="img/fahrzeuge/foto/${k}.jpg" alt=""><div><b>${de}</b><br><a href="https://commons.wikimedia.org/wiki/${encodeURIComponent(f.title.replace(/ /g, '_'))}" target="_blank" rel="noopener">${f.title.replace(/^File:/, '')}</a><br>${f.artist} · ${f.license}</div>`;
     box.appendChild(row);
   }));
+  VIDEOS.forEach(v => {
+    const row = document.createElement('div');
+    row.className = 'crow';
+    row.innerHTML = `<img src="video/${v.key}.jpg" alt=""><div><b>🎬 ${v.de}</b><br><a href="https://commons.wikimedia.org/wiki/${encodeURIComponent(v.title.replace(/ /g, '_'))}" target="_blank" rel="noopener">${v.title.replace(/^File:/, '')}</a><br>${v.artist} · ${v.license}</div>`;
+    box.appendChild(row);
+  });
   document.getElementById('creditPanel').hidden = false;
 }
 document.getElementById('creditBtn').addEventListener('click', showCredits);
 document.getElementById('creditPanel').querySelector('.vclose').addEventListener('click', () => { document.getElementById('creditPanel').hidden = true; });
+/* ----- Feuerwehr-Videos (Wikimedia Commons, freie Lizenzen; Daten in videos.js) ----- */
+const VIDEOS = window.VIDEO_LIST || [];
+const player = document.getElementById('videoPlayer');
+const pv = player.querySelector('video');
+let vIdx = 0;
+function playVideo(i) {
+  vIdx = (i + VIDEOS.length) % VIDEOS.length;
+  const v = VIDEOS[vIdx];
+  pv.src = `video/${v.key}.mp4`;
+  pv.poster = `video/${v.key}.jpg`;
+  player.querySelector('.vtitle').textContent = v.de;
+  player.hidden = false;
+  pv.currentTime = 0;
+  const p = pv.play(); if (p && p.catch) p.catch(() => {});
+}
+function closeVideo() { pv.pause(); pv.removeAttribute('src'); pv.load(); player.hidden = true; document.body.classList.remove('blaulicht'); }
+player.querySelector('.vx').addEventListener('click', closeVideo);
+player.querySelector('.vagain').addEventListener('click', () => { pv.currentTime = 0; pv.play(); });
+player.querySelector('.vnext').addEventListener('click', () => playVideo(vIdx + 1));
+player.querySelector('.vhorn').addEventListener('click', () => martinshorn());
+pv.addEventListener('click', () => (pv.paused ? pv.play() : pv.pause()));
+pv.addEventListener('ended', () => { player.querySelector('.vagain').classList.add('pulse'); setTimeout(() => player.querySelector('.vagain').classList.remove('pulse'), 3000); });
+function renderVideos(grid) {
+  VIDEOS.forEach((v, k) => {
+    const b = document.createElement('button');
+    b.className = 'nameCard videoCard';
+    b.style.animationDelay = (k * 0.04) + 's';
+    b.setAttribute('aria-label', 'Video: ' + v.de);
+    b.innerHTML = `<img class="photo" src="video/${v.key}.jpg" alt="" draggable="false"><span class="play">▶</span>`;
+    b.addEventListener('click', () => { audio(); playVideo(k); });
+    grid.appendChild(b);
+  });
+}
+if (VIDEOS.length) {
+  const at = VEHICLE_CATS.findIndex(c => c.icon === '🚒') + 1;
+  VEHICLE_CATS.splice(at, 0, { icon: '🎬', de: 'Feuerwehr-Videos', ru: 'Видео с пожарными', bg: 'linear-gradient(#1f2937, #7f1d1d)', render: renderVideos });
+}
 const fzGame = makePicker(document.getElementById('fahrzeuge'), document.getElementById('fzBar'), document.getElementById('fzGrid'), VEHICLE_CATS, 'img/fahrzeuge');
-screens.fahrzeuge = { enter: fzGame.enter, leave() { document.body.classList.remove('blaulicht'); } };
+screens.fahrzeuge = { enter: fzGame.enter, leave() { closeVideo(); } };
 
 /* ---------- Sprach-Knopf Deutsch / Russisch (in allen Spielen der 2-Jährigen) ---------- */
 const langBtn = document.getElementById('lang');

@@ -343,7 +343,7 @@ body.toddler #lang { display: block; }
 .hornCard b { position: absolute; left: 0; right: 0; bottom: 6%; font-size: min(5vmin, 26px); color: #b91c1c; }
 .hornCard img { max-height: 16vh !important; }
 body.blaulicht::after {
-  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 40;
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 60;
   animation: blauBlink .62s steps(2) infinite;
 }
 @keyframes blauBlink {
@@ -391,3 +391,21 @@ body.toddler-menu #voiceBtn { display: block; }
 .pickGrid.photos { grid-template-columns: repeat(auto-fill, minmax(min(44vw, 250px), 1fr)) !important; grid-auto-rows: auto !important; align-content: start; }
 .pickGrid.photos .nameCard { aspect-ratio: 4 / 3; height: auto; }
 .pickGrid.photos .hornCard img { width: 55% !important; height: auto !important; object-fit: contain !important; margin: 0 auto 14%; display: block; }
+
+/* ---------- Feuerwehr-Videos ---------- */
+.videoCard { position: relative; }
+.videoCard .play {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: 64px; height: 64px; border-radius: 50%; background: rgba(220, 38, 38, .9); color: #fff;
+  display: grid; place-items: center; font-size: 30px; padding-left: 6px; box-shadow: 0 4px 12px rgba(0,0,0,.4);
+}
+#videoPlayer { position: fixed; inset: 0; z-index: 45; background: #000; display: flex; flex-direction: column; }
+#videoPlayer[hidden] { display: none; }
+#videoPlayer video { flex: 1; min-height: 0; width: 100%; object-fit: contain; background: #000; }
+.vtop { display: flex; align-items: center; justify-content: space-between; padding: max(10px, env(safe-area-inset-top)) 14px 6px; color: #fff; font-size: 20px; font-weight: 700; }
+.vx { width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,.9); font-size: 24px; }
+.vbar { display: flex; justify-content: center; gap: 16px; padding: 12px 12px max(14px, env(safe-area-inset-bottom)); }
+.vbar button { height: 72px; min-width: 72px; border-radius: 36px; font-size: 30px; background: #fff; box-shadow: 0 5px 0 rgba(255,255,255,.3); }
+.vbar .vhorn { padding: 0 26px; background: #dc2626; color: #fff; font-size: 26px; font-weight: 800; box-shadow: 0 5px 0 #7f1d1d; }
+.vbar button:active { transform: translateY(3px); box-shadow: none; }
+.vbar .pulse { animation: shout .5s 6; background: #fde68a; }
