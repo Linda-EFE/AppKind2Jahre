@@ -277,9 +277,9 @@ body.in-menu #toMenu { display: none; }
 /* ---------- Wer ist das? ---------- */
 #namen { transition: background .4s; }
 #namen.active { display: flex; flex-direction: column; gap: 2vmin; padding-top: max(80px, env(safe-area-inset-top)); }
-#habitats { display: flex; justify-content: center; gap: 2.5vmin; flex: none; }
+#habitats { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.6vmin; flex: none; }
 .hab {
-  width: min(15vmin, 90px); height: min(15vmin, 90px); border-radius: 50%; font-size: min(9vmin, 54px);
+  width: min(12vmin, 76px); height: min(12vmin, 76px); border-radius: 50%; font-size: min(7.5vmin, 46px); padding: 0;
   background: rgba(255,255,255,.6); box-shadow: 0 5px 0 rgba(0,0,0,.15); transition: transform .15s;
 }
 .hab.on { background: #fff; transform: scale(1.12); box-shadow: 0 0 0 5px #ffd166, 0 5px 0 rgba(0,0,0,.15); }
@@ -323,3 +323,14 @@ body.toddler #lang { display: block; }
   transform: translate(-50%, calc(100% + 60px)); visibility: hidden;
 }
 #toast.show { transform: translate(-50%, 0); visibility: visible; }
+
+/* ---------- Ausstattung: Tür, Fenster, Treppe, Schornstein ---------- */
+.piece.extra { z-index: 2; }
+.pal[data-shape=door], .pal[data-shape=chim] { width: min(11vh, 9vw) !important; }
+.pal[data-shape=stairs] { width: min(22vh, 18vw) !important; height: min(11vh, 9vw) !important; }
+.smoke { position: absolute; z-index: 3; pointer-events: none; width: 1em; height: 1em; transform: translate(-50%, -100%); }
+.smoke i { position: absolute; left: 0; bottom: 0; width: 1em; height: 1em; border-radius: 50%; background: rgba(255,255,255,.85);
+  animation: puff 2.4s ease-out infinite; }
+.smoke i:nth-child(2) { animation-delay: .8s; }
+.smoke i:nth-child(3) { animation-delay: 1.6s; }
+@keyframes puff { from { transform: translate(0, 0) scale(.4); opacity: .9; } to { transform: translate(.8em, -3em) scale(1.6); opacity: 0; } }

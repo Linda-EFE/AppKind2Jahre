@@ -349,10 +349,47 @@ const SHAPE_NAME = { sq: 'Viereck', tri: 'Dreieck', rect: 'Rechteck', semi: 'Hal
 const SHAPE_NAME_RU = { sq: 'квадрат', tri: 'треугольник', rect: 'прямоугольник', semi: 'полукруг' };
 const SHAPES = ['sq', 'rect', 'tri', 'semi'];
 // Seitenverhältnis der Formen (Breite, Höhe) – für Palette und Ziehen
-const SHAPE_DIM = { sq: [1, 1], tri: [1, 0.9], rect: [2, 1], semi: [2, 1] };
+const SHAPE_DIM = { sq: [1, 1], tri: [1, 0.9], rect: [2, 1], semi: [2, 1], door: [0.65, 1], win: [1, 1], stairs: [1.3, 0.6], chim: [0.5, 1] };
+// Ausstattung: kommt nach Wänden und Dach dran
+const EXTRA = {
+  door: ['Die Tür!', 'Дверь!'], stairs: ['Die Treppe!', 'Лестница!'],
+  win: ['Ein Fenster!', 'Окно!'], chim: ['Der Schornstein!', 'Труба!'],
+};
+function extrasIntro(types) {
+  say(T('Jetzt kommen Tür, Treppe und Fenster' + (types.has('chim') ? ' – und der Schornstein!' : '!'),
+        'Теперь дверь, лестница и окна' + (types.has('chim') ? ' – и труба!' : '!')));
+}
+// Fenster gleichmäßig verteilen (höchstens n Stück)
+function spread(list, n) {
+  if (list.length <= n) return list.slice();
+  const out = new Set();
+  for (let i = 0; i < n; i++) out.add(list[Math.round(i * (list.length - 1) / (n - 1))]);
+  return [...out];
+}
 function colorWord(c, type) { return type === 'semi' ? c[2] : c[1]; }
 
+const EXTRA_SVG = {
+  door: `<path d="M10 98V34A40 30 0 0 1 90 34V98Z" fill="#8d5524" stroke="#5c3317" stroke-width="5"/>
+    <path d="M24 92V40A26 18 0 0 1 76 40V92Z" fill="none" stroke="#b07040" stroke-width="4"/><circle cx="70" cy="64" r="6" fill="#ffd166"/>`,
+  win: `<rect x="6" y="6" width="88" height="80" rx="6" fill="#bde0fe" stroke="#fff" stroke-width="9"/>
+    <path d="M50 8V84M8 46H92" stroke="#fff" stroke-width="7"/><path d="M18 18L34 34" stroke="#fff" stroke-width="5" opacity=".7"/>
+    <rect x="0" y="86" width="100" height="12" rx="4" fill="#d9a066"/>`,
+  stairs: `<g fill="#b0b7c3" stroke="#6b7280" stroke-width="4"><rect x="3" y="66" width="94" height="31" rx="3"/>
+    <rect x="15" y="35" width="70" height="31" rx="3"/><rect x="27" y="4" width="46" height="31" rx="3"/></g>`,
+  chim: `<rect x="10" y="14" width="80" height="84" fill="#b5523b" stroke="#7a2e1f" stroke-width="5"/>
+    <path d="M10 36H90M10 58H90M10 80H90M50 14V36M30 36V58M70 36V58M50 58V80M30 80V98M70 80V98" stroke="#e8a28f" stroke-width="3"/>
+    <rect x="2" y="2" width="96" height="16" rx="3" fill="#5c3317"/>`,
+};
+const EXTRA_GHOST = {
+  door: 'M10 98V34A40 30 0 0 1 90 34V98Z', win: 'M6 6H94V94H6Z',
+  stairs: 'M3 97V66H15V35H27V4H73V35H85V66H97V97Z', chim: 'M10 98V2H90V98Z',
+};
 function shapeSVG(type, color, ghost) {
+  if (EXTRA_SVG[type]) {
+    return ghost
+      ? `<svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="${EXTRA_GHOST[type]}" fill="rgba(255,255,255,.45)" stroke="#fff" stroke-width="4" stroke-dasharray="8 6" vector-effect="non-scaling-stroke"/></svg>`
+      : `<svg viewBox="0 0 100 100" preserveAspectRatio="none">${EXTRA_SVG[type]}</svg>`;
+  }
   const shapes = {
     sq: i => `<rect x="${i}" y="${i}" width="${100 - 2 * i}" height="${100 - 2 * i}" rx="${ghost ? 4 : 8}"/>`,
     rect: i => `<rect x="${i / 2}" y="${i}" width="${100 - i}" height="${100 - 2 * i}" rx="${ghost ? 3 : 5}"/>`,
@@ -420,12 +457,12 @@ function P(type, x, y, w, h) {
 }
 function stack(x, from, to) { const o = []; for (let y = from; y < to; y++) o.push(P('sq', x, y)); return o; }
 const HOUSES = [
-  { say: 'ein Haus', done: 'Das Haus', sayRu: 'дом', doneRu: 'Дом готов', parts: [P('rect', 0, 0), P('sq', 0, 1), P('sq', 1, 1), P('tri', 0, 2, 2)] },
+  { say: 'ein Haus', done: 'Das Haus', sayRu: 'дом', doneRu: 'Дом готов', chim: true, parts: [P('rect', 0, 0), P('sq', 0, 1), P('sq', 1, 1), P('tri', 0, 2, 2)] },
   { say: 'einen Turm mit Kuppel', done: 'Der Turm', sayRu: 'башню с куполом', doneRu: 'Башня готова', parts: [...stack(0, 0, 4), P('semi', 0, 4)] },
   { say: 'eine Kirche', done: 'Die Kirche', sayRu: 'церковь', doneRu: 'Церковь готова', top: '✝️', parts: [
     P('rect', 0, 0), P('rect', 0, 1), P('tri', 0, 2, 2),
     ...stack(2, 0, 4), P('tri', 2, 4, 1, 1.8)] },
-  { say: 'ein Hochhaus', done: 'Das Hochhaus', sayRu: 'высокий дом', doneRu: 'Высокий дом готов', parts: [...stack(0, 0, 5), ...stack(1, 0, 5), P('tri', 0, 5, 2)] },
+  { say: 'ein Hochhaus', done: 'Das Hochhaus', sayRu: 'высокий дом', doneRu: 'Высокий дом готов', chim: true, parts: [...stack(0, 0, 5), ...stack(1, 0, 5), P('tri', 0, 5, 2)] },
   { say: 'eine Burg', done: 'Die Burg', sayRu: 'крепость', doneRu: 'Крепость готова', top: '🚩', parts: [
     ...stack(0, 0, 3), P('tri', 0, 3), P('rect', 1, 0), P('rect', 1, 1), P('semi', 1, 2, 2),
     ...stack(3, 0, 3), P('tri', 3, 3)] },
@@ -441,13 +478,13 @@ const HOUSES = [
 const bauen = document.getElementById('bauen');
 const zone = document.getElementById('buildZone');
 const pals = [...bauen.querySelectorAll('.pal')];
-let houseIdx = 0, slots = [], colorIdx = 0, houseDone = false, busy = false, sunEl = null, topEl = null;
+let houseIdx = 0, slots = [], colorIdx = 0, houseDone = false, busy = false, sunEl = null, topEl = null, phase2 = false;
 const isWall2 = s => s.type === 'sq' || s.type === 'rect';
 function house2() { return HOUSES[houseIdx % HOUSES.length]; }
 
 function makePiece(type, color, ghost) {
   const el = document.createElement('div');
-  el.className = 'piece' + (ghost ? ' ghost' : '');
+  el.className = 'piece' + (ghost ? ' ghost' : '') + (EXTRA[type] ? ' extra' : '');
   el.innerHTML = shapeSVG(type, color, ghost);
   bauen.appendChild(el);
   return el;
@@ -455,28 +492,69 @@ function makePiece(type, color, ghost) {
 let unit = 100, originX = 0, groundY = 0;
 function layoutHouse() {
   const z = zone.getBoundingClientRect();
-  const cols = Math.max(...slots.map(s => s.x + s.w));
-  const rows = Math.max(...slots.map(s => s.y + s.h)) + (house2().top ? 0.7 : 0);
+  const struct = slots.filter(s => !s.host);
+  const cols = Math.max(...struct.map(s => s.x + s.w));
+  const rows = Math.max(...struct.map(s => s.y + s.h)) + (house2().top ? 0.7 : 0);
   unit = Math.min(z.width * 0.8 / cols, (z.height - 30) * 0.95 / rows, z.width * 0.3);
   originX = z.left + (z.width - cols * unit) / 2;
   groundY = z.bottom - 14;
   slots.forEach(s => {
-    s.rect = { left: originX + s.x * unit, top: groundY - s.y * unit - s.h * unit, width: s.w * unit, height: s.h * unit };
+    s.rect = s.host ? extraRect(s) : { left: originX + s.x * unit, top: groundY - s.y * unit - s.h * unit, width: s.w * unit, height: s.h * unit };
     setRect(s.ghost, s.rect);
     if (s.piece && s.landed) setRect(s.piece, s.rect);
     s.piece?.style.setProperty('--fs', unit * 0.55 + 'px');
   });
   if (topEl) placeTop2();
+  placeSmoke2();
+}
+// Lage von Tür, Treppe, Fenster und Schornstein (relativ zur Wand bzw. zum Dach)
+function extraRect(s) {
+  const r = s.host.rect, u = unit, cx = r.left + r.width / 2;
+  const box = (w, h, top, x = cx) => ({ left: x - w / 2, top, width: w, height: h });
+  if (s.type === 'door') return box(0.42 * u, 0.6 * u, r.top + r.height - 0.6 * u - 0.18 * u);
+  if (s.type === 'stairs') return box(0.78 * u, 0.2 * u, r.top + r.height - 0.2 * u);
+  if (s.type === 'win') return s.host.type === 'rect' ? box(0.9 * u, 0.48 * u, r.top + r.height / 2 - 0.27 * u) : box(0.5 * u, 0.5 * u, r.top + r.height / 2 - 0.28 * u);
+  // Schornstein: auf der rechten Dachschräge
+  const x = r.left + r.width * 0.75, bottom = r.top + r.height * 0.5 + 0.12 * u;
+  return box(0.26 * u, 0.62 * u, bottom - 0.62 * u, x);
+}
+function extras2(struct, h) {
+  const walls = struct.filter(isWall2);
+  const bottom = walls.filter(s => s.y === 0).sort((a, b) => a.x - b.x);
+  const door = bottom[Math.floor((bottom.length - 1) / 2)];
+  const out = [{ type: 'door', host: door }, { type: 'stairs', host: door }];
+  spread(walls.filter(w => w !== door), 6).forEach(w => out.push({ type: 'win', host: w }));
+  const roof = struct.find(s => s.type === 'tri' && s.w >= 2);
+  if (h.chim && roof) out.push({ type: 'chim', host: roof });
+  return out.map(e => ({ ...e, phase: 2, filled: false, landed: false }));
+}
+let smokeEl = null;
+function placeSmoke2() {
+  if (!smokeEl) return;
+  const c = slots.find(s => s.type === 'chim');
+  smokeEl.style.left = (c.rect.left + c.rect.width / 2) + 'px';
+  smokeEl.style.top = c.rect.top + 'px';
+  smokeEl.style.fontSize = unit * 0.4 + 'px';
+}
+function startExtras2() {
+  phase2 = true;
+  const ex = slots.filter(s => s.phase === 2);
+  ex.forEach(s => { s.ghost.style.display = ''; });
+  const types = new Set(ex.map(s => s.type));
+  showPalette(pals, types);
+  updatePalette();
+  setTimeout(() => extrasIntro(types), 1300);
 }
 function newHouse(doAnnounce = true) {
-  bauen.querySelectorAll('.piece, .topdeco').forEach(p => p.remove());
-  sunEl?.remove(); sunEl = null; topEl = null;
+  bauen.querySelectorAll('.piece, .topdeco, .smoke').forEach(p => p.remove());
+  sunEl?.remove(); sunEl = null; topEl = null; smokeEl = null;
   bauen.classList.remove('house-done');
-  houseDone = false;
-  slots = house2().parts.map(p => ({ ...p, filled: false, landed: false }))
+  houseDone = false; phase2 = false;
+  const struct = house2().parts.map(p => ({ ...p, filled: false, landed: false }))
     .sort((a, b) => a.y - b.y || a.x - b.x);
-  slots.forEach(s => { s.ghost = makePiece(s.type, null, true); });
-  showPalette(pals, new Set(slots.map(s => s.type)));
+  slots = [...struct, ...extras2(struct, house2())];
+  slots.forEach(s => { s.ghost = makePiece(s.type, null, true); if (s.phase === 2) s.ghost.style.display = 'none'; });
+  showPalette(pals, new Set(struct.map(s => s.type)));
   layoutHouse();
   updatePalette();
   if (doAnnounce) announce(house2());
@@ -490,10 +568,10 @@ function wiggle(pal) { pal.classList.remove('wiggle'); void pal.offsetWidth; pal
 // Platte zur Lücke fliegen lassen. from = Startrechteck, point = Ablagepunkt (beim Ziehen)
 function place(type, from, point, dragEl) {
   if (houseDone) return;
-  const free = slots.filter(s => !s.filled && s.type === type);
+  const free = slots.filter(s => !s.filled && s.type === type && (s.phase === 2) === phase2);
   if (!free.length) {
     tone(200, 0.25, 'sine', 0.25);
-    SHAPES.filter(t => t !== type).forEach(hintShape);
+    Object.keys(SHAPE_DIM).filter(t => t !== type).forEach(hintShape);
     wiggle(pals.find(p => p.dataset.shape === type));
     dragEl?.remove();
     return;
@@ -503,9 +581,10 @@ function place(type, from, point, dragEl) {
     const d = s => Math.hypot(s.rect.left + s.rect.width / 2 - point.x, s.rect.top + s.rect.height / 2 - point.y);
     target = free.reduce((a, b) => (d(b) < d(a) ? b : a));
   }
-  const ce = BUILD_COLORS[colorIdx++ % BUILD_COLORS.length];
+  const ce = EXTRA[type] ? BUILD_COLORS[0] : BUILD_COLORS[colorIdx++ % BUILD_COLORS.length];
   updatePalette();
   const el = dragEl || makePiece(type, ce[0], false);
+  if (dragEl && EXTRA[type]) dragEl.classList.add('extra');
   if (!dragEl) setRect(el, from);
   target.filled = true; target.piece = el;
   void el.offsetWidth;
@@ -515,29 +594,27 @@ function place(type, from, point, dragEl) {
   setTimeout(() => {
     el.classList.remove('fly');
     target.landed = true;
+    target.ghost.style.opacity = 0;
     magnetClick();
-    landedSpeech(slots, target, ce, isWall2, s => s.y);
-    if (slots.every(s => s.landed)) finishHouse();
+    if (EXTRA[type]) say(T(...EXTRA[type]));
+    else landedSpeech(slots, target, ce, isWall2, s => s.y);
+    if (!phase2 && slots.filter(s => s.phase !== 2).every(s => s.landed)) startExtras2();
+    else if (slots.every(s => s.landed)) finishHouse();
   }, 360);
 }
 function placeTop2() {
-  const hi = slots.reduce((a, b) => (b.y + b.h > a.y + a.h ? b : a));
+  const hi = slots.filter(s => !s.host).reduce((a, b) => (b.y + b.h > a.y + a.h ? b : a));
   topEl.style.left = (hi.rect.left + hi.rect.width / 2) + 'px';
   topEl.style.top = (hi.rect.top - unit * 0.35) + 'px';
   topEl.style.fontSize = unit * 0.6 + 'px';
 }
 function finishHouse() {
   houseDone = true;
-  const walls = slots.filter(isWall2);
-  const bottom = walls.filter(s => s.y === 0).sort((a, b) => a.x - b.x);
-  const door = bottom[Math.floor((bottom.length - 1) / 2)];
-  walls.forEach((s, i) => {
-    const d = document.createElement('div');
-    d.className = 'deco'; d.textContent = s === door ? '🚪' : '🪟';
-    d.style.animationDelay = (i * 0.05) + 's';
-    s.piece.style.setProperty('--fs', unit * 0.55 + 'px');
-    s.piece.appendChild(d);
-  });
+  if (slots.some(s => s.type === 'chim')) {
+    smokeEl = document.createElement('div'); smokeEl.className = 'smoke';
+    smokeEl.innerHTML = '<i></i><i></i><i></i>';
+    bauen.appendChild(smokeEl); placeSmoke2();
+  }
   if (house2().top) {
     topEl = document.createElement('div'); topEl.className = 'topdeco'; topEl.innerHTML = topHTML(house2().top);
     bauen.appendChild(topEl); placeTop2();
@@ -550,7 +627,7 @@ function tumble() {
   if (!houseDone || busy) return;
   busy = true;
   bumm();
-  topEl?.remove(); topEl = null;
+  topEl?.remove(); topEl = null; smokeEl?.remove(); smokeEl = null;
   slots.forEach(s => {
     const p = s.piece;
     p.classList.add('tumble');
@@ -619,14 +696,14 @@ const pals3 = [...b3.querySelectorAll('.pal')];
 // roof: pyramid | spire (Kirchturmspitze) | gable (Satteldach) | dome (Kuppel aus Halbkreisen) | none,
 // rect: lange Wände aus Rechtecken
 const HOUSES3D = [
-  { say: 'ein Haus', done: 'Das Haus', sayRu: 'дом', doneRu: 'Дом готов', blocks: [{ W: 1, D: 1, F: 1, roof: 'pyramid' }] },
-  { say: 'ein langes Haus', done: 'Das lange Haus', sayRu: 'длинный дом', doneRu: 'Длинный дом готов', blocks: [{ W: 2, D: 1, F: 2, roof: 'gable', rect: true }] },
+  { say: 'ein Haus', done: 'Das Haus', sayRu: 'дом', doneRu: 'Дом готов', chim: true, blocks: [{ W: 1, D: 1, F: 1, roof: 'pyramid' }] },
+  { say: 'ein langes Haus', done: 'Das lange Haus', sayRu: 'длинный дом', doneRu: 'Длинный дом готов', chim: true, blocks: [{ W: 2, D: 1, F: 2, roof: 'gable', rect: true }] },
   { say: 'einen Turm mit Kuppel', done: 'Der Turm', sayRu: 'башню с куполом', doneRu: 'Башня готова', blocks: [{ W: 1, D: 1, F: 3, roof: 'dome' }] },
   { say: 'eine Kirche', done: 'Die Kirche', sayRu: 'церковь', doneRu: 'Церковь готова', top: '✝️', blocks: [
     { x: 0, W: 3, D: 1, F: 1, roof: 'gable', rect: true },     // Kirchenschiff
     { x: 3, W: 1, D: 1, F: 3, roof: 'spire', top: true },      // Kirchturm
     { x: -1, W: 1, D: 1, F: 1, roof: 'dome' }] },              // runde Apsis
-  { say: 'ein großes Haus', done: 'Das große Haus', sayRu: 'большой дом', doneRu: 'Большой дом готов', blocks: [{ W: 2, D: 2, F: 2, roof: 'pyramid' }] },
+  { say: 'ein großes Haus', done: 'Das große Haus', sayRu: 'большой дом', doneRu: 'Большой дом готов', chim: true, blocks: [{ W: 2, D: 2, F: 2, roof: 'pyramid' }] },
   { say: 'eine Burg', done: 'Die Burg', sayRu: 'крепость', doneRu: 'Крепость готова', top: '🚩', blocks: [
     { x: 0, z: 0, W: 2, D: 2, F: 1, roof: 'none' },
     { x: -1, z: -1, W: 1, D: 1, F: 2, roof: 'spire', top: true },
@@ -635,10 +712,10 @@ const HOUSES3D = [
     { x: 0, W: 2, D: 1, F: 1, roof: 'gable', rect: true },
     { x: -1, W: 1, D: 1, F: 2, roof: 'dome', top: true },
     { x: 2, W: 1, D: 1, F: 2, roof: 'dome', top: true }] },
-  { say: 'ein Hochhaus', done: 'Das Hochhaus', sayRu: 'высокий дом', doneRu: 'Высокий дом готов', blocks: [{ W: 3, D: 1, F: 5, roof: 'gable', rect: true }] },
+  { say: 'ein Hochhaus', done: 'Das Hochhaus', sayRu: 'высокий дом', doneRu: 'Высокий дом готов', chim: true, blocks: [{ W: 3, D: 1, F: 5, roof: 'gable', rect: true }] },
   { say: 'einen hohen Turm', done: 'Der Turm', sayRu: 'высокую башню', doneRu: 'Башня готова', blocks: [{ W: 1, D: 1, F: 6, roof: 'spire' }] },
 ];
-let h3Idx = 0, slots3 = [], done3 = false, busy3 = false, S3 = 100, angle = -30, spin = 0.012;
+let h3Idx = 0, slots3 = [], done3 = false, busy3 = false, S3 = 100, angle = -30, spin = 0.012, phase3 = false;
 let raf3 = null, lastT = 0, dragRot = null, plate = null, topEls3 = [];
 function house3() { return HOUSES3D[h3Idx % HOUSES3D.length]; }
 function blocks3() { return house3().blocks.map(b => ({ x: 0, z: 0, ...b })); }
@@ -675,10 +752,31 @@ function buildSlots3(bs) {
     }
     if (b.roof === 'dome') for (let k = 0; k < 4; k++) out.push({ kind: 'dome', type: 'semi', b, k, lvl: L });
   });
-  return out.sort((a, c) => a.lvl - c.lvl);
+  out.sort((a, c) => a.lvl - c.lvl);
+  // Ausstattung: Tür + Treppe vorne am ersten Block, Fenster verteilt, Schornstein auf dem Dach
+  const walls = out.filter(s => s.kind === 'wall');
+  const front = walls.filter(s => s.b === bs[0] && s.side === 0 && s.f === 0);
+  const door = front[Math.floor((front.length - 1) / 2)];
+  const ex = [{ kind: 'ov', type: 'door', host: door }, { kind: 'ov', type: 'stairs', host: door }];
+  spread(walls.filter(w => w !== door), 8).forEach(w => ex.push({ kind: 'ov', type: 'win', host: w }));
+  const rb = bs.find(b => b.roof === 'gable' || b.roof === 'pyramid');
+  if (house3().chim && rb) ex.push({ kind: 'chim', type: 'chim', b: rb });
+  ex.forEach(e => { e.phase = 2; e.lvl = 99; e.b = e.b || e.host.b; });
+  return [...out, ...ex];
 }
-function geom3(s) {
+function geom3(s, r = 0) {
   const b = s.b, S = S3;
+  if (s.kind === 'ov') { // auf der Wand, leicht davor
+    const g = geom3(s.host);
+    const [w, h, dy] = s.type === 'door' ? [0.42 * S, 0.6 * S, S / 2 - 0.3 * S - 0.18 * S]
+      : s.type === 'stairs' ? [0.78 * S, 0.2 * S, S / 2 - 0.1 * S]
+      : s.host.type === 'rect' ? [0.9 * S, 0.48 * S, -0.03 * S] : [0.5 * S, 0.5 * S, -0.03 * S];
+    return { w, h, tf: g.tf + ` translate3d(0, ${dy}px, ${s.type === 'stairs' ? 4 : 2}px)` };
+  }
+  if (s.kind === 'chim') { // zwei gekreuzte Flächen auf der Dachschräge
+    const h = 0.62 * S, base = -(b.F * S + roofH(b) * S / 2) + 0.12 * S;
+    return { w: 0.26 * S, h, tf: `translate3d(${b.ox + 0.25 * b.W * S}px, ${base - h / 2}px, ${b.oz + 0.25 * b.D * S}px) rotateY(${r}deg)` };
+  }
   const at = `translate3d(${b.ox}px, 0, ${b.oz}px) `;
   const rot = `rotateY(${(s.side || 0) * 90}deg) `;
   if (s.kind === 'wall') {
@@ -708,7 +806,7 @@ function applyGeom(el, g, extra = '') {
 }
 function face3(type, color, ghost) {
   const el = document.createElement('div');
-  el.className = 'face' + (ghost ? ' ghost' : '');
+  el.className = 'face' + (ghost ? ' ghost' : '') + (EXTRA[type] ? ' extra' : '');
   el.innerHTML = shapeSVG(type, color, ghost);
   stage.appendChild(el);
   return el;
@@ -726,6 +824,7 @@ function layout3d() {
     const g = geom3(s);
     applyGeom(s.ghost, g);
     if (s.piece && s.landed) applyGeom(s.piece, g);
+    if (s.cross) applyGeom(s.cross, geom3(s, 90));
     s.piece?.style.setProperty('--fs', S3 * 0.5 + 'px');
   });
   applyGeom(plate, { w: (x1 - x0 + 0.8) * S3, h: (z1 - z0 + 0.8) * S3, tf: 'rotateX(90deg)' });
@@ -739,12 +838,12 @@ function newHouse3d(doAnnounce = true) {
   stage.innerHTML = '';
   topEls3 = [];
   b3.classList.remove('house-done');
-  done3 = false;
+  done3 = false; phase3 = false;
   bs3 = blocks3();
   plate = document.createElement('div'); plate.className = 'plate'; stage.appendChild(plate);
   slots3 = buildSlots3(bs3);
-  slots3.forEach(s => { s.ghost = face3(s.type, null, true); });
-  showPalette(pals3, new Set(slots3.map(s => s.type)));
+  slots3.forEach(s => { s.ghost = face3(s.type, null, true); if (s.phase === 2) s.ghost.style.display = 'none'; });
+  showPalette(pals3, new Set(slots3.filter(s => s.phase !== 2).map(s => s.type)));
   layout3d();
   updatePalette();
   if (doAnnounce) announce(house3());
@@ -752,7 +851,7 @@ function newHouse3d(doAnnounce = true) {
 function place3d(type, point, dragEl) {
   dragEl?.remove();
   if (done3) return;
-  const free = slots3.filter(s => !s.filled && s.type === type);
+  const free = slots3.filter(s => !s.filled && s.type === type && (s.phase === 2) === phase3);
   if (!free.length) {
     tone(200, 0.25, 'sine', 0.25);
     wiggle(pals3.find(p => p.dataset.shape === type));
@@ -763,7 +862,7 @@ function place3d(type, point, dragEl) {
     const d = s => { const r = s.ghost.getBoundingClientRect(); return Math.hypot(r.left + r.width / 2 - point.x, r.top + r.height / 2 - point.y); };
     target = free.reduce((a, b) => (d(b) < d(a) ? b : a));
   }
-  const ce = BUILD_COLORS[colorIdx++ % BUILD_COLORS.length];
+  const ce = EXTRA[type] ? BUILD_COLORS[0] : BUILD_COLORS[colorIdx++ % BUILD_COLORS.length];
   updatePalette();
   const el = face3(type, ce[0], false);
   target.filled = true; target.piece = el;
@@ -781,22 +880,24 @@ function place3d(type, point, dragEl) {
     target.landed = true;
     target.ghost.style.opacity = 0;
     magnetClick();
-    landedSpeech(slots3, target, ce, s => s.kind === 'wall', s => s.lvl);
-    if (slots3.every(s => s.landed)) finish3d();
+    if (type === 'chim') { target.cross = face3('chim', null, false); applyGeom(target.cross, geom3(target, 90)); }
+    if (EXTRA[type]) say(T(...EXTRA[type]));
+    else landedSpeech(slots3, target, ce, s => s.kind === 'wall', s => s.lvl);
+    if (!phase3 && slots3.filter(s => s.phase !== 2).every(s => s.landed)) startExtras3();
+    else if (slots3.every(s => s.landed)) finish3d();
   }, 480);
+}
+function startExtras3() {
+  phase3 = true;
+  const ex = slots3.filter(s => s.phase === 2);
+  ex.forEach(s => { s.ghost.style.display = ''; });
+  const types = new Set(ex.map(s => s.type));
+  showPalette(pals3, types);
+  updatePalette();
+  setTimeout(() => extrasIntro(types), 1300);
 }
 function finish3d() {
   done3 = true;
-  const walls = slots3.filter(s => s.kind === 'wall');
-  const front = walls.filter(s => s.b === bs3[0] && s.side === 0 && s.f === 0);
-  const door = front[Math.floor((front.length - 1) / 2)];
-  walls.forEach((s, i) => {
-    const d = document.createElement('div');
-    d.className = 'deco';
-    d.textContent = s === door ? '🚪' : (s.b.top && s.f === s.b.F - 1 && house3().top === '✝️' ? '🔔' : '🪟');
-    d.style.animationDelay = (i * 0.04) + 's';
-    s.piece.appendChild(d);
-  });
   // Kreuz, Fahne oder Krone oben auf den Türmen (zwei gekreuzte Ebenen, damit man es von allen Seiten sieht)
   if (house3().top) bs3.filter(b => b.top || bs3.length === 1).forEach(b => [0, 90].forEach(r => {
     const el = document.createElement('div');
@@ -821,6 +922,7 @@ function tumble3d() {
     s.piece.style.transform = `translate3d(${Math.random() * 400 - 200}px, ${150 + Math.random() * 150}px, ${Math.random() * 300 - 100}px) rotateX(${Math.random() * 360}deg) rotateZ(${Math.random() * 360}deg) ` + g.tf;
     s.piece.style.opacity = 0;
     s.ghost.style.opacity = 0;
+    s.cross?.remove();
   });
   setTimeout(() => { h3Idx++; newHouse3d(); busy3 = false; }, 950);
 }
@@ -1021,25 +1123,41 @@ screens.autos = { leave: stopSong };
 // [Bild, deutscher Name mit Artikel, russischer Name]
 const HABITATS = [
   { icon: '🚜', de: 'Auf dem Bauernhof', ru: 'На ферме', bg: 'linear-gradient(#bde0fe, #d8f3dc 55%, #b7e4c7)', animals: [
-    ['kuh', 'die Kuh', 'Корова'], ['schwein', 'das Schwein', 'Свинья'], ['schaf', 'das Schaf', 'Овца'], ['huhn', 'das Huhn', 'Курица'],
-    ['pferd', 'das Pferd', 'Лошадь'], ['ente', 'die Ente', 'Утка'], ['hund', 'der Hund', 'Собака'], ['katze', 'die Katze', 'Кошка'],
-    ['ziege', 'die Ziege', 'Коза'], ['esel', 'der Esel', 'Ослик'], ['hase', 'der Hase', 'Заяц']] },
+    ['kuh', 'die Kuh', 'Корова'], ['schwein', 'das Schwein', 'Свинья'], ['schaf', 'das Schaf', 'Овца'], ['widder', 'der Widder', 'Баран'],
+    ['huhn', 'das Huhn', 'Курица'], ['hahn', 'der Hahn', 'Петух'], ['kueken', 'das Küken', 'Цыплёнок'], ['pferd', 'das Pferd', 'Лошадь'],
+    ['esel', 'der Esel', 'Ослик'], ['ente', 'die Ente', 'Утка'], ['gans', 'die Gans', 'Гусь'], ['truthahn', 'der Truthahn', 'Индюк'],
+    ['ziege', 'die Ziege', 'Коза'], ['ochse', 'der Ochse', 'Бык'], ['lama', 'das Lama', 'Лама']] },
+  { icon: '🏠', de: 'Unsere Haustiere', ru: 'Домашние питомцы', bg: 'linear-gradient(#ffe5ec, #fff1e6 60%, #fde2e4)', animals: [
+    ['hund', 'der Hund', 'Собака'], ['katze', 'die Katze', 'Кошка'], ['pudel', 'der Pudel', 'Пудель'],
+    ['hamster', 'der Hamster', 'Хомяк'], ['hase', 'der Hase', 'Заяц']] },
   { icon: '🌲', de: 'Im Wald', ru: 'В лесу', bg: 'linear-gradient(#cdeac0, #95d5b2 60%, #74c69d)', animals: [
-    ['fuchs', 'der Fuchs', 'Лиса'], ['baer', 'der Bär', 'Медведь'], ['eule', 'die Eule', 'Сова'], ['igel', 'der Igel', 'Ёжик'],
-    ['eichhoernchen', 'das Eichhörnchen', 'Белка'], ['hirsch', 'der Hirsch', 'Олень'], ['wolf', 'der Wolf', 'Волк'],
-    ['maus', 'die Maus', 'Мышка'], ['vogel', 'der Vogel', 'Птичка']] },
-  { icon: '🦁', de: 'Im Zoo', ru: 'В зоопарке', bg: 'linear-gradient(#ffe8a3, #ffd6a5 60%, #f4c27a)', animals: [
+    ['fuchs', 'der Fuchs', 'Лиса'], ['baer', 'der Bär', 'Медведь'], ['wolf', 'der Wolf', 'Волк'], ['hirsch', 'der Hirsch', 'Олень'],
+    ['elch', 'der Elch', 'Лось'], ['wildschwein', 'das Wildschwein', 'Кабан'], ['eule', 'die Eule', 'Сова'], ['igel', 'der Igel', 'Ёжик'],
+    ['eichhoernchen', 'das Eichhörnchen', 'Белка'], ['maus', 'die Maus', 'Мышка'], ['biber', 'der Biber', 'Бобр'], ['dachs', 'der Dachs', 'Барсук'],
+    ['waschbaer', 'der Waschbär', 'Енот'], ['fledermaus', 'die Fledermaus', 'Летучая мышь'], ['stinktier', 'das Stinktier', 'Скунс'], ['eidechse', 'die Eidechse', 'Ящерица']] },
+  { icon: '🦁', de: 'In Afrika', ru: 'В Африке', bg: 'linear-gradient(#ffe8a3, #ffd6a5 60%, #f4c27a)', animals: [
     ['loewe', 'der Löwe', 'Лев'], ['elefant', 'der Elefant', 'Слон'], ['giraffe', 'die Giraffe', 'Жираф'], ['zebra', 'das Zebra', 'Зебра'],
-    ['affe', 'der Affe', 'Обезьяна'], ['tiger', 'der Tiger', 'Тигр'], ['nilpferd', 'das Nilpferd', 'Бегемот'], ['nashorn', 'das Nashorn', 'Носорог'],
-    ['kamel', 'das Kamel', 'Верблюд'], ['krokodil', 'das Krokodil', 'Крокодил'], ['panda', 'der Panda', 'Панда'], ['kaenguru', 'das Känguru', 'Кенгуру'],
-    ['koala', 'der Koala', 'Коала'], ['gorilla', 'der Gorilla', 'Горилла'], ['papagei', 'der Papagei', 'Попугай'], ['schlange', 'die Schlange', 'Змея']] },
+    ['nilpferd', 'das Nilpferd', 'Бегемот'], ['nashorn', 'das Nashorn', 'Носорог'], ['leopard', 'der Leopard', 'Леопард'], ['krokodil', 'das Krokodil', 'Крокодил'],
+    ['bueffel', 'der Büffel', 'Буйвол'], ['affe', 'der Affe', 'Обезьяна'], ['gorilla', 'der Gorilla', 'Горилла'], ['kamel', 'das Kamel', 'Верблюд']] },
+  { icon: '🐼', de: 'Im Zoo', ru: 'В зоопарке', bg: 'linear-gradient(#e9ecef, #dee2e6 50%, #c7d2fe)', animals: [
+    ['tiger', 'der Tiger', 'Тигр'], ['panda', 'der Panda', 'Панда'], ['kaenguru', 'das Känguru', 'Кенгуру'], ['koala', 'der Koala', 'Коала'],
+    ['eisbaer', 'der Eisbär', 'Белый медведь'], ['faultier', 'das Faultier', 'Ленивец'], ['orangutan', 'der Orang-Utan', 'Орангутан'],
+    ['bison', 'der Bison', 'Бизон'], ['schlange', 'die Schlange', 'Змея']] },
   { icon: '🌊', de: 'Im Wasser', ru: 'В воде', bg: 'linear-gradient(#caf0f8, #90e0ef 50%, #48cae4)', animals: [
-    ['fisch', 'der Fisch', 'Рыбка'], ['delfin', 'der Delfin', 'Дельфин'], ['wal', 'der Wal', 'Кит'], ['schildkroete', 'die Schildkröte', 'Черепаха'],
-    ['pinguin', 'der Pinguin', 'Пингвин'], ['krake', 'der Krake', 'Осьминог'], ['krebs', 'die Krabbe', 'Краб'], ['robbe', 'die Robbe', 'Тюлень'],
-    ['frosch', 'der Frosch', 'Лягушка']] },
+    ['fisch', 'der Fisch', 'Рыбка'], ['delfin', 'der Delfin', 'Дельфин'], ['wal', 'der Wal', 'Кит'], ['hai', 'der Hai', 'Акула'],
+    ['schildkroete', 'die Schildkröte', 'Черепаха'], ['pinguin', 'der Pinguin', 'Пингвин'], ['robbe', 'die Robbe', 'Тюлень'], ['otter', 'der Otter', 'Выдра'],
+    ['krake', 'der Krake', 'Осьминог'], ['tintenfisch', 'der Tintenfisch', 'Кальмар'], ['qualle', 'die Qualle', 'Медуза'], ['krebs', 'die Krabbe', 'Краб'],
+    ['hummer', 'der Hummer', 'Омар'], ['garnele', 'die Garnele', 'Креветка'], ['kugelfisch', 'der Kugelfisch', 'Рыба-ёж'], ['frosch', 'der Frosch', 'Лягушка']] },
+  { icon: '🕊️', de: 'Die Vögel', ru: 'Птицы', bg: 'linear-gradient(#e0f2fe, #bae6fd 60%, #a5f3fc)', animals: [
+    ['adler', 'der Adler', 'Орёл'], ['taube', 'die Taube', 'Голубь'], ['schwan', 'der Schwan', 'Лебедь'], ['pfau', 'der Pfau', 'Павлин'],
+    ['flamingo', 'der Flamingo', 'Фламинго'], ['papagei', 'der Papagei', 'Попугай'], ['vogel', 'der Vogel', 'Птичка']] },
   { icon: '🐞', de: 'Kleine Krabbeltiere', ru: 'Букашки', bg: 'linear-gradient(#fff3b0, #d8f3dc 70%)', animals: [
     ['biene', 'die Biene', 'Пчела'], ['schmetterling', 'der Schmetterling', 'Бабочка'], ['marienkaefer', 'der Marienkäfer', 'Божья коровка'],
-    ['schnecke', 'die Schnecke', 'Улитка'], ['ameise', 'die Ameise', 'Муравей']] },
+    ['kaefer', 'der Käfer', 'Жук'], ['grille', 'der Grashüpfer', 'Кузнечик'], ['fliege', 'die Fliege', 'Муха'], ['spinne', 'die Spinne', 'Паук'],
+    ['raupe', 'die Raupe', 'Гусеница'], ['wurm', 'der Wurm', 'Червяк'], ['schnecke', 'die Schnecke', 'Улитка'], ['ameise', 'die Ameise', 'Муравей']] },
+  { icon: '🦕', de: 'Dinos und Fabelwesen', ru: 'Динозавры и сказочные звери', bg: 'linear-gradient(#e9d5ff, #fbcfe8 60%, #fde68a)', animals: [
+    ['trex', 'der Tyrannosaurus', 'Тираннозавр'], ['langhals', 'der Langhals-Dino', 'Диплодок'], ['mammut', 'das Mammut', 'Мамонт'],
+    ['dodo', 'der Dodo', 'Додо'], ['einhorn', 'das Einhorn', 'Единорог'], ['drache', 'der Drache', 'Дракон']] },
 ];
 const namen = document.getElementById('namen');
 const habBar = document.getElementById('habitats');
