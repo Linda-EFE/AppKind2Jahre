@@ -1302,7 +1302,7 @@ const VEHICLE_CATS = VEHICLE_CATS_ALL
 function showCredits() {
   const box = document.getElementById('creditList');
   box.innerHTML = '';
-  VEHICLE_CATS.forEach(c => c.items.forEach(([k, de]) => {
+  VEHICLE_CATS.forEach(c => (c.items || []).forEach(([k, de]) => {
     const f = CREDITS[k];
     const row = document.createElement('div');
     row.className = 'crow';
@@ -1324,6 +1324,31 @@ const VIDEOS = window.VIDEO_LIST || [];
 const player = document.getElementById('videoPlayer');
 const pv = player.querySelector('video');
 let vIdx = 0;
+// Tatütata-Modus: Bei Videos ohne deutsches Zweitonhorn spielt die App das Martinshorn dazu
+let hornMode = true, hornIv = null;
+try { hornMode = localStorage.getItem('fe_hornmode') !== 'off'; } catch { /* egal */ }
+const hornBtn = player.querySelector('.vmode');
+function paintHornMode() { hornBtn.textContent = hornMode ? '📢 an' : '📢 aus'; hornBtn.classList.toggle('off', !hornMode); }
+function stopHornLoop() { clearInterval(hornIv); hornIv = null; }
+function startHornLoop() {
+  stopHornLoop();
+  const v = VIDEOS[vIdx];
+  pv.volume = 1;
+  if (!hornMode || v.tatue) return;
+  pv.volume = 0.35;
+  martinshorn();
+  hornIv = setInterval(() => { if (!pv.paused) martinshorn(); }, 8 * 620);
+}
+hornBtn.addEventListener('click', () => {
+  hornMode = !hornMode;
+  try { localStorage.setItem('fe_hornmode', hornMode ? 'on' : 'off'); } catch { /* egal */ }
+  paintHornMode();
+  if (!pv.paused) startHornLoop(); else stopHornLoop();
+});
+paintHornMode();
+pv.addEventListener('play', startHornLoop);
+pv.addEventListener('pause', stopHornLoop);
+pv.addEventListener('ended', stopHornLoop);
 function playVideo(i) {
   vIdx = (i + VIDEOS.length) % VIDEOS.length;
   const v = VIDEOS[vIdx];
@@ -1334,7 +1359,7 @@ function playVideo(i) {
   pv.currentTime = 0;
   const p = pv.play(); if (p && p.catch) p.catch(() => {});
 }
-function closeVideo() { pv.pause(); pv.removeAttribute('src'); pv.load(); player.hidden = true; document.body.classList.remove('blaulicht'); }
+function closeVideo() { stopHornLoop(); pv.pause(); pv.removeAttribute('src'); pv.load(); player.hidden = true; document.body.classList.remove('blaulicht'); }
 player.querySelector('.vx').addEventListener('click', closeVideo);
 player.querySelector('.vagain').addEventListener('click', () => { pv.currentTime = 0; pv.play(); });
 player.querySelector('.vnext').addEventListener('click', () => playVideo(vIdx + 1));

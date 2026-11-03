@@ -409,3 +409,17 @@ body.toddler-menu #voiceBtn { display: block; }
 .vbar .vhorn { padding: 0 26px; background: #dc2626; color: #fff; font-size: 26px; font-weight: 800; box-shadow: 0 5px 0 #7f1d1d; }
 .vbar button:active { transform: translateY(3px); box-shadow: none; }
 .vbar .pulse { animation: shout .5s 6; background: #fde68a; }
+.vbar .vmode { font-size: 20px; padding: 0 16px; background: #fde68a; }
+.vbar .vmode.off { background: #e5e7eb; }
+/* Bild füllt die Karte, ohne die Zeilenhöhe zu beeinflussen (sonst überlappen die Karten) */
+.pickGrid.photos .nameCard { position: relative; }
+.pickGrid.photos .nameCard img.photo { position: absolute; inset: 6px; width: calc(100% - 12px); height: calc(100% - 12px); }
+@media (max-width: 520px) {
+  .vbar { gap: 8px; padding-left: 8px; padding-right: 8px; }
+  .vbar button { height: 62px; min-width: 62px; font-size: 24px; }
+  .vbar .vhorn { padding: 0 14px; font-size: 19px; }
+  .vbar .vmode { font-size: 15px; padding: 0 10px; }
+}
+/* Karten-Höhe fest aus der Breite (4:3), unabhängig vom Bild */
+.pickGrid.photos .nameCard { aspect-ratio: auto; height: auto; }
+.pickGrid.photos .nameCard::before { content: ""; display: block; padding-top: 75%; }
