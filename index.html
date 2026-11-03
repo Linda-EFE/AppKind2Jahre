@@ -32,6 +32,7 @@
     <button class="tile" data-go="klavier" style="--c:#8d6e63" aria-label="Klavier">🎹</button>
     <button class="tile" data-go="tiere" style="--c:#ff9f1c" aria-label="Tiere">🐮</button>
     <button class="tile" data-go="namen" style="--c:#80b918" aria-label="Wer ist das? Tiernamen">🦒</button>
+    <button class="tile" data-go="fahrzeuge" style="--c:#3a86ff" aria-label="Fahrzeuge">✈️</button>
     <button class="tile" data-go="musik" style="--c:#e71d73" aria-label="Xylophon">🎵</button>
     <button class="tile" data-go="farben" style="--c:#2ec4b6" aria-label="Farben">🎈</button>
     <button class="tile" data-go="blasen" style="--c:#5e60ce" aria-label="Seifenblasen">🫧</button>
@@ -44,8 +45,14 @@
 
   <!-- Wer ist das? Tiernamen -->
   <section id="namen" class="screen">
-    <div id="habitats"></div>
-    <div id="nameGrid"></div>
+    <div id="habitats" class="pickBar"></div>
+    <div id="nameGrid" class="pickGrid"></div>
+  </section>
+
+  <!-- Fahrzeuge -->
+  <section id="fahrzeuge" class="screen">
+    <div id="fzBar" class="pickBar"></div>
+    <div id="fzGrid" class="pickGrid"></div>
   </section>
 
   <!-- Farben / Ballons -->
@@ -117,6 +124,16 @@
   <button id="toMenu" aria-label="Zum Menü">🏠 Zum Menü</button>
   <button id="lang" aria-label="Sprache umschalten"><i class="flag"></i><b>DE</b></button>
   <div id="toast" role="status"></div>
+  <button id="voiceBtn" aria-label="Stimme einstellen">⚙️</button>
+  <div id="voicePanel" hidden>
+    <div class="vbox">
+      <h2>Stimme einstellen</h2>
+      <p class="vhint">Die Aussprache kommt von den Stimmen, die auf diesem Gerät installiert sind. Am natürlichsten klingen
+        in <b>Microsoft Edge</b> die „Online (Natural)“-Stimmen (z. B. Svetlana, Dariya, Dmitry) und in <b>Google Chrome</b> „Google русский“.</p>
+      <div class="vlist"></div>
+      <button class="vclose">Fertig</button>
+    </div>
+  </div>
 
   <script src="app.js"></script>
   <script src="kids7.js"></script>

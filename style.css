@@ -275,15 +275,15 @@ body.in-menu #toMenu { display: none; }
 #menu.active { grid-template-columns: repeat(3, 1fr) !important; padding-top: max(84px, env(safe-area-inset-top)); }
 
 /* ---------- Wer ist das? ---------- */
-#namen { transition: background .4s; }
-#namen.active { display: flex; flex-direction: column; gap: 2vmin; padding-top: max(80px, env(safe-area-inset-top)); }
-#habitats { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.6vmin; flex: none; }
+#namen, #fahrzeuge { transition: background .4s; }
+#namen.active, #fahrzeuge.active { display: flex; flex-direction: column; gap: 2vmin; padding-top: max(80px, env(safe-area-inset-top)); }
+.pickBar { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.6vmin; flex: none; }
 .hab {
   width: min(12vmin, 76px); height: min(12vmin, 76px); border-radius: 50%; font-size: min(7.5vmin, 46px); padding: 0;
   background: rgba(255,255,255,.6); box-shadow: 0 5px 0 rgba(0,0,0,.15); transition: transform .15s;
 }
 .hab.on { background: #fff; transform: scale(1.12); box-shadow: 0 0 0 5px #ffd166, 0 5px 0 rgba(0,0,0,.15); }
-#nameGrid {
+.pickGrid {
   flex: 1; min-height: 0; display: grid; gap: 2vmin;
   grid-template-columns: repeat(auto-fit, minmax(min(26vw, 150px), 1fr)); grid-auto-rows: minmax(0, 1fr);
   align-content: stretch; overflow-y: auto; touch-action: pan-y; padding-bottom: 8px;
@@ -334,3 +334,42 @@ body.toddler #lang { display: block; }
 .smoke i:nth-child(2) { animation-delay: .8s; }
 .smoke i:nth-child(3) { animation-delay: 1.6s; }
 @keyframes puff { from { transform: translate(0, 0) scale(.4); opacity: .9; } to { transform: translate(.8em, -3em) scale(1.6); opacity: 0; } }
+
+@media (orientation: landscape) { #menu.active { grid-template-columns: repeat(5, 1fr) !important; } }
+#menu .tile { font-size: 11vmin; }
+
+/* Martinshorn */
+.hornCard { background: radial-gradient(circle at 50% 35%, #fff, #fecaca 70%) !important; border: 4px solid #ef4444; position: relative; }
+.hornCard b { position: absolute; left: 0; right: 0; bottom: 6%; font-size: min(5vmin, 26px); color: #b91c1c; }
+.hornCard img { max-height: 16vh !important; }
+body.blaulicht::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 40;
+  animation: blauBlink .62s steps(2) infinite;
+}
+@keyframes blauBlink {
+  0% { box-shadow: inset 0 0 80px 30px rgba(37, 99, 235, .75); }
+  50% { box-shadow: inset 0 0 80px 30px rgba(37, 99, 235, 0); }
+}
+
+/* Stimme einstellen */
+#voiceBtn {
+  position: fixed; z-index: 20; display: none; top: calc(max(10px, env(safe-area-inset-top)) + 4px); right: calc(max(10px, env(safe-area-inset-right)) + 76px);
+  width: 56px; height: 56px; border-radius: 50%; font-size: 26px; background: rgba(255,255,255,.9); box-shadow: 0 2px 8px rgba(0,0,0,.25);
+}
+body.toddler-menu #voiceBtn { display: block; }
+/* in den Bauspielen sitzt dort oben der Wechsel-Knopf – Zahnrad etwas tiefer */
+#voicePanel { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.45); display: grid; place-items: center; padding: 16px; }
+#voicePanel[hidden] { display: none; }
+.vbox { background: #fff; color: #222; border-radius: 22px; padding: 20px; width: min(600px, 100%); max-height: 90vh; overflow-y: auto; touch-action: pan-y; }
+.vbox h2 { margin: 0 0 8px; }
+.vbox h3 { margin: 16px 0 6px; }
+.vhint { font-size: 15px; line-height: 1.45; color: #444; margin: 0; }
+.vrow { display: flex; gap: 8px; margin: 6px 0; }
+.vsel { flex: 1; text-align: left; padding: 12px; border-radius: 12px; background: #f1f5f9; font-size: 15px; }
+.vrow.on .vsel { background: #dcfce7; font-weight: 700; }
+.vtry { width: 48px; border-radius: 12px; background: #3a86ff; color: #fff; font-size: 18px; }
+.vgood { background: #fde68a; border-radius: 8px; padding: 1px 6px; font-size: 12px; margin-left: 4px; }
+.vnone { color: #b91c1c; }
+.vclose { margin-top: 16px; width: 100%; padding: 14px; border-radius: 14px; background: #3a86ff; color: #fff; font-size: 18px; font-weight: 700; }
+.nameCard svg { width: 100%; height: 100%; max-height: 22vh; pointer-events: none; filter: drop-shadow(0 8px 6px rgba(0,0,0,.25)); }
+.nameCard.jump svg { animation: jump3d .9s cubic-bezier(.3,1.3,.5,1); }

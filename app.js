@@ -68,11 +68,28 @@ function popSound() {
 let LANG = 'de';
 try { LANG = localStorage.getItem('fe_lang') === 'ru' ? 'ru' : 'de'; } catch { /* egal */ }
 const voices = { de: null, ru: null };
+// Alle installierten Stimmen einer Sprache
+function voicesFor(l) {
+  if (!('speechSynthesis' in window)) return [];
+  return speechSynthesis.getVoices().filter(v => v.lang.replace('_', '-').toLowerCase().startsWith(l));
+}
+// Natürliche Stimmen bevorzugen (Edge: „Online (Natural)“, Chrome: „Google“, Apple: „Premium/Erweitert“)
+function rankVoice(v, l) {
+  let s = 0;
+  if (/natural|neural/i.test(v.name)) s += 6;
+  if (/online/i.test(v.name)) s += 2;
+  if (/google/i.test(v.name)) s += 4;
+  if (/premium|enhanced|erweitert|siri/i.test(v.name)) s += 4;
+  if (v.lang.replace('_', '-').toLowerCase() === (l === 'ru' ? 'ru-ru' : 'de-de')) s += 1;
+  return s;
+}
 function pickVoice() {
-  const vs = speechSynthesis.getVoices();
-  const find = (full, short) => vs.find(v => v.lang.replace('_', '-') === full) || vs.find(v => v.lang.startsWith(short)) || null;
-  voices.de = find('de-DE', 'de');
-  voices.ru = find('ru-RU', 'ru');
+  ['de', 'ru'].forEach(l => {
+    const list = voicesFor(l);
+    let chosen = null;
+    try { const k = localStorage.getItem('fe_voice_' + l); chosen = list.find(v => v.voiceURI === k) || null; } catch { /* egal */ }
+    voices[l] = chosen || list.slice().sort((a, b) => rankVoice(b, l) - rankVoice(a, l))[0] || null;
+  });
 }
 // Text in der aktuellen Sprache (nur im Bereich der 2-Jährigen wird übersetzt)
 function speechLang() { return isToddlerArea(current) ? LANG : 'de'; }
@@ -111,6 +128,7 @@ function go(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === name));
   document.body.classList.toggle('in-menu', name === 'start');
   document.body.classList.toggle('toddler', isToddlerArea(name));
+  document.body.classList.toggle('toddler-menu', name === 'menu');
   if (screens[current]?.leave) screens[current].leave();
   if ('speechSynthesis' in window) speechSynthesis.cancel();
   current = name;
@@ -1159,40 +1177,105 @@ const HABITATS = [
     ['trex', 'der Tyrannosaurus', 'Тираннозавр'], ['langhals', 'der Langhals-Dino', 'Диплодок'], ['mammut', 'das Mammut', 'Мамонт'],
     ['dodo', 'der Dodo', 'Додо'], ['einhorn', 'das Einhorn', 'Единорог'], ['drache', 'der Drache', 'Дракон']] },
 ];
-const namen = document.getElementById('namen');
-const habBar = document.getElementById('habitats');
-const nameGrid = document.getElementById('nameGrid');
-let habIdx = 0;
-function showHabitat(i, speak = true) {
-  habIdx = i;
-  const H = HABITATS[i];
-  namen.style.background = H.bg;
-  [...habBar.children].forEach((b, k) => b.classList.toggle('on', k === i));
-  nameGrid.innerHTML = '';
-  nameGrid.style.setProperty('--n', H.animals.length);
-  H.animals.forEach(([img, de, ru], k) => {
-    const b = document.createElement('button');
-    b.className = 'nameCard';
-    b.style.animationDelay = (k * 0.04) + 's';
-    b.setAttribute('aria-label', de);
-    b.innerHTML = `<img src="img/tiere/${img}.png" alt="" draggable="false">`;
-    b.addEventListener('pointerdown', () => {
-      b.classList.remove('jump'); void b.offsetWidth; b.classList.add('jump');
-      tone(660 + k * 20, 0.12, 'triangle', 0.15);
-      vibrate();
-      say(T(de.charAt(0).toUpperCase() + de.slice(1), ru) + '!', { rate: 0.8 });
+// Bilder-Spiel mit Kategorien (für Tiere und Fahrzeuge): Antippen liest den Namen vor
+function makePicker(section, bar, grid, cats, dir) {
+  let idx = 0;
+  function show(i, speak = true) {
+    idx = i;
+    const C = cats[i];
+    section.style.background = C.bg;
+    [...bar.children].forEach((b, k) => b.classList.toggle('on', k === i));
+    grid.innerHTML = '';
+    if (C.extra) grid.appendChild(C.extra());
+    C.items.forEach(([img, de, ru, html], k) => {
+      const b = document.createElement('button');
+      b.className = 'nameCard';
+      b.style.animationDelay = (k * 0.04) + 's';
+      b.setAttribute('aria-label', de);
+      b.innerHTML = html || `<img src="${dir}/${img}.png" alt="" draggable="false">`;
+      b.addEventListener('pointerdown', () => {
+        b.classList.remove('jump'); void b.offsetWidth; b.classList.add('jump');
+        tone(660 + k * 20, 0.12, 'triangle', 0.15);
+        vibrate();
+        say(T(de.charAt(0).toUpperCase() + de.slice(1), ru) + '!', { rate: 0.8 });
+      });
+      grid.appendChild(b);
     });
-    nameGrid.appendChild(b);
+    if (speak) say(T(C.de, C.ru));
+  }
+  cats.forEach((C, i) => {
+    const b = document.createElement('button');
+    b.className = 'hab'; b.textContent = C.icon; b.setAttribute('aria-label', C.de);
+    b.addEventListener('pointerdown', () => { tone(520, 0.12, 'sine', 0.2); show(i); });
+    bar.appendChild(b);
   });
-  if (speak) say(T(H.de, H.ru));
+  return { enter() { show(idx); }, show };
 }
-HABITATS.forEach((H, i) => {
+HABITATS.forEach(H => { H.items = H.animals; });
+const namenGame = makePicker(document.getElementById('namen'), document.getElementById('habitats'), document.getElementById('nameGrid'), HABITATS, 'img/tiere');
+screens.namen = { enter: namenGame.enter };
+
+/* ---------- Fahrzeuge: Kategorien + Martinshorn ---------- */
+// Martinshorn: zwei Töne im Wechsel (Quarte), etwas rau wie ein echtes Horn
+let hornBus = null, hornTimer = null;
+function martinshorn() {
+  const a = audio(), t = a.currentTime;
+  if (hornBus) { hornBus.gain.setTargetAtTime(0, t, 0.02); const old = hornBus; setTimeout(() => old.disconnect(), 200); }
+  hornBus = a.createGain(); hornBus.gain.value = 0.5;
+  const lp = a.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2600;
+  hornBus.connect(lp).connect(a.destination);
+  const tones = [440, 587.33];
+  for (let i = 0; i < 8; i++) {
+    const st = t + i * 0.62, f = tones[i % 2];
+    [1, 1.005].forEach(det => {
+      const o = a.createOscillator(), g = a.createGain();
+      o.type = 'sawtooth'; o.frequency.value = f * det;
+      g.gain.setValueAtTime(0.0001, st);
+      g.gain.exponentialRampToValueAtTime(0.18, st + 0.04);
+      g.gain.setValueAtTime(0.18, st + 0.56);
+      g.gain.exponentialRampToValueAtTime(0.0001, st + 0.61);
+      o.connect(g).connect(hornBus);
+      o.start(st); o.stop(st + 0.63);
+    });
+  }
+  document.body.classList.add('blaulicht');
+  clearTimeout(hornTimer);
+  hornTimer = setTimeout(() => document.body.classList.remove('blaulicht'), 8 * 620);
+  vibrate(200);
+}
+function hornCard() {
   const b = document.createElement('button');
-  b.className = 'hab'; b.textContent = H.icon; b.setAttribute('aria-label', H.de);
-  b.addEventListener('pointerdown', () => { tone(520, 0.12, 'sine', 0.2); showHabitat(i); });
-  habBar.appendChild(b);
-});
-screens.namen = { enter() { showHabitat(habIdx); } };
+  b.className = 'nameCard hornCard';
+  b.setAttribute('aria-label', 'Martinshorn');
+  b.innerHTML = '<img src="img/fahrzeuge/blaulicht.png" alt="" draggable="false"><b>Tatütata</b>';
+  b.addEventListener('pointerdown', () => { b.classList.remove('jump'); void b.offsetWidth; b.classList.add('jump'); martinshorn(); });
+  return b;
+}
+const VEHICLE_CATS = [
+  { icon: '🚗', de: 'Die Autos', ru: 'Легковые машины', bg: 'linear-gradient(#e0f2fe, #f1f5f9 60%, #cbd5e1)', items: [
+    ['auto', 'das Auto', 'Машина'], ['gelaendewagen', 'der Geländewagen', 'Внедорожник'], ['taxi', 'das Taxi', 'Такси'],
+    ['rennwagen', 'der Rennwagen', 'Гоночная машина'], ['pickup', 'der Pick-up', 'Пикап'], ['kleinbus', 'der Kleinbus', 'Микроавтобус']] },
+  { icon: '🚚', de: 'Lastwagen und Busse', ru: 'Грузовики и автобусы', bg: 'linear-gradient(#fef3c7, #fde68a 60%, #d6d3d1)', items: [
+    ['lastwagen', 'der Lastwagen', 'Грузовик'], ['sattelzug', 'der Sattelzug', 'Фура'], ['traktor', 'der Traktor', 'Трактор'],
+    ['bus', 'der Bus', 'Автобус'], ['obus', 'der Oberleitungsbus', 'Троллейбус']] },
+  { icon: '✈️', de: 'In der Luft', ru: 'В небе', bg: 'linear-gradient(#bae6fd, #e0f2fe 70%, #fff)', items: [
+    ['flugzeug', 'das Flugzeug', 'Самолёт'], ['kleinflugzeug', 'das kleine Flugzeug', 'Маленький самолёт'], ['hubschrauber', 'der Hubschrauber', 'Вертолёт'],
+    ['rakete', 'die Rakete', 'Ракета'], ['satellit', 'der Satellit', 'Спутник'], ['ufo', 'das Ufo', 'Летающая тарелка']] },
+  { icon: '🚢', de: 'Auf dem Wasser', ru: 'На воде', bg: 'linear-gradient(#e0f2fe, #90e0ef 55%, #0096c7)', items: [
+    ['schiff', 'das Schiff', 'Корабль'], ['kreuzfahrtschiff', 'das Kreuzfahrtschiff', 'Лайнер'], ['faehre', 'die Fähre', 'Паром'],
+    ['motorboot', 'das Motorboot', 'Моторная лодка'], ['schnellboot', 'das Schnellboot', 'Катер'], ['segelboot', 'das Segelboot', 'Парусная лодка'], ['kanu', 'das Kanu', 'Каноэ']] },
+  { icon: '🏍️', de: 'Die Motorräder', ru: 'Мотоциклы', bg: 'linear-gradient(#fee2e2, #fecaca 60%, #e5e7eb)', items: [
+    ['motorrad', 'das Motorrad', 'Мотоцикл'], ['motorroller', 'der Motorroller', 'Мотороллер'], ['rikscha', 'die Rikscha', 'Тук-тук']] },
+  { icon: '🚲', de: 'Fahrräder und Roller', ru: 'Велосипеды и самокаты', bg: 'linear-gradient(#dcfce7, #bbf7d0 60%, #86efac)', items: [
+    ['fahrrad', 'das Fahrrad', 'Велосипед'], ['radfahrer', 'der Radfahrer', 'Велосипедист'], ['mountainbike', 'das Mountainbike', 'Горный велосипед'],
+    ['tretroller', 'der Tretroller', 'Самокат'], ['skateboard', 'das Skateboard', 'Скейтборд'], ['rollschuh', 'der Rollschuh', 'Ролики']] },
+  { icon: '🚨', de: 'Die Einsatzfahrzeuge', ru: 'Спецмашины', bg: 'linear-gradient(#dbeafe, #fee2e2 70%)', extra: hornCard, items: [
+    ['feuerwehr', 'die Feuerwehr', 'Пожарная машина'], ['krankenwagen', 'der Krankenwagen', 'Скорая помощь'],
+    ['polizei', 'das Polizeiauto', 'Полицейская машина'], ['thw', 'das Auto vom THW', 'Машина службы спасения', THW_SVG],
+    ['hubschrauber', 'der Rettungshubschrauber', 'Вертолёт спасателей']] },
+];
+const fzGame = makePicker(document.getElementById('fahrzeuge'), document.getElementById('fzBar'), document.getElementById('fzGrid'), VEHICLE_CATS, 'img/fahrzeuge');
+screens.fahrzeuge = { enter: fzGame.enter, leave() { document.body.classList.remove('blaulicht'); } };
 
 /* ---------- Sprach-Knopf Deutsch / Russisch (in allen Spielen der 2-Jährigen) ---------- */
 const langBtn = document.getElementById('lang');
@@ -1216,6 +1299,42 @@ langBtn.addEventListener('click', () => {
     showToast('Auf diesem Gerät ist keine russische Stimme installiert – die Aussprache kann falsch klingen. Russisch in den Spracheinstellungen des Geräts hinzufügen.');
 });
 paintLang();
+
+// Stimme auswählen und probehören
+const voiceBtn = document.getElementById('voiceBtn');
+const voicePanel = document.getElementById('voicePanel');
+function buildVoicePanel() {
+  pickVoice();
+  const box = voicePanel.querySelector('.vlist');
+  box.innerHTML = '';
+  [['ru', 'Русский (Russisch)', 'Привет! Корова, собака, кошка. Строим дом!'], ['de', 'Deutsch', 'Hallo! Die Kuh, der Hund, die Katze. Wir bauen ein Haus!']].forEach(([l, title, sample]) => {
+    const sec = document.createElement('div');
+    sec.innerHTML = `<h3>${title}</h3>`;
+    const list = voicesFor(l).sort((a, b) => rankVoice(b, l) - rankVoice(a, l));
+    if (!list.length) sec.innerHTML += '<p class="vnone">Keine Stimme installiert.</p>';
+    list.forEach(v => {
+      const row = document.createElement('div');
+      row.className = 'vrow' + (voices[l] === v ? ' on' : '');
+      const good = rankVoice(v, l) >= 4 ? ' <span class="vgood">natürlich</span>' : '';
+      row.innerHTML = `<button class="vsel">${voices[l] === v ? '✅' : '⚪'} ${v.name}${good}</button><button class="vtry" aria-label="Probehören">▶</button>`;
+      row.querySelector('.vsel').addEventListener('click', () => {
+        try { localStorage.setItem('fe_voice_' + l, v.voiceURI); } catch { /* egal */ }
+        pickVoice(); buildVoicePanel();
+        say(sample, { lang: l });
+      });
+      row.querySelector('.vtry').addEventListener('click', () => {
+        speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(sample); u.voice = v; u.lang = v.lang; u.rate = 0.85; u.pitch = 1.1;
+        speechSynthesis.speak(u);
+      });
+      sec.appendChild(row);
+    });
+    box.appendChild(sec);
+  });
+}
+voiceBtn.addEventListener('click', () => { buildVoicePanel(); voicePanel.hidden = false; });
+voicePanel.querySelector('.vclose').addEventListener('click', () => { voicePanel.hidden = true; });
+if ('speechSynthesis' in window) speechSynthesis.addEventListener?.('voiceschanged', () => { if (!voicePanel.hidden) buildVoicePanel(); });
 
 /* ---------- Start ---------- */
 document.body.classList.add('in-menu');

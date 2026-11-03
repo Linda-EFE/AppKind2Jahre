@@ -33,12 +33,13 @@ Spiele ohne Lesen, ohne Werbung, ohne Internet (nach dem ersten Laden).
 | 🚒 | **Autos & Lieder** | Feuerwehr, Krankenwagen, Polizei oder THW antippen → jemand ruft um Hilfe (🔥 „Feuer, es brennt!“, 🤕 „Ich brauche ein Pflaster!“, 😟 „Ich brauche Hilfe!“, 🌊 „Wasser kommt!“), dann Tatü-tata, Blaulicht, das Fahrzeug fährt zum Einsatz, kommt zurück, das Problem ist gelöst und es spielt ein Kinderlied (Bruder Jakob, Alle meine Entchen, Hänschen klein, Funkel funkel kleiner Stern) |
 | 🎹 | **Klavier** | Klavier mit weißen und schwarzen Tasten, farbige Punkte, Noten fliegen hoch |
 | 🦒 | **Wer ist das?** | 97 Tiere als 3D-Bilder in 9 Bereichen (🚜 Bauernhof, 🏠 Haustiere, 🌲 Wald, 🦁 Afrika, 🐼 Zoo, 🌊 Wasser, 🕊️ Vögel, 🐞 Krabbeltiere, 🦕 Dinos & Fabelwesen). Tier antippen → der Name wird vorgelesen |
+| ✈️ | **Fahrzeuge** | 37 Fahrzeuge als 3D-Bilder in 7 Kategorien (🚗 Autos, 🚚 Lastwagen & Busse, ✈️ Luft, 🚢 Wasser, 🏍️ Motorräder, 🚲 Fahrräder & Roller, 🚨 Einsatzfahrzeuge). Antippen liest den Namen vor. Bei den Einsatzfahrzeugen gibt es den Martinshorn-Knopf „Tatütata“ mit Blaulicht |
 | 🐮 | **Tiere** | 12 Tiere als 3D-Bilder. Tier antippen → es springt und dreht sich und sagt z. B. „Die Kuh macht Muuuh!“ |
 | 🎈 | **Farben** | Luftballons steigen auf; antippen → Plopp! und die Farbe wird gesagt |
 | 🎵 | **Xylophon** | Bunte Xylophon-Stäbe, antippen oder mit dem Finger drüberwischen |
 | 🫧 | **Seifenblasen** | Überall tippen/malen → Blasen und Töne (oben = hoch, unten = tief) |
 
-**Sprache Deutsch/Russisch:** Oben rechts in allen Spielen der 2-Jährigen schaltet die Flagge die Sprachausgabe zwischen Deutsch und Russisch um (wird gespeichert). Dafür muss auf dem Gerät eine russische Stimme installiert sein. Die Bereiche für 7 und 17 Jahre bleiben Deutsch.
+**Sprache Deutsch/Russisch:** Oben rechts in allen Spielen der 2-Jährigen schaltet die Flagge die Sprachausgabe zwischen Deutsch und Russisch um (wird gespeichert). Dafür muss auf dem Gerät eine russische Stimme installiert sein. Das ⚙️ neben der Flagge im Menü öffnet die Stimmenauswahl (probehören und wählen); die App nimmt sonst automatisch die natürlichste Stimme (z. B. „Online (Natural)“ in Microsoft Edge, „Google русский“ in Chrome). Die Bereiche für 7 und 17 Jahre bleiben Deutsch.
 
 **Bauwerk wählen:** In beiden Bauspielen wechseln ◀ ▶ oben in der Mitte zum vorherigen bzw. nächsten Bauwerk.
 
