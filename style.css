@@ -423,3 +423,12 @@ body.toddler-menu #voiceBtn { display: block; }
 /* Karten-Höhe fest aus der Breite (4:3), unabhängig vom Bild */
 .pickGrid.photos .nameCard { aspect-ratio: auto; height: auto; }
 .pickGrid.photos .nameCard::before { content: ""; display: block; padding-top: 75%; }
+
+/* ---------- Kachel + Seite Feuerwehr-Videos ---------- */
+@media (orientation: landscape) { #menu.active { grid-template-columns: repeat(6, 1fr) !important; } }
+.tile-video { position: relative; }
+.tile-video small { position: absolute; right: 8%; bottom: 8%; font-size: 0.5em; line-height: 1; }
+#videos { background: linear-gradient(#1f2937, #7f1d1d); }
+#videos.active { display: flex; flex-direction: column; gap: 2vmin; padding-top: max(80px, env(safe-area-inset-top)); }
+.vhead { margin: 0; color: #fff; text-align: center; font-size: clamp(22px, 4.5vmin, 36px); }
+#videoGrid { overflow-y: auto; touch-action: pan-y; }

@@ -1378,10 +1378,16 @@ function renderVideos(grid) {
     grid.appendChild(b);
   });
 }
-if (VIDEOS.length) {
-  const at = VEHICLE_CATS.findIndex(c => c.icon === '🚒') + 1;
-  VEHICLE_CATS.splice(at, 0, { icon: '🎬', de: 'Feuerwehr-Videos', ru: 'Видео с пожарными', bg: 'linear-gradient(#1f2937, #7f1d1d)', render: renderVideos });
-}
+// Eigene Kachel im Menü der 2-Jährigen: Feuerwehr-Videos
+screens.videos = {
+  enter() {
+    const g = document.getElementById('videoGrid');
+    g.innerHTML = '';
+    renderVideos(g);
+    say(T('Die Feuerwehr-Videos! Tippe auf ein Video.', 'Видео с пожарными! Нажми на видео.'));
+  },
+  leave() { closeVideo(); },
+};
 const fzGame = makePicker(document.getElementById('fahrzeuge'), document.getElementById('fzBar'), document.getElementById('fzGrid'), VEHICLE_CATS, 'img/fahrzeuge');
 screens.fahrzeuge = { enter: fzGame.enter, leave() { closeVideo(); } };
 
