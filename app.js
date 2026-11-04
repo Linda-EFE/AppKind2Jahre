@@ -110,16 +110,36 @@ function say(text, { pitch = 1.25, rate = 0.85, done = null, lang = null } = {})
   const finish = () => { if (!called) { called = true; done && done(); } };
   if (done) setTimeout(finish, Math.min(6000, 1200 + text.length * 85));
   if (!('speechSynthesis' in window)) { if (done) setTimeout(finish, 800); return; }
-  speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = L === 'ru' ? 'ru-RU' : 'de-DE'; u.rate = rate; u.pitch = pitch;
-  if (voices[L]) u.voice = voices[L];
-  u.onend = () => setTimeout(finish, 250);
+  // Stimme bei jedem Satz frisch wählen: Browser laden ihre Stimmen spät oder neu,
+  // eine alte Stimme bleibt sonst stumm (Fehler: Ton erst nach Sprachwechsel)
+  pickVoice();
+  const make = withVoice => {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = L === 'ru' ? 'ru-RU' : 'de-DE'; u.rate = rate; u.pitch = pitch;
+    if (withVoice && voices[L]) u.voice = voices[L];
+    u.onend = () => setTimeout(finish, 250);
+    return u;
+  };
+  const u = make(true);
+  // Schlägt die gewählte (z. B. Online-)Stimme fehl, mit der Standardstimme nochmal versuchen
+  u.onerror = e => {
+    if (e && (e.error === 'interrupted' || e.error === 'canceled')) return;
+    const u2 = make(false); lastUtterance = u2; speechSynthesis.speak(u2);
+  };
   lastUtterance = u; // Chrome: Referenz halten, sonst feuert onend manchmal nicht
-  speechSynthesis.speak(u);
+  const busy = speechSynthesis.speaking || speechSynthesis.pending;
+  speechSynthesis.cancel();
+  speechSynthesis.resume(); // falls der Sprachdienst hängt
+  // Chrome verschluckt speak() direkt nach cancel() manchmal – kurz warten
+  if (busy) setTimeout(() => { if (lastUtterance === u) speechSynthesis.speak(u); }, 80);
+  else speechSynthesis.speak(u);
 }
 
 function vibrate(ms = 30) { if (navigator.vibrate) navigator.vibrate(ms); }
+
+// Jedes Antippen weckt den Ton-Baustein, falls der Browser ihn schlafen gelegt hat
+document.addEventListener('pointerdown', () => { try { audio(); } catch { /* egal */ } }, { capture: true, passive: true });
+if ('speechSynthesis' in window) document.addEventListener('visibilitychange', () => { if (!document.hidden) { speechSynthesis.cancel(); pickVoice(); } });
 
 /* ---------- Navigation ---------- */
 const screens = {};
@@ -135,7 +155,7 @@ function go(name) {
   if (screens[name]?.enter) screens[name].enter();
 }
 document.querySelectorAll('[data-go]').forEach(b =>
-  b.addEventListener('pointerdown', () => { audio(); tone(660, 0.25, 'triangle'); go(b.dataset.go); }));
+  b.addEventListener('pointerdown', () => { audio(); tone(660, 0.25, 'triangle'); if (b.dataset.vcat) videoCat = b.dataset.vcat; go(b.dataset.go); }));
 
 // Wohin führt "Zurück"? Spiele der 2-Jährigen -> Menü, Menüs -> Startseite
 const PARENT = { menu: 'start', menu7: 'start', menu17: 'start', game7: 'menu7', game17: 'menu17' };
@@ -1309,7 +1329,7 @@ function showCredits() {
     row.innerHTML = `<img src="img/fahrzeuge/foto/${k}.jpg" alt=""><div><b>${de}</b><br><a href="https://commons.wikimedia.org/wiki/${encodeURIComponent(f.title.replace(/ /g, '_'))}" target="_blank" rel="noopener">${f.title.replace(/^File:/, '')}</a><br>${f.artist} · ${f.license}</div>`;
     box.appendChild(row);
   }));
-  VIDEOS.forEach(v => {
+  VIDEOS_ALL.forEach(v => {
     const row = document.createElement('div');
     row.className = 'crow';
     row.innerHTML = `<img src="video/${v.key}.jpg" alt=""><div><b>🎬 ${v.de}</b><br><a href="https://commons.wikimedia.org/wiki/${encodeURIComponent(v.title.replace(/ /g, '_'))}" target="_blank" rel="noopener">${v.title.replace(/^File:/, '')}</a><br>${v.artist} · ${v.license}</div>`;
@@ -1320,7 +1340,19 @@ function showCredits() {
 document.getElementById('creditBtn').addEventListener('click', showCredits);
 document.getElementById('creditPanel').querySelector('.vclose').addEventListener('click', () => { document.getElementById('creditPanel').hidden = true; });
 /* ----- Feuerwehr-Videos (Wikimedia Commons, freie Lizenzen; Daten in videos.js) ----- */
-const VIDEOS = window.VIDEO_LIST || [];
+const VIDEOS_ALL = (window.VIDEO_LIST || []).map(v => ({ cat: 'feuerwehr', ...v }));
+// Video-Kategorien: jede hat eine eigene Kachel im Menü der 2-Jährigen
+const VIDEO_CATS = {
+  feuerwehr: { de: 'Feuerwehr', ru: 'Пожарные', icon: '🚒', say: ['Die Feuerwehr-Videos!', 'Видео с пожарными!'], bg: 'linear-gradient(#1f2937, #7f1d1d)' },
+  rettung: { de: 'Krankenwagen', ru: 'Скорая помощь', icon: '🚑', say: ['Die Krankenwagen-Videos!', 'Видео со скорой помощью!'], bg: 'linear-gradient(#1f2937, #b45309)' },
+  polizei: { de: 'Polizei', ru: 'Полиция', icon: '🚓', say: ['Die Polizei-Videos!', 'Видео с полицией!'], bg: 'linear-gradient(#0f172a, #1d4ed8)' },
+  thw: { de: 'THW', ru: 'Спасатели', icon: '🚧', say: ['Die Videos vom THW!', 'Видео со спасателями!'], bg: 'linear-gradient(#0f172a, #1e40af)' },
+  polizeimotorrad: { de: 'Polizei-Motorräder', ru: 'Полицейские мотоциклы', icon: '🏍️', say: ['Die Polizei-Motorräder!', 'Полицейские мотоциклы!'], bg: 'linear-gradient(#0f172a, #0e7490)' },
+  heli: { de: 'Hubschrauber', ru: 'Вертолёты', icon: '🚁', say: ['Die Hubschrauber-Videos!', 'Видео с вертолётами!'], bg: 'linear-gradient(#0c4a6e, #0369a1)' },
+  motorrad: { de: 'Motorräder', ru: 'Мотоциклы', icon: '🏍️', say: ['Die Motorrad-Videos!', 'Видео с мотоциклами!'], bg: 'linear-gradient(#1f2937, #4d7c0f)' },
+};
+let videoCat = 'feuerwehr';
+let VIDEOS = VIDEOS_ALL.filter(v => v.cat === videoCat);
 const player = document.getElementById('videoPlayer');
 const pv = player.querySelector('video');
 let vIdx = 0;
@@ -1381,10 +1413,14 @@ function renderVideos(grid) {
 // Eigene Kachel im Menü der 2-Jährigen: Feuerwehr-Videos
 screens.videos = {
   enter() {
+    const C = VIDEO_CATS[videoCat] || VIDEO_CATS.feuerwehr;
+    VIDEOS = VIDEOS_ALL.filter(v => v.cat === videoCat);
+    document.getElementById('videos').style.background = C.bg;
+    document.querySelector('#videos .vhead').textContent = `${C.icon} ${T(C.de, C.ru)}`;
     const g = document.getElementById('videoGrid');
     g.innerHTML = '';
     renderVideos(g);
-    say(T('Die Feuerwehr-Videos! Tippe auf ein Video.', 'Видео с пожарными! Нажми на видео.'));
+    say(T(C.say[0] + ' Tippe auf ein Video.', C.say[1] + ' Нажми на видео.'));
   },
   leave() { closeVideo(); },
 };
@@ -1449,6 +1485,9 @@ function buildVoicePanel() {
 voiceBtn.addEventListener('click', () => { buildVoicePanel(); voicePanel.hidden = false; });
 voicePanel.querySelector('.vclose').addEventListener('click', () => { voicePanel.hidden = true; });
 if ('speechSynthesis' in window) speechSynthesis.addEventListener?.('voiceschanged', () => { if (!voicePanel.hidden) buildVoicePanel(); });
+
+// Video-Kacheln ohne Videos ausblenden
+document.querySelectorAll('[data-vcat]').forEach(t => { if (!VIDEOS_ALL.some(v => v.cat === t.dataset.vcat)) t.hidden = true; });
 
 /* ---------- Start ---------- */
 document.body.classList.add('in-menu');

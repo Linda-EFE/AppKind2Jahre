@@ -434,3 +434,10 @@ body.toddler-menu #voiceBtn { display: block; }
 #videoGrid { overflow-y: auto; touch-action: pan-y; }
 /* Karten behalten ihre Höhe; bei vielen Karten wird gescrollt statt gestaucht */
 .pickGrid.photos { grid-auto-rows: max-content !important; }
+
+/* Menü mit vielen Kacheln: scrollt, Kacheln bleiben groß */
+#menu.active { overflow-y: auto; touch-action: pan-y; grid-auto-rows: minmax(26vh, 1fr); }
+@media (orientation: portrait) { #menu.active { grid-auto-rows: minmax(17vh, 1fr); } }
+.tile[hidden] { display: none; }
+.tile-video .thwlogo { font: 900 0.42em/1 Arial, sans-serif; color: #1e3a8a; background: #fff; padding: .18em .3em; border-radius: .15em; letter-spacing: .03em; }
+.tile-video .blau { position: absolute; left: 10%; top: 10%; font-size: .45em; font-style: normal; }
