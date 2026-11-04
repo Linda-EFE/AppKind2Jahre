@@ -31,3 +31,26 @@ Alle Videos: Wikimedia Commons, für die App gekürzt und verkleinert (MP4, max.
 | fdnyleiter.mp4 | [Tower Ladder FDNY 2011.theora.ogv](https://commons.wikimedia.org/wiki/File:Tower_Ladder_FDNY_2011.theora.ogv) | Kevin.B | CC BY-SA 3.0 |
 | mckinney.mp4 | [Mckinney Wysong Central Fire truck rush on July 3, 2026.webm](https://commons.wikimedia.org/wiki/File:Mckinney_Wysong_Central_Fire_truck_rush_on_July_3,_2026.webm) | Ranch9613 | CC0 |
 | torontohorn.mp4 | [Toronto Fire uses air horn while responding.webm](https://commons.wikimedia.org/wiki/File:Toronto_Fire_uses_air_horn_while_responding.webm) | Hillelfrei | CC BY-SA 4.0 |
+| l_ladderams.mp4 | [Nieuwe ladderwagens voor de Amsterdamse brandweer-509297.ogv](https://commons.wikimedia.org/wiki/File:Nieuwe_ladderwagens_voor_de_Amsterdamse_brandweer-509297.ogv) | Polygoon-Profilti (producent) / Nederlands Instituut voor Beeld en Geluid (beheerder) | CC BY-SA 3.0 nl |
+| l_sf.mp4 | [San Francisco Fire Department Badasses Vertical 50-foot Ladder Demonstration.webm](https://commons.wikimedia.org/wiki/File:San_Francisco_Fire_Department_Badasses_Vertical_50-foot_Ladder_Demonstration.webm) | ZorkFox | CC BY 3.0 |
+| l_sf2.mp4 | [San Francisco Fire Department Badasses Vertical 50-foot Ladder Demonstration.webm](https://commons.wikimedia.org/wiki/File:San_Francisco_Fire_Department_Badasses_Vertical_50-foot_Ladder_Demonstration.webm) | ZorkFox | CC BY 3.0 |
+| l_wedstrijd.mp4 | [BRANDWEER WEDSTRIJDEN-PGM4011885.webm](https://commons.wikimedia.org/wiki/File:BRANDWEER_WEDSTRIJDEN-PGM4011885.webm) | Polygoon Hollands Nieuws (producent) / Nederlands Instituut voor Beeld en Geluid (beheerder) | Public domain |
+| l_demo.mp4 | [BRANDWEER DEMONSTRATIE-PGM4011877.webm](https://commons.wikimedia.org/wiki/File:BRANDWEER_DEMONSTRATIE-PGM4011877.webm) | Polygoon Hollands Nieuws (producent) / Nederlands Instituut voor Beeld en Geluid (beheerder) | Public domain |
+| l_haag2.mp4 | [De Haagse brandweer (acte 2).webm](https://commons.wikimedia.org/wiki/File:De_Haagse_brandweer_%28acte_2%29.webm) | Willy Mullens / Haghefilm | Public domain |
+| r_brussels.mp4 | [-111 BFD Ambulance A75 and a Doctor's car responding in Brussels!.webm](https://commons.wikimedia.org/wiki/File:-111_BFD_Ambulance_A75_and_a_Doctor's_car_responding_in_Brussels!.webm) | 112 South-West NL | CC BY 3.0 |
+| r_tauber2.mp4 | [2022-08-26 Zwei Krankenwagen Rettungssanitäter und Polizeiauto in Tauberbischofsheim.webm](https://commons.wikimedia.org/wiki/File:2022-08-26_Zwei_Krankenwagen_Rettungssanitäter_und_Polizeiauto_in_Tauberbischofsheim.webm) | Triplec85 | CC BY-SA 4.0 |
+| r_gdansk.mp4 | [Karetka na sygnale w Gdańsku.webm](https://commons.wikimedia.org/wiki/File:Karetka_na_sygnale_w_Gdańsku.webm) | MT23chrze | CC BY 4.0 |
+| r_spoedrit.mp4 | [Spoedrit ambulance.webm](https://commons.wikimedia.org/wiki/File:Spoedrit_ambulance.webm) | S. Perquin | CC BY-SA 4.0 |
+| r_poznan.mp4 | [Ambulance responding sirens, in Poznan (2019).webm](https://commons.wikimedia.org/wiki/File:Ambulance_responding_sirens,_in_Poznan_%282019%29.webm) | Kevin.B | CC BY-SA 4.0 |
+| r_oslo.mp4 | [Akuttbil, Ambulance Volvo in Oslo (2021).ogg](https://commons.wikimedia.org/wiki/File:Akuttbil,_Ambulance_Volvo_in_Oslo_%282021%29.ogg) | Kevin.B | CC BY-SA 4.0 |
+| r_road.mp4 | [Ambulance running on road.webm](https://commons.wikimedia.org/wiki/File:Ambulance_running_on_road.webm) | Free Video Library | CC BY 3.0 |
+| h_christoph63.mp4 | [ADAC-Hubschrauber Christoph63 in Zwenkau 2017-12-05.webm](https://commons.wikimedia.org/wiki/File:ADAC-Hubschrauber_Christoph63_in_Zwenkau_2017-12-05.webm) | Cmuelle8 | CC0 |
+| h_c3start.mp4 | [Start des Rettungshubschraubers Christoph 3 von der Rettungstation auf dem Flughafen Köln-Bonn.webm](https://commons.wikimedia.org/wiki/File:Start_des_Rettungshubschraubers_Christoph_3_von_der_Rettungstation_auf_dem_Flughafen_Köln-Bonn.webm) | Raimond Spekking | CC BY-SA 4.0 |
+| h_klinikum.mp4 | [Helicopter Klinikum.ogv](https://commons.wikimedia.org/wiki/File:Helicopter_Klinikum.ogv) | Hiddenhauser | CC0 |
+| h_meran.mp4 | [Rettungshubschrauber Meran.webm](https://commons.wikimedia.org/wiki/File:Rettungshubschrauber_Meran.webm) | RudolfSimon | CC BY-SA 4.0 |
+| h_lorenskog.mp4 | [Luftambulanse Lørenskog 2020.webm](https://commons.wikimedia.org/wiki/File:Luftambulanse_Lørenskog_2020.webm) | Annikdance | CC BY-SA 4.0 |
+| h_kss.mp4 | [Kent Surrey Sussex Air Ambulance (G-LNAC) Take-off.webm](https://commons.wikimedia.org/wiki/File:Kent_Surrey_Sussex_Air_Ambulance_%28G-LNAC%29_Take-off.webm) | Celsoazevedo | CC BY 4.0 |
+| h_london.mp4 | [London's Air Ambulance (G-LAAB) Take-Off Ruskin Park.webm](https://commons.wikimedia.org/wiki/File:London's_Air_Ambulance_%28G-LAAB%29_Take-Off_Ruskin_Park.webm) | Celsoazevedo | CC BY 4.0 |
+| h_h135.mp4 | [Start & take-off of an Airbus Helicopters H135.webm](https://commons.wikimedia.org/wiki/File:Start_&_take-off_of_an_Airbus_Helicopters_H135.webm) | Olivier Cleynen | CC BY 4.0 |
+| h_slowenien.mp4 | [Helikopteri u Sloveniji svakih nekoliko minuta ukrcavaju vodu.webm](https://commons.wikimedia.org/wiki/File:Helikopteri_u_Sloveniji_svakih_nekoliko_minuta_ukrcavaju_vodu.webm) | PIXSELL | CC BY 3.0 |
+| h_lokvica2.mp4 | [Zajem vode pri Lokvici 2.webm](https://commons.wikimedia.org/wiki/File:Zajem_vode_pri_Lokvici_2.webm) | Bojan Marušič | CC BY-SA 4.0 |
