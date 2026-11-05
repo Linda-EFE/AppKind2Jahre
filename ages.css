@@ -248,3 +248,79 @@
 .genes { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
 .gene { background: #263244; color: #94a3b8; border-radius: 12px; padding: 12px 6px; display: flex; flex-direction: column; gap: 2px; border: 2px solid transparent; }
 .gene.on { background: #12352f; color: #e7ecf3; border-color: #2dd4bf; }
+
+/* =================== Meine Spielwelt (7 Jahre) =================== */
+#menu7 .mcard:first-child { grid-column: 1 / -1; min-height: 120px; flex-direction: row; align-items: center; gap: 18px;
+  background: linear-gradient(120deg, #ff006e, #8338ec 55%, #3a86ff); color: #fff; border: 0; box-shadow: 0 6px 0 #5b21b6; }
+#menu7 .mcard:first-child b { color: #fff; font-size: 26px; }
+#menu7 .mcard:first-child small { color: #fff; opacity: .9; font-size: 16px; }
+#menu7 .mcard:first-child .micon { font-size: 64px; margin: 0; }
+.wtabs { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 10px; }
+.wtab { flex: none; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 12px; border-radius: 18px;
+  background: #fff; color: #2b2250; font-weight: 700; font-size: 14px; box-shadow: 0 4px 0 #d6cff5; min-width: 78px; }
+.wtab span { font-size: 30px; line-height: 1; }
+.wtab.on { background: #ff006e; color: #fff; box-shadow: 0 4px 0 #a3004a; }
+.wpane { min-height: 50vh; }
+.wh { margin: 16px 0 8px; font-size: 18px; }
+.wgal { display: flex; gap: 10px; overflow-x: auto; padding: 4px 2px 10px; }
+.wg { position: relative; flex: none; }
+.wgb { width: 92px; height: 120px; background: #fff; border-radius: 18px; padding: 4px; box-shadow: 0 4px 0 #d6cff5; display: flex; flex-direction: column; align-items: center; overflow: hidden; }
+.wgb svg { width: 100%; height: 92px; }
+.wgb b { font-size: 13px; color: #2b2250; }
+.wg.on .wgb { outline: 4px solid #ff006e; }
+.wdel { position: absolute; top: -6px; right: -6px; width: 28px; height: 28px; border-radius: 50%; background: #fff; color: #b91c1c; font-size: 13px; box-shadow: 0 2px 4px rgba(0,0,0,.25); }
+.wedit { display: grid; grid-template-columns: minmax(180px, 280px) 1fr; gap: 18px; align-items: start; }
+@media (max-width: 640px) { .wedit { grid-template-columns: 1fr; } }
+.wleft { background: #fff; border-radius: 22px; padding: 12px; box-shadow: 0 4px 14px rgba(0,0,0,.07); position: sticky; top: 0; }
+.wprev svg { width: 100%; height: 300px; display: block; }
+@media (max-width: 640px) { .wprev svg { height: 220px; } .wleft { position: static; } }
+.wname { width: 100%; font-size: 20px; padding: 10px; border-radius: 12px; border: 2px solid #e0d7ff; text-align: center; margin-top: 6px; user-select: text; -webkit-user-select: text; }
+.wopts { display: flex; flex-direction: column; gap: 10px; }
+.wrow { background: #fff; border-radius: 16px; padding: 8px 10px; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
+.wrow small { display: block; font-weight: 700; color: #6b5fa5; margin-bottom: 6px; }
+.wrow.center { text-align: center; }
+.wsw { display: flex; flex-wrap: wrap; gap: 6px; }
+.wo { min-width: 44px; height: 44px; padding: 0 10px; border-radius: 12px; background: #f3f0ff; color: #2b2250; font-size: 16px; font-weight: 600; border: 3px solid transparent; }
+.wo.on { border-color: #ff006e; background: #ffe4f1; }
+.wo.swatch { width: 44px; padding: 0; border: 3px solid #fff; box-shadow: 0 0 0 1px #ccc; }
+.wo.swatch.on { box-shadow: 0 0 0 3px #ff006e; }
+.wo.wtop { width: 64px; height: 64px; padding: 2px; background: #fff; }
+.wo.wtop svg, .wgb svg { pointer-events: none; }
+.wo.wtop svg { width: 100%; height: 100%; }
+.wo.wani { width: 58px; height: 58px; padding: 4px; background: #fff; }
+.wo.wani img { width: 100%; height: 100%; object-fit: contain; }
+.wcolor { width: 64px; height: 44px; border: 0; background: none; padding: 0; }
+.wpetprev { position: relative; height: 200px; display: grid; place-items: center; }
+.wpetprev img { height: 180px; }
+.wpetprev i { position: absolute; top: 4px; left: 50%; transform: translateX(-10%); font-size: 60px; font-style: normal; }
+.wpet { position: relative; }
+.wgb.wpet img { width: 74px; height: 74px; object-fit: contain; }
+.wpet i { position: absolute; top: -4px; right: 6px; font-style: normal; font-size: 26px; }
+/* Szenen */
+.wstage { position: relative; width: 100%; aspect-ratio: 16 / 10; max-height: 62vh; border-radius: 22px; overflow: hidden; box-shadow: 0 6px 18px rgba(0,0,0,.15); touch-action: none; background: #bde0fe; margin: 0 auto; }
+.wstage > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.wlayer { position: absolute; inset: 0; }
+.witem { position: absolute; display: grid; place-items: center; cursor: grab; touch-action: none; transition: filter .15s; }
+.witem img, .witem svg { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+.witem .we { line-height: 1; pointer-events: none; }
+.witem.sel { filter: drop-shadow(0 0 6px #ff006e) drop-shadow(0 0 2px #fff); }
+.witem .wpet { width: 100%; height: 100%; display: block; pointer-events: none; }
+.witem .wpet img { width: 100%; height: 100%; }
+.witem .wpet i { font-size: .45em; top: -18%; right: -10%; }
+.witem .wpet b { position: absolute; left: 50%; bottom: -28%; transform: translateX(-50%); font-size: .2em; background: #fff; border-radius: 8px; padding: 1px 6px; white-space: nowrap; color: #2b2250; }
+.wtools { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin: 10px 0; min-height: 52px; align-items: center; }
+.wtb { width: 52px; height: 52px; border-radius: 16px; background: #fff; font-size: 24px; box-shadow: 0 4px 0 #d6cff5; }
+.whint { color: #6b5fa5; font-size: 15px; }
+.wcats { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; }
+.wcat { flex: none; padding: 8px 14px; border-radius: 99px; background: #fff; font-weight: 700; color: #2b2250; box-shadow: 0 3px 0 #d6cff5; }
+.wcat.on { background: #8338ec; color: #fff; box-shadow: 0 3px 0 #5b21b6; }
+.wpal { display: flex; flex-wrap: wrap; gap: 8px; background: #fff; border-radius: 18px; padding: 10px; margin-top: 6px; max-height: 30vh; overflow-y: auto; touch-action: pan-y; }
+.wp { width: 60px; height: 60px; border-radius: 14px; background: #f3f0ff; font-size: 34px; display: grid; place-items: center; padding: 4px; }
+.wp img, .wp svg { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+.wp.wpc { height: 80px; }
+/* Musik */
+.wmus { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin: 10px 0 16px; }
+.wmb { background: #fff; border-radius: 22px; padding: 16px 8px; font-size: 18px; font-weight: 800; color: #2b2250; box-shadow: 0 5px 0 #d6cff5; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.wmb span { font-size: 46px; }
+.wmb.on { background: #ffe4f1; outline: 4px solid #ff006e; }
+.wvol { width: min(100%, 360px); }

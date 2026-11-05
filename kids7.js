@@ -638,5 +638,5 @@ const GAMES7 = [
   },
 ];
 
-buildMenu('menu7', 'game7', '🧒 Entdecker-Akademie', 'Spiele, die dein Gehirn stark machen. Tippe auf 🔊, dann wird vorgelesen.', GAMES7,
+buildMenu('menu7', 'game7', '🧒 Entdecker-Akademie', 'Spiele, die dein Gehirn stark machen. Tippe auf 🔊, dann wird vorgelesen.', window.SPIELWELT ? [window.SPIELWELT, ...GAMES7] : GAMES7,
   'Für Eltern: Am meisten lernen Kinder, wenn ihr gemeinsam spielt und danach darüber sprecht.');
