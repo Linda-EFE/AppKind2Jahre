@@ -10,7 +10,7 @@ Die Themen für 7 und 17 Jahre: Neuroplastizität, Finanzen, Entscheidungen, Pro
 
 | Thema | 7 Jahre | 17 Jahre |
 |---|---|---|
-| Gestalten | 🌍 **Meine Spielwelt** (eigenes Spiel): coole Leute gestalten, Kleider im Mode-Atelier entwerfen, Haustiere aussuchen, Haus / Tierheim / Eisberg-Haus einrichten, Musik wählen – alles wird im Browser gespeichert | – |
+| Gestalten | 🌍 **Meine Spielwelt** (eigenes Spiel): coole Leute gestalten, Kleider im Mode-Atelier entwerfen, Haustiere aussuchen, Haus / Tierheim / Eisberg-Haus einrichten (verschiedene Hausarten zum Aussuchen: Stadthaus, Bauernhaus, Baumhaus, Modernes Haus, Schloss, Tierhof, Tierklinik, Eispalast, Eishöhle), dann mit ▶️ Spielen alles ausprobieren (Leute reden, Tiere machen Geräusche, Licht, Fernseher, Essen, Schlafen, Tag/Nacht, Schnee), Musik wählen – alles wird im Browser gespeichert | – |
 | Neuroplastizität | 🧠 Gehirn-Trainer: Memory mit 3D-Tieren, ein Gehirn-Bild bekommt mit jedem Üben mehr Verbindungen | 🧠 Gehirn-Gym: Zahlen-Merktest mit Verlauf, Erklärung wie das Gehirn lernt |
 | Finanzen | 🐷 Drei Spardosen: Taschengeld auf Sparen/Ausgeben/Teilen verteilen und auf einen Wunsch sparen | 💰 Geld-Labor: Zinseszins-Rechner (Start mit 17 vs. 27), Budget 50/30/20, Inflation |
 | Entscheidungen | 🤔 Was passiert dann? 8 Alltagssituationen, „Stopp – Denk nach – Entscheide“ | ⚖️ Entscheidungs-Matrix mit Gewichtung, 10-10-10, Pre-Mortem |
