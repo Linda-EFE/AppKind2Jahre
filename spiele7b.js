@@ -196,7 +196,7 @@
     intro: 'Wirf abwechselnd Steine in das Gitter. Wer zuerst vier in einer Reihe hat – waagrecht, senkrecht oder schräg – gewinnt!',
     render(body) {
       const C = 7, R = 6;
-      let b, turn, over, vsPc = store.get('vier_pc', true), level = store.get('vier_lv10', [2, 5, 9][store.get('vier_lv', 1)] ?? 5), busy = false;
+      let b, turn, over, vsPc = store.get('vier_pc', true), level = store.get('vier_lv10', [1, 5, 9][store.get('vier_lv', 1)] ?? 3), busy = false;
       const score = store.get('vier_score', { du: 0, pc: 0, rot: 0, gelb: 0 });
       const top = h('div', { class: 'vtop' }), board = h('div', { class: 'vboard' }), msg = h('p', { class: 'big' });
       put(body, top, msg, board, h('div', { class: 'btnrow' }, h('button', { class: 'btn', onclick: neu }, '🔁 Neues Spiel')));
@@ -259,15 +259,15 @@
         const valid = [...Array(C).keys()].filter(c => drop(b, c) >= 0);
         const tryMove = (c, p) => { const bb = b.map(r => r.slice()); bb[drop(bb, c)][c] = p; return bb; };
         const winNow = p => valid.find(c => wins(tryMove(c, p), p));
-        const w = winNow(2); if (w !== undefined && chance(0.35 + 0.65 * k * 1.6)) return w;
-        const block = winNow(1); if (block !== undefined && chance(0.3 + 0.7 * k * 1.5)) return block;
+        const w = winNow(2); if (w !== undefined && chance(0.1 + 1.2 * k)) return w;
+        const block = winNow(1); if (block !== undefined && chance(0.05 + 1.1 * k)) return block;
         let pool = valid;
         if (chance(k * 1.25 - 0.25)) {
           // keine Züge, nach denen der Mensch sofort gewinnen kann
           const safe = valid.filter(c => { const bb = tryMove(c, 2); return ![...Array(C).keys()].some(c2 => { const r2 = drop(bb, c2); if (r2 < 0) return false; const b2 = bb.map(r => r.slice()); b2[r2][c2] = 1; return wins(b2, 1); }); });
           if (safe.length) pool = safe;
         }
-        if (chance(0.15 + 0.6 * k)) { const center = [3, 2, 4, 1, 5, 0, 6].filter(c => pool.includes(c)).slice(0, level >= 8 ? 1 : 3); if (center.length) return center[Math.floor(Math.random() * center.length)]; }
+        if (chance(0.7 * k)) { const center = [3, 2, 4, 1, 5, 0, 6].filter(c => pool.includes(c)).slice(0, level >= 8 ? 1 : 3); if (center.length) return center[Math.floor(Math.random() * center.length)]; }
         return pool[Math.floor(Math.random() * pool.length)];
       }
       neu();

@@ -12,9 +12,9 @@ Die Themen für 7 und 17 Jahre: Neuroplastizität, Finanzen, Entscheidungen, Pro
 |---|---|---|
 | Gestalten | 🌍 **Meine Spielwelt** (eigenes Spiel): coole Leute im Grundschulalter gestalten (Namen selbst eintragen), im 🚪 Kleiderschrank anziehen (Kleiderstange, Hosen-Regal, Schuhe, Extras-Schublade – auch als Möbel im Haus), Kleider im Mode-Atelier entwerfen, Haustiere aussuchen und selbst benennen, Haus / Tierheim / Eisberg-Haus einrichten (im Haus: eigene Leute mit Namen – einzeln, „Alle ins Haus“ oder direkt per „🏡 Ins Haus setzen“ – sowie Hunde & Katzen) (verschiedene Hausarten zum Aussuchen: Stadthaus, Bauernhaus, Baumhaus, Modernes Haus, Schloss, Tierhof, Tierklinik, Eispalast, Eishöhle), dann mit ▶️ Spielen alles ausprobieren (Leute reden, Tiere machen Geräusche, Licht, Fernseher, Essen, Schlafen, Tag/Nacht, Schnee), Musik wählen – alles wird im Browser gespeichert | – |
 | Bauen | 🧱 **Klötzchen-Welt**: eigene Welt aus 15 Blocksorten bauen und abbauen, Spielfigur laufen und springen lassen, 5 versteckte Sterne finden, Tag/Nacht | – |
-| Brettspiel | 🔴 **Vier in einer Reihe** gegen den Computer (leicht/mittel/schwer) oder zu zweit | – |
+| Brettspiel | 🔴 **Vier in einer Reihe** gegen den Computer (Schieber Leicht → Schwer, 11 Stufen) oder zu zweit | – |
 | Lesen & Fakten | 💡 **Wusstest du?** – Wissens-Quiz mit Vorlesen: Tiere, Weltall, Körper, Dinos, Erde | – |
-| Neuroplastizität | 🧠 Gehirn-Trainer: Memory mit 3D-Tieren, ein Gehirn-Bild bekommt mit jedem Üben mehr Verbindungen | 🧠 Gehirn-Gym: Zahlen-Merktest mit Verlauf, Erklärung wie das Gehirn lernt |
+| Neuroplastizität | 🧠 Gehirn-Trainer: Memory mit 3D-Tieren (Schieber: 3–10 Paare), ein Gehirn-Bild bekommt mit jedem Üben mehr Verbindungen | 🧠 Gehirn-Gym: Zahlen-Merktest mit Verlauf, Erklärung wie das Gehirn lernt |
 | Finanzen | 🐷 Drei Spardosen: Taschengeld auf Sparen/Ausgeben/Teilen verteilen und auf einen Wunsch sparen | 💰 Geld-Labor: Zinseszins-Rechner (Start mit 17 vs. 27), Budget 50/30/20, Inflation |
 | Entscheidungen | 🤔 Was passiert dann? 8 Alltagssituationen, „Stopp – Denk nach – Entscheide“ | ⚖️ Entscheidungs-Matrix mit Gewichtung, 10-10-10, Pre-Mortem |
 | Prokrastination | 🍪 Warte-Keks (warten lohnt sich) und Aufräum-Rakete (Timer) | ⏱️ Fokus-Timer (Pomodoro), „Eat the frog“, Ursachen und Strategien |
@@ -32,7 +32,7 @@ Spiele ohne Lesen, ohne Werbung, ohne Internet (nach dem ersten Laden).
 ### Spiele
 | | Spiel | Was passiert |
 |---|---|---|
-| 🏡 | **Häuser bauen** | Magnetplatten in 4 Formen (Viereck, Rechteck, Dreieck, Halbkreis) antippen oder auf die Baustelle ziehen – sie „klicken“ magnetisch in die Lücke. 8 Bauwerke: Haus, Turm mit Kuppel, Kirche, Hochhaus, Burg, Schloss, große Kirche, großes Hochhaus. Sind Wände und Dach fertig, kommen Tür, Außentreppe, Fenster und (bei Wohnhäusern) der Schornstein dran. Fertiges Gebäude antippen → es purzelt um |
+| 🏡 | **Häuser bauen** | Magnetplatten in 4 Formen (Leiste rechts) (Viereck, Rechteck, Dreieck, Halbkreis) antippen oder auf die Baustelle ziehen – sie „klicken“ magnetisch in die Lücke. 8 Bauwerke: Haus, Turm mit Kuppel, Kirche, Hochhaus, Burg, Schloss, große Kirche, großes Hochhaus. Sind Wände und Dach fertig, kommen Tür, Außentreppe, Fenster und (bei Wohnhäusern) der Schornstein dran. Fertiges Gebäude antippen → es purzelt um |
 | 🏰 | **3D bauen** | Gebäude aus mehreren Teilen, die sich langsam drehen (wischen zum Drehen): Haus, langes Haus, Turm mit Kuppel, Kirche (Kirchenschiff, Kirchturm mit Spitze und Glocken, runde Apsis), großes Haus, Burg, Schloss mit Kuppeltürmen, Hochhaus, hoher Turm |
 | 🚒 | **Autos & Lieder** | Feuerwehr, Krankenwagen, Polizei oder THW antippen → jemand ruft um Hilfe (🔥 „Feuer, es brennt!“, 🤕 „Ich brauche ein Pflaster!“, 😟 „Ich brauche Hilfe!“, 🌊 „Wasser kommt!“), dann Tatü-tata, Blaulicht, das Fahrzeug fährt zum Einsatz, kommt zurück, das Problem ist gelöst und es spielt ein Kinderlied (Bruder Jakob, Alle meine Entchen, Hänschen klein, Funkel funkel kleiner Stern) |
 | 🎹 | **Klavier** | Klavier mit weißen und schwarzen Tasten, farbige Punkte, Noten fliegen hoch |
