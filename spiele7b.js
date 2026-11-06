@@ -373,5 +373,74 @@
     },
   };
 
-  window.EXTRA7 = [KLOETZE, VIER, WISSEN];
+
+  /* ======================= ⚡ Blitz-Lesen ======================= */
+  // Silben mit „-“ getrennt (für die farbigen Silben nach dem Vorlesen), Leerzeichen trennt Wörter
+  const BLITZ = [
+    { de: '🐣 Ganz kurz', w: [['Ei', '🥚'], ['Eis', '🍦'], ['O-ma', '👵'], ['O-pa', '👴'], ['Uhr', '⌚'], ['Rad', '🚲'], ['Bus', '🚌'], ['Zug', '🚆'], ['Hut', '🎩'], ['Kuh', '🐄'], ['Reh', '🦌'], ['Ma-ma', '👩'], ['Pa-pa', '👨'], ['Au-to', '🚗'], ['So-fa', '🛋️'], ['La-ma', '🦙'], ['Ho-se', '👖'], ['Na-se', '👃'], ['Ro-se', '🌹'], ['I-gel', '🦔'], ['E-sel', '🫏'], ['Mo-fa', '🛵'], ['Ki-wi', '🥝'], ['Piz-za', '🍕']] },
+    { de: '🙂 Ein Klang', w: [['Hund', '🐕'], ['Maus', '🐭'], ['Haus', '🏠'], ['Baum', '🌳'], ['Ball', '⚽'], ['Bett', '🛏️'], ['Brot', '🍞'], ['Mond', '🌙'], ['Fisch', '🐟'], ['Tisch', '🍽️'], ['Kind', '🧒'], ['Bein', '🦵'], ['Hand', '✋'], ['Fuß', '🦶'], ['Buch', '📖'], ['Stern', '⭐'], ['Schaf', '🐑'], ['Pferd', '🐴'], ['Zelt', '⛺'], ['Herz', '❤️'], ['Milch', '🥛'], ['Schuh', '👟'], ['Bär', '🐻'], ['Frosch', '🐸']] },
+    { de: '📗 Zwei Silben', w: [['Kat-ze', '🐱'], ['Ap-fel', '🍎'], ['Blu-me', '🌸'], ['Son-ne', '☀️'], ['Tas-se', '☕'], ['Bir-ne', '🍐'], ['En-te', '🦆'], ['Ha-se', '🐰'], ['Wol-ke', '☁️'], ['Pup-pe', '🪆'], ['Ker-ze', '🕯️'], ['Gei-ge', '🎻'], ['Schu-le', '🏫'], ['Fe-der', '🪶'], ['Rau-pe', '🐛'], ['Ku-chen', '🍰'], ['Zwie-bel', '🧅'], ['Ta-xi', '🚕'], ['Pin-sel', '🖌️'], ['Kro-ne', '👑'], ['Dra-chen', '🐉'], ['Ze-bra', '🦓'], ['Lö-we', '🦁'], ['Af-fe', '🐒']] },
+    { de: '📘 Drei Silben', w: [['Ba-na-ne', '🍌'], ['To-ma-te', '🍅'], ['Ka-rot-te', '🥕'], ['Gi-raf-fe', '🦒'], ['Ra-ke-te', '🚀'], ['Ka-nin-chen', '🐇'], ['E-le-fant', '🐘'], ['Schmet-ter-ling', '🦋'], ['Pa-pa-gei', '🦜'], ['Pin-gu-in', '🐧'], ['Gi-tar-re', '🎸'], ['Kro-ko-dil', '🐊'], ['Te-le-fon', '☎️'], ['Schild-krö-te', '🐢'], ['Erd-bee-re', '🍓'], ['Fla-min-go', '🦩'], ['Pi-ra-ten', '🏴‍☠️'], ['Zi-tro-ne', '🍋'], ['Ham-bur-ger', '🍔'], ['Ro-bo-ter', '🤖']] },
+    { de: '📙 Lange Wörter', w: [['Feu-er-wehr', '🚒'], ['Schnee-mann', '⛄'], ['Fuß-ball', '⚽'], ['Eis-bär', '🐻‍❄️'], ['Hub-schrau-ber', '🚁'], ['Re-gen-schirm', '☂️'], ['Weih-nachts-baum', '🎄'], ['Schul-ran-zen', '🎒'], ['Zahn-bürs-te', '🪥'], ['Son-nen-blu-me', '🌻'], ['Kran-ken-wa-gen', '🚑'], ['Po-li-zei-au-to', '🚓'], ['Ein-horn', '🦄'], ['Flug-zeug', '✈️'], ['Spiel-platz', '🛝'], ['Re-gen-bo-gen', '🌈'], ['Ma-ri-en-kä-fer', '🐞'], ['Scho-ko-la-de', '🍫'], ['Ge-burts-tag', '🎂'], ['Fahr-rad-helm', '🚴']] },
+    { de: '📚 Kleine Sätze', w: [['Der Hund bellt.', '🐕'], ['Die Son-ne scheint.', '☀️'], ['Ich es-se ein Eis.', '🍦'], ['Ma-ma liest ein Buch.', '📖'], ['Das Au-to ist rot.', '🚗'], ['Die Kat-ze schläft.', '🐱'], ['Wir spie-len Fuß-ball.', '⚽'], ['Der Mond ist rund.', '🌙'], ['O-ma backt Ku-chen.', '🍰'], ['Es reg-net heu-te.', '🌧️'], ['Ich ma-le ein Haus.', '🏠'], ['Der Zug fährt schnell.', '🚆'], ['Das Ba-by lacht.', '👶'], ['Pa-pa kocht Nu-deln.', '🍝'], ['Die En-te schwimmt.', '🦆'], ['Im Gar-ten blüht ei-ne Blu-me.', '🌸'], ['Der Bus ist gelb.', '🚌'], ['Ich ha-be ei-nen Ball.', '⚽']] },
+  ];
+  const plain = w => w.replace(/-/g, '');
+  const BLITZ_GAME = {
+    id: 'blitzlesen', icon: '⚡', color: '#7c3aed', skill: 'Lesen üben', title: 'Blitz-Lesen',
+    intro: 'Lies das Wort! Dann drück auf ▶️ – und hör, ob du richtig gelesen hast. Mit ➜ kommt das nächste Wort.',
+    render(body) {
+      let lv = store.get('blitz_lv', 0), blitz = store.get('blitz_mode', false);
+      let deck = [], i = 0, shown = false, hideT = null;
+      const card = h('button', { class: 'bzcard', 'aria-label': 'Wort' });
+      const count = h('span', { class: 'pill' });
+      const total = h('span', { class: 'pill' });
+      const modeBtn = h('button', { class: 'btn alt bzmode', onclick: () => { blitz = !blitz; store.set('blitz_mode', blitz); paintMode(); show(); } });
+      const prevB = h('button', { class: 'btn alt bznav', 'aria-label': 'Wort davor', onclick: () => go(-1) }, '◀ Davor');
+      const playB = h('button', { class: 'bzplay', 'aria-label': 'Vorlesen', onclick: play }, '▶');
+      const nextB = h('button', { class: 'btn bznav', 'aria-label': 'Nächstes Wort', onclick: () => go(1) }, 'Weiter ➜');
+      const slider = window.diffSlider({ min: 0, max: BLITZ.length - 1, value: lv, label: v => BLITZ[v].de, onChange: v => { lv = v; store.set('blitz_lv', v); neu(); sayKid(BLITZ[v].de.replace(/^\S+\s/, '')); } });
+      put(body, slider, h('div', { class: 'row bzinfo' }, count, total, modeBtn), card, h('div', { class: 'bzctl' }, prevB, playB, nextB));
+      card.addEventListener('click', () => { if (blitz && card.classList.contains('hide')) { card.classList.remove('hide'); flash(); } });
+      function paintMode() { modeBtn.textContent = blitz ? '⚡ Blitz: an' : '⚡ Blitz: aus'; modeBtn.classList.toggle('on', blitz); }
+      function neu() { deck = shuffle(BLITZ[lv].w.slice()); i = 0; show(); }
+      function flash() {
+        clearTimeout(hideT);
+        // Blitz: Wort ist nur kurz zu sehen (längere Wörter etwas länger)
+        if (blitz && !shown) hideT = setTimeout(() => { if (!shown) card.classList.add('hide'); }, 900 + plain(deck[i][0]).length * 90);
+      }
+      function show() {
+        const [w] = deck[i]; shown = false;
+        card.className = 'bzcard' + (plain(w).length > 14 ? ' long' : '') + (plain(w).length > 24 ? ' xlong' : '');
+        card.innerHTML = `<span class="bzword">${plain(w)}</span><span class="bzhint">${blitz ? '👆 Antippen = nochmal zeigen' : ''}</span>`;
+        card.classList.remove('bzin'); void card.offsetWidth; card.classList.add('bzin');
+        count.textContent = `Wort ${i + 1} von ${deck.length}`;
+        total.textContent = `📖 ${store.get('blitz_total', 0)} gelesen`;
+        prevB.disabled = i === 0;
+        playB.classList.add('pulse');
+        tone(880, 0.06, 'triangle', 0.12);
+        flash();
+      }
+      function play() {
+        const [w, emo] = deck[i];
+        clearTimeout(hideT);
+        // Silben farbig (blau/rot wie in der Schule) + Bild
+        const syl = w.split(' ').map(word => word.split('-').map((s, k) => `<span class="s${k % 2}">${s}</span>`).join('')).join(' ');
+        card.className = 'bzcard open' + (plain(w).length > 14 ? ' long' : '') + (plain(w).length > 24 ? ' xlong' : '');
+        card.innerHTML = `<span class="bzword">${syl}</span><span class="bzemo">${emo}</span>`;
+        playB.classList.remove('pulse');
+        say(plain(w), { lang: 'de', rate: 0.75, pitch: 1.1 });
+        if (!shown) { shown = true; store.set('blitz_total', store.get('blitz_total', 0) + 1); total.textContent = `📖 ${store.get('blitz_total', 0)} gelesen`; }
+      }
+      function go(d) {
+        const n = i + d;
+        if (n < 0) return;
+        if (n >= deck.length) { cheer(); sayKid(`Super! Du hast ${deck.length} Wörter gelesen! Jetzt kommen neue.`); neu(); return; }
+        i = n; show();
+      }
+      paintMode(); neu();
+      return () => clearTimeout(hideT);
+    },
+  };
+
+  window.EXTRA7 = [BLITZ_GAME, KLOETZE, VIER, WISSEN];
 })();

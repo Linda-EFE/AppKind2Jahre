@@ -469,3 +469,28 @@
 .dslider input[type=range]::-moz-range-thumb { width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 5px solid #3a86ff; box-shadow: 0 3px 6px rgba(0,0,0,.25); cursor: grab; }
 .vtop .dslider { margin: 0; flex: 1 1 320px; }
 @media (max-width: 480px) { .dsend { font-size: 12px; } .dsrow { gap: 6px; } }
+/* =================== ⚡ Blitz-Lesen =================== */
+.bzinfo { justify-content: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.bzmode { padding: 8px 14px; font-size: 15px; }
+.t7 .bzmode.on { background: #7c3aed; color: #fff; box-shadow: 0 5px 0 #5b21b6; }
+.bzcard { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; width: 100%; max-width: 760px; min-height: 230px; margin: 0 auto; padding: 20px; border-radius: 28px; background: #fff; box-shadow: 0 8px 0 #ddd6fe, 0 10px 30px rgba(124,58,237,.15); color: #1e1b4b; cursor: default; }
+.bzword { font-family: 'Andika', 'Comic Sans MS', 'Trebuchet MS', system-ui, sans-serif; font-size: clamp(48px, 13vw, 110px); font-weight: 700; line-height: 1.1; letter-spacing: .02em; text-align: center; word-break: break-word; }
+.bzcard.long .bzword { font-size: clamp(36px, 9vw, 80px); }
+.bzcard.xlong .bzword { font-size: clamp(28px, 6.5vw, 58px); }
+.bzcard .s0 { color: #1d4ed8; } .bzcard .s1 { color: #dc2626; }
+.bzemo { font-size: clamp(54px, 12vw, 96px); line-height: 1; animation: appear .4s; }
+.bzhint { font-size: 14px; color: #8b84b8; min-height: 1em; }
+.bzcard.hide .bzword { visibility: hidden; }
+.bzcard.hide { cursor: pointer; background: repeating-linear-gradient(45deg, #faf5ff, #faf5ff 14px, #f3e8ff 14px, #f3e8ff 28px); }
+.bzcard.hide::before { content: '⚡'; font-size: 70px; position: absolute; }
+.bzcard { position: relative; }
+.bzcard.bzin { animation: bzpop .35s ease-out; }
+@keyframes bzpop { from { transform: scale(.85); opacity: .3; } }
+.bzcard.open { background: #fefce8; }
+.bzctl { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 18px; }
+.bznav { min-width: 120px; }
+.bznav:disabled { opacity: .4; }
+.bzplay { width: 96px; height: 96px; border-radius: 50%; font-size: 44px; color: #fff; padding-left: 8px; background: linear-gradient(135deg, #22c55e, #16a34a); box-shadow: 0 6px 0 #166534; flex: none; }
+.bzplay:active { transform: translateY(4px); box-shadow: 0 2px 0 #166534; }
+.bzplay.pulse { animation: wpulse 1.6s ease-in-out infinite; }
+@media (max-width: 480px) { .bzctl { gap: 8px; } .bznav { min-width: 0; padding: 12px 14px; } .bzplay { width: 84px; height: 84px; } .bzcard { min-height: 200px; } }
