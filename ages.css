@@ -450,3 +450,12 @@
   .wardprev svg { max-width: 110px; }
   .wardtop { font-size: 16px; }
 }
+/* Namen an Figuren & Tieren, Ins-Haus-Knöpfe */
+.witem .wcn { position: absolute; left: 50%; bottom: -4%; transform: translateX(-50%); font-size: max(11px, .13em); font-weight: 800; background: #fff; border-radius: 8px; padding: 1px 6px; white-space: nowrap; color: #2b2250; pointer-events: none; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+.witem.wlie .wcn { display: none; }
+.wp.wpc, .wp.wpn { position: relative; height: 92px; width: 66px; align-content: start; }
+.wp.wpc svg { height: 70px; }
+.wp.wpn img { height: 58px; }
+.wp.wpc b, .wp.wpn b { position: absolute; bottom: 3px; left: 0; right: 0; font-size: 11px; color: #2b2250; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.btn.wallin { align-self: center; padding: 10px 14px; font-size: 16px; }
+.btn.winhaus { width: 100%; margin-top: 8px; background: linear-gradient(135deg, #22c55e, #16a34a); box-shadow: 0 5px 0 #166534; }

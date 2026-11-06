@@ -144,6 +144,24 @@
     pets: () => store.get('welt_pets', [{ id: id(), a: 'hund', name: 'Bello', acc: '🎀' }, { id: id(), a: 'katze', name: 'Mimi', acc: '' }]),
     setPets: v => store.set('welt_pets', v),
   };
+  // Gespeicherte Figur (gleiche id) aktualisieren – so passt alles in Leute und im Haus zusammen
+  function storeChar(c) {
+    const cs = S.chars(), i = cs.findIndex(x => x.id === c.id);
+    if (i >= 0) { cs[i] = JSON.parse(JSON.stringify(c)); S.setChars(cs); return true; }
+    return false;
+  }
+  // Freier Platz für die k-te Figur im Haus (4 Plätze oben, 4 unten, dann leicht versetzt)
+  const SPOTS = [[18, 46], [42, 46], [64, 46], [84, 46], [18, 78], [42, 78], [64, 78], [84, 78]];
+  const spot = k => { const [x, y] = SPOTS[k % 8]; const r = Math.floor(k / 8); return { x: x + r * 6, y: y - r * 3 }; };
+  // Figur direkt ins Haus setzen (oder dort aktualisieren)
+  function placeInHouse(c) {
+    const key = 'welt_scene_haus';
+    const items = store.get(key, null) || SCENE_DEF.haus.start.map(i => ({ s: 1, f: 1, ...i, id: id() }));
+    const ex = items.find(i => i.t === 'char' && i.c.id === c.id);
+    if (ex) ex.c = JSON.parse(JSON.stringify(c));
+    else { items.push({ t: 'char', c: JSON.parse(JSON.stringify(c)), s: 1, f: 1, ...spot(items.filter(i => i.t === 'char').length), id: id() }); }
+    store.set(key, items); return !ex;
+  }
 
   /* ---------------- Musik ---------------- */
   let musBus = null, musTimer = null, musStep = 0;
@@ -339,9 +357,13 @@
     put(layer, b); setTimeout(() => b.remove(), 1900);
   }
   function anim(el, cls, ms = 900) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(() => el.classList.remove(cls), ms); }
+  // Hunde und Katzen (Fotos-Bilder + Emoji-Varianten) fürs Haus
+  const DOGCAT_IMG = ['hund', 'pudel', 'katze'];
+  const DOGCAT_EMO = { '🐕': 'hund', '🦮': 'hund', '🐕‍🦺': 'hund', '🐩': 'pudel', '🐶': 'hund', '🐈': 'katze', '🐈‍⬛': 'katze', '🐱': 'katze' };
   function playTap(it, el, ctx) {
     const v = it.v;
-    if (it.t === 'char') { anim(el, 'whop', 700); const s = pick(SAYINGS); bubble(ctx.layer, it, s); sayKid(s); return; }
+    if (it.t === 'e' && DOGCAT_EMO[v]) it = { ...it, t: 'img', v: DOGCAT_EMO[v] };
+    if (it.t === 'char') { anim(el, 'whop', 700); const nm = (ctx.liveChar ? ctx.liveChar(it) : it.c).name; const s = nm && Math.random() < 0.35 ? 'Ich heiße ' + nm + '!' : pick(SAYINGS); bubble(ctx.layer, it, s); sayKid(s); return; }
     if (it.t === 'pet' || it.t === 'img') {
       const a = it.t === 'pet' ? it.p.a : it.v; anim(el, 'whop', 700);
       const snd = PET_SOUND[a] || 'Hallo!'; bubble(ctx.layer, it, snd);
@@ -397,7 +419,7 @@
       if (it.t === 'img') return `<img src="img/tiere/${it.v}.png" alt="" draggable="false">`;
       if (it.t === 'iglu') return IGLU;
       if (it.t === 'schrank') return SCHRANK_SVG;
-      if (it.t === 'char') return charSVG(it.c);
+      if (it.t === 'char') { const c = liveChar(it); return charSVG(c) + (c.name ? `<span class="wcn">${c.name}</span>` : ''); }
       if (it.t === 'pet') return `<span class="wpet"><img src="img/tiere/${it.p.a}.png" alt="" draggable="false">${it.p.acc ? `<i>${it.p.acc}</i>` : ''}<b>${it.p.name}</b></span>`;
       return '';
     }
@@ -406,9 +428,12 @@
       const k = w < 500 ? 1.35 : 1; // auf dem Handy etwas größer
       return k * ({ e: w * 0.075, img: w * 0.1, iglu: w * 0.22, char: w * 0.11, pet: w * 0.1, schrank: w * 0.08 }[it.t] || w * 0.08);
     }
+    // Figuren immer so zeigen, wie sie bei 👫 Leute zuletzt angezogen wurden
+    let live = S.chars();
+    const liveChar = it => live.find(c => c.id === it.c.id) || it.c;
     const isBed = i => i.t === 'e' && '🛏️🛋️'.includes(i.v);
     function draw() {
-      layer.innerHTML = '';
+      layer.innerHTML = ''; live = S.chars();
       items.forEach(it => {
         const el = h('div', { class: 'witem wt-' + it.t + (sel === it.id && mode === 'bauen' ? ' sel' : '') + (it.on && '💡🕯️🔦'.includes(it.v) ? ' won' : '') + (it.on && it.v === '📺' ? ' wtv' : '') + (it.lie ? ' wlie' : ''), html: itemHTML(it) });
         const sz = size(it);
@@ -469,15 +494,34 @@
       items.push(it); sel = it.id; save(); draw(); drawTools();
       tone(700 + Math.random() * 300, 0.1, 'triangle', 0.15);
     }
-    const cats = { ...CATALOG[sid], '🐾 Tiere': 'animals', '👫 Leute': 'chars', '🐶 Meine Tiere': 'pets' };
+    const cats = sid === 'haus'
+      ? { '👫 Meine Leute': 'chars', '🐶 Hunde & Katzen': 'dogcats', '🐾 Meine Tiere': 'pets', ...CATALOG[sid], '🐹 Andere Tiere': 'animals' }
+      : { '👫 Meine Leute': 'chars', '🐾 Meine Tiere': 'pets', ...CATALOG[sid], '🐾 Tiere': 'animals' };
+    const charBtn = c => h('button', { class: 'wp wpc', 'aria-label': c.name, onclick: () => { add({ t: 'char', c: JSON.parse(JSON.stringify(c)) }); sayKid((c.name || 'Ich') + ' ist im Haus!'); }, html: charSVG(c) + `<b>${c.name || ''}</b>` });
+    function allIn() {
+      const cs = S.chars(); let n = 0;
+      cs.forEach((c, i) => { if (!items.some(it => it.t === 'char' && it.c.id === c.id)) { items.push({ t: 'char', c: JSON.parse(JSON.stringify(c)), s: 1, f: 1, ...spot(items.filter(it => it.t === 'char').length), id: id() }); n++; } });
+      save(); draw(); drawTools();
+      if (n) { cheer(); sayKid(n === 1 ? 'Ein Kind ist eingezogen!' : n + ' Kinder sind eingezogen!'); } else sayKid('Alle deine Leute sind schon da!');
+    }
     function showCat(name) {
       [...catBar.children].forEach(b => b.classList.toggle('on', b.textContent === name));
       pal.innerHTML = '';
       const v = cats[name];
       if (Array.isArray(v)) v.forEach(e => put(pal, h('button', { class: 'wp', onclick: () => add(e === 'IGLU' ? { t: 'iglu', s: 1.2 } : e === 'SCHRANK' ? { t: 'schrank', s: 1.3 } : { t: 'e', v: e }), html: e === 'IGLU' ? IGLU : e === 'SCHRANK' ? SCHRANK_SVG : e })));
       else if (v === 'animals') SCENE_ANIMALS[sid].forEach(a => put(pal, h('button', { class: 'wp', onclick: () => add({ t: 'img', v: a }), html: `<img src="img/tiere/${a}.png" alt="">` })));
-      else if (v === 'chars') { const cs = S.chars(); if (!cs.length) put(pal, h('span', { class: 'whint' }, 'Gestalte zuerst Leute bei 👫!')); cs.forEach(c => put(pal, h('button', { class: 'wp wpc', onclick: () => add({ t: 'char', c }), html: charSVG(c) }))); }
-      else if (v === 'pets') { const ps = S.pets(); if (!ps.length) put(pal, h('span', { class: 'whint' }, 'Such dir zuerst Tiere bei 🐾 aus!')); ps.forEach(p => put(pal, h('button', { class: 'wp', onclick: () => add({ t: 'pet', p }), html: `<img src="img/tiere/${p.a}.png" alt="">` }))); }
+      else if (v === 'chars') {
+        const cs = S.chars();
+        if (!cs.length) put(pal, h('span', { class: 'whint' }, 'Gestalte zuerst Leute bei 👫!'));
+        else put(pal, h('button', { class: 'btn wallin', onclick: allIn }, '👫 Alle ins Haus'));
+        cs.forEach(c => put(pal, charBtn(c)));
+      }
+      else if (v === 'dogcats') {
+        DOGCAT_IMG.forEach(a => put(pal, h('button', { class: 'wp', 'aria-label': a, onclick: () => add({ t: 'img', v: a }), html: `<img src="img/tiere/${a}.png" alt="">` })));
+        Object.keys(DOGCAT_EMO).forEach(e => put(pal, h('button', { class: 'wp', onclick: () => add({ t: 'e', v: e }) }, e)));
+        S.pets().filter(p => DOGCAT_IMG.includes(p.a)).forEach(p => put(pal, h('button', { class: 'wp wpn', 'aria-label': p.name, onclick: () => add({ t: 'pet', p }), html: `<img src="img/tiere/${p.a}.png" alt=""><b>${p.name}</b>` })));
+      }
+      else if (v === 'pets') { const ps = S.pets(); if (!ps.length) put(pal, h('span', { class: 'whint' }, 'Such dir zuerst Tiere bei 🐾 aus!')); ps.forEach(p => put(pal, h('button', { class: 'wp wpn', 'aria-label': p.name, onclick: () => add({ t: 'pet', p }), html: `<img src="img/tiere/${p.a}.png" alt=""><b>${p.name}</b>` }))); }
     }
     Object.keys(cats).forEach(n => put(catBar, h('button', { class: 'wcat', onclick: () => showCat(n) }, n)));
     // Hausart auswählen
@@ -519,9 +563,9 @@
       const kids = items.filter(i => i.t === 'char');
       if (!kids.length) { bubble(layer, sch, 'Setz zuerst ein Kind ins Haus!'); return; }
       const kid = kids.reduce((a, b) => (Math.hypot(b.x - sch.x, b.y - sch.y) < Math.hypot(a.x - sch.x, a.y - sch.y) ? b : a));
-      openWardrobe(kid.c, nc => { kid.c = nc; save(); draw(); });
+      openWardrobe(liveChar(kid), nc => { kid.c = nc; storeChar(nc); save(); draw(); });
     }
-    const ctx = { layer, save, draw, snow: letItSnow, night: toggleNight, wardrobe: wardrobeFor };
+    const ctx = { layer, save, draw, snow: letItSnow, night: toggleNight, wardrobe: wardrobeFor, liveChar };
     const ro = new ResizeObserver(draw); ro.observe(stage);
     drawStyles(); showCat(Object.keys(cats)[0]); setMode('bauen');
     return () => ro.disconnect();
@@ -589,7 +633,8 @@
         h('div', { class: 'btnrow' },
           h('button', { class: 'btn alt', onclick: zufall }, '🎲 Zufall'),
           h('button', { class: 'btn', onclick: speichern }, '💾 Speichern'),
-          h('button', { class: 'btn alt', onclick: neu }, '➕ Neu'))), opts));
+          h('button', { class: 'btn alt', onclick: neu }, '➕ Neu')),
+        h('button', { class: 'btn winhaus', onclick: insHaus }, '🏡 Ins Haus setzen')), opts));
     function drawGallery() {
       gallery.innerHTML = '';
       chars.forEach(c => put(gallery, h('div', { class: 'wg' + (c.id === cur.id ? ' on' : '') },
@@ -617,7 +662,7 @@
         row('Augenfarbe', EYEC.map((c, i) => i), i => (cur.ec ?? 0) === i, i => { cur.ec = i; }, i => EYEC[i]),
         row('Mund', MOUTH, x => cur.mouth === x[0], x => { cur.mouth = x[0]; }));
       put(opts, h('div', { class: 'wrow center' }, h('small', {}, 'Anziehen'),
-        h('button', { class: 'wschrankbtn', onclick: () => openWardrobe(cur, nc => { cur = nc; prev.innerHTML = charSVG(cur); }), html: SCHRANK_SVG + '<b>Kleiderschrank öffnen</b>' })));
+        h('button', { class: 'wschrankbtn', onclick: () => openWardrobe(cur, nc => { cur = { ...nc, name: (name.value || '').trim() || nc.name }; prev.innerHTML = charSVG(cur); if (cur.name && storeChar(cur)) { chars = S.chars(); drawGallery(); } }), html: SCHRANK_SVG + '<b>Kleiderschrank öffnen</b>' })));
       drawGallery();
     }
     function zufall() {
@@ -631,6 +676,16 @@
       const i = chars.findIndex(c => c.id === cur.id);
       if (i >= 0) chars[i] = JSON.parse(JSON.stringify(cur)); else chars.push(JSON.parse(JSON.stringify(cur)));
       S.setChars(chars); draw(); cheer(); sayKid(cur.name + ' ist gespeichert!');
+      return true;
+    }
+    function insHaus() {
+      cur.name = (name.value || '').trim();
+      if (!cur.name) { needName(name, 'Wie heißt dein Kind? Schreib zuerst einen Namen hinein.'); return; }
+      const i = chars.findIndex(c => c.id === cur.id);
+      if (i >= 0) chars[i] = JSON.parse(JSON.stringify(cur)); else chars.push(JSON.parse(JSON.stringify(cur)));
+      S.setChars(chars);
+      const neuIn = placeInHouse(cur); draw(); cheer();
+      sayKid(neuIn ? cur.name + ' zieht ins Haus ein!' : cur.name + ' hat sich im Haus umgezogen!');
     }
     function neu() { cur = { ...PRESETS[Math.floor(Math.random() * PRESETS.length)], id: id(), name: '' }; zufall(); name.focus(); sayKid('Ein neues Kind! Wie soll es heißen?'); }
     name.addEventListener('input', () => { cur.name = name.value; });
