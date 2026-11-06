@@ -298,6 +298,204 @@ window.VIDEO_LIST = [
   "tatue": false
  },
  {
+  "key": "e_heliwasser",
+  "cat": "feuerwehr",
+  "de": "Hubschrauber wirft Wasser ab",
+  "title": "File:Example Helitack drop.webm",
+  "artist": "JustaDuckling",
+  "license": "CC BY-SA 4.0",
+  "tatue": false
+ },
+ {
+  "key": "e_drehleiterfenster",
+  "cat": "feuerwehr",
+  "de": "Die Drehleiter fährt zum Fenster",
+  "title": "File:CNRJ Fire Department Sasebo Joint Fire Drill (990854).webm",
+  "artist": "U.S. Navy video by Petty Officer 2nd Class Colin Lightner",
+  "license": "Public domain",
+  "tatue": false
+ },
+ {
+  "key": "e_abseilrettung",
+  "cat": "feuerwehr",
+  "de": "Rettungsübung am Turm",
+  "title": "File:Firefighters conduct rescue training at Torii Station (1014846).webm",
+  "artist": "U.S. Army USAG-O by Natalie Stanley",
+  "license": "Public domain",
+  "tatue": false
+ },
+ {
+  "key": "e_alteswasser",
+  "cat": "feuerwehr",
+  "de": "Feuerwehr spritzt Wasser (früher)",
+  "title": "File:Brandweerdemonstraties.webm",
+  "artist": "Polygoon Hollands Nieuws (producent) / Nederlands Instituut voor Beeld en Geluid (beheerder)",
+  "license": "Public domain",
+  "tatue": false
+ },
+ {
+  "key": "e_schlauchuebung",
+  "cat": "feuerwehr",
+  "de": "Feuerwehr übt mit dem Schlauch",
+  "title": "File:TokyoMetropolitanFireDepartment-FireHoseDrill.ogv",
+  "artist": "Nesnad",
+  "license": "CC BY-SA 3.0",
+  "tatue": false
+ },
+ {
+  "key": "e_schlauchtraining",
+  "cat": "feuerwehr",
+  "de": "Feuerwehrleute spritzen Wasser",
+  "title": "File:86 AW firefighters stay ready (977192).webm",
+  "artist": "U.S. Air Force video by Airman 1st Class Jason Jones Jr.",
+  "license": "Public domain",
+  "tatue": false
+ },
+ {
+  "key": "e_autobrand",
+  "cat": "feuerwehr",
+  "de": "Die Feuerwehr löscht ein Auto",
+  "title": "File:Autobrand Turfweg.webm",
+  "artist": "Omroep Veldhoven",
+  "license": "CC BY 3.0",
+  "tatue": false
+ },
+ {
+  "key": "e_roterhubschrauber",
+  "cat": "feuerwehr",
+  "de": "Roter Löschhubschrauber",
+  "title": "File:Bell 212 Schmilka Fire Fighting Elbe 30 7 2022.webm",
+  "artist": "SamsonBVB",
+  "license": "CC0",
+  "tatue": false
+ },
+ {
+  "key": "e_korbspritze",
+  "cat": "feuerwehr",
+  "de": "Wasser aus dem Leiterkorb",
+  "title": "File:Grote brand in hooischuur Dreumel onder controle.webm",
+  "artist": "RN7",
+  "license": "CC BY 3.0",
+  "tatue": false
+ },
+ {
+  "key": "e_flughafenfeuerwehr",
+  "cat": "feuerwehr",
+  "de": "Flughafenfeuerwehr löscht",
+  "title": "File:Kadena AB firefighter SrA Ingwerson (955254).webm",
+  "artist": "U.S. Marine Corps video by Cpl. Ernesto Lagunes",
+  "license": "Public domain",
+  "tatue": false
+ },
+ {
+  "key": "e_loeschflugzeug",
+  "cat": "feuerwehr",
+  "de": "Löschflugzeug wirft Wasser ab",
+  "title": "File:Tanker drops on central Washington wildfire (35722492706).webm",
+  "artist": "BLM Oregon & Washington",
+  "license": "Public domain",
+  "tatue": false
+ },
+ {
+  "key": "e_loeschuebung",
+  "cat": "feuerwehr",
+  "de": "Feuerwehr löscht bei der Übung",
+  "title": "File:Mobile firefighting training prop used by the Country Fire Authority, Victoria, Australia.webm",
+  "artist": "Country Fire Authority",
+  "license": "CC BY 3.0",
+  "tatue": false
+ },
+ {
+  "key": "e_hubschraubereimer",
+  "cat": "feuerwehr",
+  "de": "Hubschrauber holt Wasser",
+  "title": "File:Central South Island Helicopters ZK-HDN MD 520N video, Mt Allan fire, NZ 2010.ogv",
+  "artist": "Benchill",
+  "license": "CC BY-SA 3.0",
+  "tatue": false
+ },
+ {
+  "key": "e_bambibucket",
+  "cat": "feuerwehr",
+  "de": "Hubschrauber mit Wassereimer",
+  "title": "File:25th Combat Aviation Brigade Performs Bambi Bucket Operation During Salaknib 2025 (957634).webm",
+  "artist": "U.S. Army 28PAD by Staff Sgt. Katelyn Vazquez",
+  "license": "Public domain",
+  "tatue": false
+ },
+ {
+  "key": "e_nh90eimer",
+  "cat": "feuerwehr",
+  "de": "Großer Hubschrauber mit Eimer",
+  "title": "File:Helicópteros de bomberos NH90 Schmilka a 4 8 2022.webm",
+  "artist": "SamsonBVB",
+  "license": "CC0",
+  "tatue": false
+ },
+ {
+  "key": "e_spritzenreihe",
+  "cat": "feuerwehr",
+  "de": "Viele Wasserstrahlen",
+  "title": "File:25 BABYMOTORBRANDSPUITEN WORDEN GEDEMONSTREERD-PGM4011569.webm",
+  "artist": "Polygoon Hollands Nieuws (producent) / Nederlands Instituut voor Beeld en Geluid (beheerder)",
+  "license": "Public domain",
+  "tatue": false
+ },
+ {
+  "key": "e_wasserbogen",
+  "cat": "feuerwehr",
+  "de": "Wasserbögen im Park",
+  "title": "File:Demonstratie brandweerbond.webm",
+  "artist": "Polygoon Hollands Nieuws (producent) / Nederlands Instituut voor Beeld en Geluid (beheerder)",
+  "license": "Public domain",
+  "tatue": false
+ },
+ {
+  "key": "e_kirchturmspritze",
+  "cat": "feuerwehr",
+  "de": "Feuerwehr spritzt an den Turm",
+  "title": "File:Nieuwe waterleiding en demonstratie brandweer.webm",
+  "artist": "Polygoon Hollands Nieuws (producent) / Nederlands Instituut voor Beeld en Geluid (beheerder)",
+  "license": "Public domain",
+  "tatue": false
+ },
+ {
+  "key": "e_neuefeuerwehr",
+  "cat": "feuerwehr",
+  "de": "Neue Feuerwehr spritzt Wasser",
+  "title": "File:NIEUW BRANDWEERMATERIAAL-PGM4011543.webm",
+  "artist": "Polygoon Hollands Nieuws (producent) / Nederlands Instituut voor Beeld en Geluid (beheerder)",
+  "license": "Public domain",
+  "tatue": false
+ },
+ {
+  "key": "e_flugzeugabwurf",
+  "cat": "feuerwehr",
+  "de": "Flugzeug lässt Wasser regnen",
+  "title": "File:California Air National Guard waterbombers DOD 100489779-720x406-1500k.theora.ogv",
+  "artist": "Video by Ty Moore",
+  "license": "Public domain",
+  "tatue": false
+ },
+ {
+  "key": "e_waldbrandheli",
+  "cat": "feuerwehr",
+  "de": "Hubschrauber hilft im Wald",
+  "title": "File:Waldbrand.webm",
+  "artist": "BFV Radkersburg",
+  "license": "CC BY-SA 2.0",
+  "tatue": false
+ },
+ {
+  "key": "e_hafenstrahlen",
+  "cat": "feuerwehr",
+  "de": "Wasserstrahlen am Hafen",
+  "title": "File:Brandweerdemonstratie.webm",
+  "artist": "Polygoon Hollands Nieuws (producent) / Nederlands Instituut voor Beeld en Geluid (beheerder)",
+  "license": "Public domain",
+  "tatue": false
+ },
+ {
   "key": "r_brussels",
   "cat": "rettung",
   "de": "Krankenwagen fahren in Brüssel",
