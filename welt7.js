@@ -64,7 +64,7 @@
     let back = '', front = '';
     const fringe = `<path d="M44 96 Q40 34 100 30 Q160 34 156 96 Q150 66 130 58 Q114 72 88 60 Q62 66 44 96Z" fill="${hc}" ${st}/>`;
     switch (c.hair) {
-      case 'lang': back = `<path d="M40 92 Q30 206 70 214 L130 214 Q170 206 160 92Z" fill="${hc}" ${st}/>`; front = fringe; break;
+      case 'lang': back = `<path d="M40 92 Q28 236 70 250 L130 250 Q172 236 160 92Z" fill="${hc}" ${st}/>`; front = fringe; break;
       case 'zopf': back = `<path d="M150 62 Q190 90 176 168 Q170 188 160 168 Q170 120 146 86Z" fill="${hc}" ${st}/><circle cx="152" cy="62" r="9" fill="#ff70a6" ${st}/>`; front = fringe; break;
       case 'locken': back = `<g fill="${hc}" ${st}>${[[46, 120], [154, 120], [40, 96], [160, 96]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="17"/>`).join('')}</g>`;
         front = `<g fill="${hc}" ${st}>${[[50, 70], [64, 48], [84, 36], [106, 32], [128, 38], [146, 52], [156, 74]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="20"/>`).join('')}</g><path d="M50 74 Q100 58 152 76 Q100 48 50 74Z" fill="${hc}"/>`; break;
@@ -75,8 +75,8 @@
     }
     const shine = front && c.hair !== 'iro' && c.hair !== 'locken' ? `<path d="M70 46 Q96 36 120 42" stroke="#fff" stroke-opacity=".45" stroke-width="6" stroke-linecap="round" fill="none"/>` : '';
     const eyeOpen = (x, big) => {
-      const rx = big ? 13 : 11, ry = big ? 15 : 13;
-      return `<ellipse cx="${x}" cy="102" rx="${rx}" ry="${ry}" fill="#fff" ${st}/><circle cx="${x + 1}" cy="104" r="${big ? 9 : 8}" fill="${ec}"/>
+      const rx = big ? 12 : 10, ry = big ? 13 : 11;
+      return `<ellipse cx="${x}" cy="102" rx="${rx}" ry="${ry}" fill="#fff" ${st}/><circle cx="${x + 1}" cy="104" r="${big ? 8 : 7}" fill="${ec}"/>
         <circle cx="${x + 1}" cy="104" r="${big ? 4.5 : 4}" fill="#1b1b1b"/><circle cx="${x + 4}" cy="99" r="3.2" fill="#fff"/><circle cx="${x - 2}" cy="108" r="1.6" fill="#fff"/>`;
     };
     const eyeShut = x => `<path d="M${x - 10} 104 Q${x} 94 ${x + 10} 104" stroke="${OL}" stroke-width="4" stroke-linecap="round" fill="none"/>`;
@@ -104,33 +104,34 @@
       schleife: `<g ${st}><path d="M134 46 L112 30 L112 62 Z M134 46 L156 30 L156 62Z" fill="#ff70a6"/><circle cx="134" cy="46" r="7" fill="#e0457b"/></g>`,
       blume: `<g transform="translate(140 50)" ${st}>${[0, 72, 144, 216, 288].map(a => `<circle cx="${(Math.cos(a * Math.PI / 180) * 9).toFixed(1)}" cy="${(Math.sin(a * Math.PI / 180) * 9).toFixed(1)}" r="8" fill="#ff8fab"/>`).join('')}<circle r="6" fill="#ffd60a"/></g>`,
     }[c.acc] || '';
-    // Beine, Hose, Rock, Schuhe
-    const legY = dress ? 244 : 214;
-    let legs = limb(`M88 ${legY} L88 272`, skin, 18) + limb(`M112 ${legY} L112 272`, skin, 18);
-    if (!dress && c.bottom === 'hose') legs = limb('M88 212 L88 270', bc, 22) + limb('M112 212 L112 270', bc, 22) + `<path d="M70 206 L130 206 L132 226 L68 226Z" fill="${bc}" ${st}/>`;
-    if (!dress && c.bottom === 'shorts') legs += `<path d="M68 206 L132 206 L136 242 L104 242 L100 228 L96 242 L64 242 Z" fill="${bc}" ${st}/>`;
-    if (!dress && c.bottom === 'rock') legs += `<path d="M70 204 L130 204 L146 248 Q100 256 54 248 Z" fill="${bc}" ${st}/>`;
-    const shoe = x => `<path d="M${x - 16} 284 Q${x - 16} 268 ${x} 268 Q${x + 18} 268 ${x + 18} 284 Z" fill="${shoes}" ${st}/><path d="M${x - 16} 284 L${x + 18} 284" stroke="${OL}" stroke-width="3"/>`;
-    // Arme + Ärmel
-    const armL = 'M72 156 Q56 182 52 206', armR = 'M128 156 Q144 182 148 206';
-    const arms = limb(armL, skin, 15) + limb(armR, skin, 15) + `<circle cx="52" cy="210" r="9" fill="${skin}" ${st}/><circle cx="148" cy="210" r="9" fill="${skin}" ${st}/>`;
-    const sleeve = t.shape === 'pulli' ? [armL, armR] : t.shape === 'top' ? [] : ['M72 156 Q66 166 63 174', 'M128 156 Q134 166 137 174'];
-    const sleeves = sleeve.map(d => limb(d, top, 19)).join('');
+    // Körper wie bei einem Kind von 7–8 Jahren: Kopf etwa ein Fünftel der Größe, lange Beine
+    const legY = dress ? 220 : 190;
+    let legs = limb(`M89 ${legY} L89 272`, skin, 15) + limb(`M111 ${legY} L111 272`, skin, 15);
+    if (!dress && c.bottom === 'hose') legs = limb('M89 196 L89 272', bc, 19) + limb('M111 196 L111 272', bc, 19) + `<path d="M70 184 L130 184 L132 206 L68 206Z" fill="${bc}" ${st}/>`;
+    if (!dress && c.bottom === 'shorts') legs += `<path d="M69 184 L131 184 L134 222 L104 222 L100 208 L96 222 L66 222 Z" fill="${bc}" ${st}/>`;
+    if (!dress && c.bottom === 'rock') legs += `<path d="M70 184 L130 184 L146 230 Q100 238 54 230 Z" fill="${bc}" ${st}/>`;
+    const shoe = x => `<path d="M${x - 13} 288 Q${x - 13} 274 ${x} 274 Q${x + 16} 274 ${x + 16} 288 Z" fill="${shoes}" ${st}/><path d="M${x - 13} 288 L${x + 16} 288" stroke="${OL}" stroke-width="3"/>`;
+    const armL = 'M74 120 Q60 152 58 184', armR = 'M126 120 Q140 152 142 184';
+    const arms = limb(armL, skin, 12) + limb(armR, skin, 12) + `<circle cx="58" cy="188" r="7.5" fill="${skin}" ${st}/><circle cx="142" cy="188" r="7.5" fill="${skin}" ${st}/>`;
+    const sleeve = t.shape === 'pulli' ? [armL, armR] : t.shape === 'top' ? [] : ['M74 120 Q68 132 65 144', 'M126 120 Q132 132 135 144'];
+    const sleeves = sleeve.map(d => limb(d, top, 16)).join('');
     const body = dress
-      ? `<path d="M72 148 Q100 140 128 148 L150 248 Q100 260 50 248 Z" fill="${top}" ${st}/>`
-      : t.shape === 'top' ? `<path d="M76 150 Q100 142 124 150 L130 214 Q100 220 70 214 Z" fill="${top}" ${st}/>`
-      : `<path d="M70 150 Q100 140 130 150 L134 214 Q100 222 66 214 Z" fill="${top}" ${st}/>`;
-    const sticker = t.sticker ? `<text x="100" y="196" font-size="26" text-anchor="middle">${t.sticker}</text>` : '';
+      ? `<path d="M73 114 Q100 106 127 114 L148 224 Q100 234 52 224 Z" fill="${top}" ${st}/>`
+      : t.shape === 'top' ? `<path d="M78 116 Q100 110 122 116 L128 192 Q100 198 72 192 Z" fill="${top}" ${st}/>`
+      : `<path d="M71 116 Q100 106 129 116 L132 192 Q100 200 68 192 Z" fill="${top}" ${st}/>`;
+    const sticker = t.sticker ? `<text x="100" y="166" font-size="22" text-anchor="middle">${t.sticker}</text>` : '';
+    const HEAD = 'translate(100 64) scale(0.7) translate(-100 -94)';
     return `<svg viewBox="0 0 200 300" class="figur"><defs>${patternDef(t, k)}</defs>
-      <ellipse cx="100" cy="290" rx="52" ry="7" fill="#000" opacity=".12"/>
-      ${back}${legs}${shoe(86)}${shoe(116)}${arms}${body}${sleeves}${sticker}
-      <rect x="91" y="138" width="18" height="16" fill="${skin}" ${st}/>
+      <ellipse cx="100" cy="292" rx="44" ry="6" fill="#000" opacity=".12"/>
+      <g transform="${HEAD}">${back}</g>${legs}${shoe(86)}${shoe(114)}${arms}${body}${sleeves}${sticker}
+      <rect x="92" y="98" width="16" height="18" fill="${skin}" ${st}/>
+      <g transform="${HEAD}">
       <circle cx="44" cy="104" r="11" fill="${skin}" ${st}/><circle cx="156" cy="104" r="11" fill="${skin}" ${st}/>
-      <ellipse cx="100" cy="94" rx="56" ry="54" fill="${skin}" ${st}/>
-      <circle cx="70" cy="122" r="9" fill="#ff8fab" opacity=".5"/><circle cx="130" cy="122" r="9" fill="#ff8fab" opacity=".5"/>
+      <ellipse cx="100" cy="94" rx="56" ry="56" fill="${skin}" ${st}/>
+      <circle cx="70" cy="122" r="8" fill="#ff8fab" opacity=".35"/><circle cx="130" cy="122" r="8" fill="#ff8fab" opacity=".35"/>
       ${front}${shine}${brows}${eyes}
-      <path d="M97 112 Q100 117 103 112" stroke="${shade(skin, 0.7)}" stroke-width="3" fill="none" stroke-linecap="round"/>
-      ${mouth}${acc}</svg>`;
+      <path d="M96 110 Q100 118 104 110" stroke="${shade(skin, 0.68)}" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      ${mouth}${acc}</g></svg>`;
   }
   W.charSVG = charSVG;
 
@@ -313,7 +314,7 @@
     <g stroke="#cbd5e1" stroke-width="1.6" fill="none"><path d="M10 44 L90 44 M14 30 L86 30 M26 18 L74 18 M30 44 L30 58 M60 44 L60 58 M44 30 L44 44 M72 30 L72 44 M50 18 L50 30"/></g>
     <path d="M38 58 Q38 40 50 40 Q62 40 62 58Z" fill="#334155"/></svg>`;
   const CATALOG = {
-    haus: { '🛋️ Möbel': '🛏️ 🛋️ 🪑 🚪 🪟 🖼️ 🪴 🛁 🚿 🚽 📺 💡 🕯️ 🪞 🧺 📚 🎹 🕰️'.split(' '), '🧸 Spielzeug': '🧸 🎮 🎨 ⚽ 🎈 🎁 🪀 🪁 🎸 🥁 🛝 🌈'.split(' '), '🍕 Essen': '🍳 🧁 🎂 🍕 🍎 🍌 🍓 🍦 🥨 🥛 🍫'.split(' ') },
+    haus: { '🛋️ Möbel': ['SCHRANK', ...'🛏️ 🛋️ 🪑 🚪 🪟 🖼️ 🪴 🛁 🚿 🚽 📺 💡 🕯️ 🪞 🧺 📚 🎹 🕰️'.split(' ')], '🧸 Spielzeug': '🧸 🎮 🎨 ⚽ 🎈 🎁 🪀 🪁 🎸 🥁 🛝 🌈'.split(' '), '🍕 Essen': '🍳 🧁 🎂 🍕 🍎 🍌 🍓 🍦 🥨 🥛 🍫'.split(' ') },
     tierheim: { '🦴 Für Tiere': '🦴 🥣 🍖 🥕 🐟 🧶 🎾 🪀 🧸 🛏️ 🧺 🏠 🪵 🚿 🧼 🩹 💉 🎀 💧'.split(' '), '🌳 Draußen': '🌳 🌼 🌻 🪴 ⛲ 🪨 🌈 ☀️'.split(' ') },
     eisberg: { '❄️ Eis & Schnee': ['IGLU', ...'🧊 ❄️ ⛄ 🏔️ 🛷 ⛸️ 🎿 🧣 🧤 🔦 🕯️ 🛋️ 🛏️ 🍵 🐟 🎣 ⛺ 🌌 ⭐ 🌙 🎄 🐚 🪸'.split(' ')] },
   };
@@ -349,6 +350,7 @@
       return;
     }
     if (it.t === 'iglu') { anim(el, 'wwig'); bubble(ctx.layer, it, 'Schön warm hier drin!'); tone(500, 0.3, 'sine', 0.2); return; }
+    if (it.t === 'schrank') { ctx.wardrobe(it); return; }
     if (FOOD.includes(v)) { el.classList.add('weaten'); bubble(ctx.layer, it, 'Mampf! Lecker!'); [0, 1, 2].forEach(i => tone(300 + i * 60, 0.08, 'square', 0.08, i * 0.12)); setTimeout(() => el.classList.remove('weaten'), 4000); return; }
     if ('💡🕯️🔦'.includes(v)) { it.on = !it.on; el.classList.toggle('won', it.on); tone(it.on ? 1200 : 600, 0.06, 'square', 0.1); ctx.save(); return; }
     if (v === '📺') { it.on = !it.on; el.classList.toggle('wtv', it.on); if (it.on) ['C5', 'E5', 'G5'].forEach((n, i) => pianoNote(freq(n), i * 0.15, null, 0.25)); ctx.save(); return; }
@@ -394,6 +396,7 @@
       if (it.t === 'e') return `<span class="we">${it.v}</span>`;
       if (it.t === 'img') return `<img src="img/tiere/${it.v}.png" alt="" draggable="false">`;
       if (it.t === 'iglu') return IGLU;
+      if (it.t === 'schrank') return SCHRANK_SVG;
       if (it.t === 'char') return charSVG(it.c);
       if (it.t === 'pet') return `<span class="wpet"><img src="img/tiere/${it.p.a}.png" alt="" draggable="false">${it.p.acc ? `<i>${it.p.acc}</i>` : ''}<b>${it.p.name}</b></span>`;
       return '';
@@ -401,7 +404,7 @@
     function size(it) {
       const w = stage.clientWidth;
       const k = w < 500 ? 1.35 : 1; // auf dem Handy etwas größer
-      return k * ({ e: w * 0.075, img: w * 0.1, iglu: w * 0.22, char: w * 0.11, pet: w * 0.1 }[it.t] || w * 0.08);
+      return k * ({ e: w * 0.075, img: w * 0.1, iglu: w * 0.22, char: w * 0.11, pet: w * 0.1, schrank: w * 0.08 }[it.t] || w * 0.08);
     }
     const isBed = i => i.t === 'e' && '🛏️🛋️'.includes(i.v);
     function draw() {
@@ -411,7 +414,7 @@
         const sz = size(it);
         el.style.left = it.x + '%'; el.style.top = it.y + '%';
         el.style.width = sz + 'px';
-        el.style.height = (it.t === 'char' ? sz * 1.5 : it.t === 'iglu' ? sz * 0.6 : sz) + 'px';
+        el.style.height = (it.t === 'char' ? sz * 1.5 : it.t === 'iglu' ? sz * 0.6 : it.t === 'schrank' ? sz * 1.25 : sz) + 'px';
         el.style.fontSize = sz * 0.85 + 'px';
         el.style.setProperty('--tf', `translate(-50%, -50%) scale(${it.s || 1}) scaleX(${it.f || 1})`);
         el.addEventListener('pointerdown', e => {
@@ -471,7 +474,7 @@
       [...catBar.children].forEach(b => b.classList.toggle('on', b.textContent === name));
       pal.innerHTML = '';
       const v = cats[name];
-      if (Array.isArray(v)) v.forEach(e => put(pal, h('button', { class: 'wp', onclick: () => add(e === 'IGLU' ? { t: 'iglu', s: 1.2 } : { t: 'e', v: e }), html: e === 'IGLU' ? IGLU : e })));
+      if (Array.isArray(v)) v.forEach(e => put(pal, h('button', { class: 'wp', onclick: () => add(e === 'IGLU' ? { t: 'iglu', s: 1.2 } : e === 'SCHRANK' ? { t: 'schrank', s: 1.3 } : { t: 'e', v: e }), html: e === 'IGLU' ? IGLU : e === 'SCHRANK' ? SCHRANK_SVG : e })));
       else if (v === 'animals') SCENE_ANIMALS[sid].forEach(a => put(pal, h('button', { class: 'wp', onclick: () => add({ t: 'img', v: a }), html: `<img src="img/tiere/${a}.png" alt="">` })));
       else if (v === 'chars') { const cs = S.chars(); if (!cs.length) put(pal, h('span', { class: 'whint' }, 'Gestalte zuerst Leute bei 👫!')); cs.forEach(c => put(pal, h('button', { class: 'wp wpc', onclick: () => add({ t: 'char', c }), html: charSVG(c) }))); }
       else if (v === 'pets') { const ps = S.pets(); if (!ps.length) put(pal, h('span', { class: 'whint' }, 'Such dir zuerst Tiere bei 🐾 aus!')); ps.forEach(p => put(pal, h('button', { class: 'wp', onclick: () => add({ t: 'pet', p }), html: `<img src="img/tiere/${p.a}.png" alt="">` }))); }
@@ -511,10 +514,66 @@
       snowEl.innerHTML = Array.from({ length: 40 }, () => `<i style="left:${Math.random() * 100}%;animation-delay:${(Math.random() * 2).toFixed(2)}s;animation-duration:${(2 + Math.random() * 2).toFixed(2)}s">❄</i>`).join('');
       clearTimeout(letItSnow.t); letItSnow.t = setTimeout(() => { snowEl.innerHTML = ''; }, 5000);
     }
-    const ctx = { layer, save, draw, snow: letItSnow, night: toggleNight };
+    // Schrank im Spiel: das Kind, das am nächsten steht, zieht sich um
+    function wardrobeFor(sch) {
+      const kids = items.filter(i => i.t === 'char');
+      if (!kids.length) { bubble(layer, sch, 'Setz zuerst ein Kind ins Haus!'); return; }
+      const kid = kids.reduce((a, b) => (Math.hypot(b.x - sch.x, b.y - sch.y) < Math.hypot(a.x - sch.x, a.y - sch.y) ? b : a));
+      openWardrobe(kid.c, nc => { kid.c = nc; save(); draw(); });
+    }
+    const ctx = { layer, save, draw, snow: letItSnow, night: toggleNight, wardrobe: wardrobeFor };
     const ro = new ResizeObserver(draw); ro.observe(stage);
     drawStyles(); showCat(Object.keys(cats)[0]); setMode('bauen');
     return () => ro.disconnect();
+  }
+
+  // Name fehlt: Feld wackelt, wird rot umrandet und vorgelesen
+  function needName(input, text) {
+    input.classList.remove('wneed'); void input.offsetWidth; input.classList.add('wneed');
+    input.focus(); softFail(); sayKid(text);
+  }
+  /* ---------------- Kleiderschrank (zum Anziehen) ---------------- */
+  const SCHRANK_SVG = `<svg viewBox="0 0 80 100"><rect x="4" y="4" width="72" height="90" rx="4" fill="#b07a45" stroke="#5c3a1e" stroke-width="3"/>
+    <rect x="9" y="9" width="30" height="70" rx="2" fill="#c98f55" stroke="#5c3a1e" stroke-width="2"/><rect x="41" y="9" width="30" height="70" rx="2" fill="#c98f55" stroke="#5c3a1e" stroke-width="2"/>
+    <circle cx="35" cy="44" r="2.5" fill="#ffd60a"/><circle cx="45" cy="44" r="2.5" fill="#ffd60a"/><rect x="9" y="82" width="62" height="9" rx="2" fill="#a66b38" stroke="#5c3a1e" stroke-width="2"/>
+    <rect x="34" y="85" width="12" height="3" rx="1.5" fill="#ffd60a"/></svg>`;
+  const BASIC_TOPS = [defTop(), { shape: 'pulli', color: '#e63946', pattern: '', pc: '#fff', sticker: '' }, { shape: 'kleid', color: '#ffd60a', pattern: 'punkte', pc: '#ffffff', sticker: '' },
+    { shape: 'shirt', color: '#ffffff', pattern: 'streifen', pc: '#1d4ed8', sticker: '⚓' }, { shape: 'top', color: '#ff70a6', pattern: '', pc: '#fff', sticker: '🌸' }, { shape: 'pulli', color: '#2a9d4a', pattern: 'karo', pc: '#14532d', sticker: '' }];
+  // Öffnet den Schrank als großes Fenster. onChange(char) wird bei jeder Änderung aufgerufen.
+  function openWardrobe(char, onChange) {
+    const c = JSON.parse(JSON.stringify(char));
+    const ov = h('div', { class: 'wardov' });
+    const prev = h('div', { class: 'wardprev' });
+    const inner = h('div', { class: 'wardin' });
+    const doors = h('div', { class: 'warddoors' }, h('div', { class: 'wdoor l' }, h('i')), h('div', { class: 'wdoor r' }, h('i')));
+    const box = h('div', { class: 'wardbox' },
+      h('div', { class: 'wardtop' }, h('b', {}, `🚪 ${c.name ? c.name + 's ' : ''}Kleiderschrank`), h('button', { class: 'btn', onclick: close }, '✅ Fertig')),
+      h('div', { class: 'wardbody' }, prev, h('div', { class: 'wardcab' }, inner, doors)));
+    put(ov, box); document.body.appendChild(ov);
+    const ch = () => { prev.innerHTML = charSVG(c) + (c.name ? `<b>${c.name}</b>` : ''); onChange(JSON.parse(JSON.stringify(c))); };
+    const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+    function draw() {
+      inner.innerHTML = '';
+      // Kleiderstange mit Bügeln
+      const rail = h('div', { class: 'wrail' });
+      [...BASIC_TOPS, ...S.clothes()].forEach(t => put(rail, h('button', { class: 'whang' + (same(c.top, t) ? ' on' : ''), 'aria-label': 'Anziehen', onclick: () => { c.top = { ...t }; tone(880, 0.08, 'triangle', 0.15); ch(); draw(); }, html: `<span class="hook"></span>${clothesSVG(t)}` })));
+      // Regal: Hosen & Röcke
+      const shelf = (title, kids) => h('div', { class: 'wshelf' }, h('small', {}, title), h('div', { class: 'wshelfin' }, kids));
+      const bottomBtn = (b, col) => h('button', { class: 'wfold' + (c.bottom === b[0] && c.bc === col ? ' on' : ''), 'aria-label': b[1], onclick: () => { c.bottom = b[0]; c.bc = col; tone(700, 0.07, 'triangle', 0.15); ch(); draw(); },
+        html: `<svg viewBox="0 0 40 30">${b[0] === 'rock' ? `<path d="M10 4 L30 4 L36 26 L4 26Z" fill="${col}" stroke="${OL}" stroke-width="2"/>` : b[0] === 'shorts' ? `<path d="M8 4 L32 4 L34 20 L22 20 L20 12 L18 20 L6 20Z" fill="${col}" stroke="${OL}" stroke-width="2"/>` : `<path d="M10 2 L30 2 L32 28 L23 28 L20 10 L17 28 L8 28Z" fill="${col}" stroke="${OL}" stroke-width="2"/>`}</svg>` });
+      const bcols = ['#1d4ed8', '#222222', '#8d6e63', '#e63946', '#ff70a6', '#2a9d4a', '#ffffff', '#9b5de5'];
+      const shoeBtn = col => h('button', { class: 'wfold' + (c.shoes === col ? ' on' : ''), 'aria-label': 'Schuhe', onclick: () => { c.shoes = col; tone(600, 0.07, 'triangle', 0.15); ch(); draw(); },
+        html: `<svg viewBox="0 0 40 24"><path d="M4 20 Q4 8 14 8 Q22 8 24 14 L36 16 Q38 20 36 21Z" fill="${col}" stroke="${OL}" stroke-width="2"/></svg>` });
+      put(inner, h('small', { class: 'wlabel' }, '👕 Oberteile & Kleider – tippe zum Anziehen'), rail,
+        shelf('👖 Hosen, Shorts & Röcke', BOTTOM.flatMap(b => bcols.slice(0, b[0] === 'rock' ? 8 : 6).map(col => bottomBtn(b, col)))),
+        shelf('👟 Schuhe', COLORS.map(shoeBtn)),
+        shelf('🎀 Schublade mit Extras', ACC.map(a => h('button', { class: 'wfold emo' + (c.acc === a[0] ? ' on' : ''), onclick: () => { c.acc = a[0]; tone(1000, 0.07, 'sine', 0.15); ch(); draw(); } }, a[1]))));
+    }
+    function close() { ov.classList.add('closing'); setTimeout(() => ov.remove(), 300); }
+    ov.addEventListener('click', e => { if (e.target === ov) close(); });
+    draw(); ch();
+    tone(220, 0.25, 'sawtooth', 0.05); setTimeout(() => doors.classList.add('open'), 60);
+    sayKid('Der Kleiderschrank! Such dir etwas zum Anziehen aus.');
   }
 
   /* ---------------- Leute gestalten ---------------- */
@@ -524,7 +583,7 @@
     const gallery = h('div', { class: 'wgal' });
     const prev = h('div', { class: 'wprev' });
     const opts = h('div', { class: 'wopts' });
-    const name = h('input', { class: 'wname', maxlength: '14', placeholder: 'Name' });
+    const name = h('input', { class: 'wname', maxlength: '14', placeholder: '✏️ Name eintragen' });
     put(pane, h('h3', { class: 'wh' }, 'Meine Leute – tippe jemanden an'), gallery,
       h('div', { class: 'wedit' }, h('div', { class: 'wleft' }, prev, name,
         h('div', { class: 'btnrow' },
@@ -557,15 +616,8 @@
         row('Augen', EYES, x => cur.eyes === x[0], x => { cur.eyes = x[0]; }),
         row('Augenfarbe', EYEC.map((c, i) => i), i => (cur.ec ?? 0) === i, i => { cur.ec = i; }, i => EYEC[i]),
         row('Mund', MOUTH, x => cur.mouth === x[0], x => { cur.mouth = x[0]; }));
-      const tr = h('div', { class: 'wrow' }, h('small', {}, 'Oberteil (eigene Kleider aus dem 👗 Atelier!)'));
-      const tb = h('div', { class: 'wsw' });
-      wardrobe.forEach(t => put(tb, h('button', { class: 'wo wtop' + (JSON.stringify(cur.top) === JSON.stringify(t) ? ' on' : ''), onclick: () => { cur.top = { ...t }; draw(); }, html: clothesSVG(t) })));
-      put(tr, tb); put(opts, tr);
-      put(opts,
-        row('Unten', BOTTOM, x => cur.bottom === x[0], x => { cur.bottom = x[0]; }),
-        row('Farbe unten', COLORS, c => cur.bc === c, c => { cur.bc = c; }, c => c),
-        row('Schuhe', COLORS, c => cur.shoes === c, c => { cur.shoes = c; }, c => c),
-        row('Extra', ACC, x => cur.acc === x[0], x => { cur.acc = x[0]; }));
+      put(opts, h('div', { class: 'wrow center' }, h('small', {}, 'Anziehen'),
+        h('button', { class: 'wschrankbtn', onclick: () => openWardrobe(cur, nc => { cur = nc; prev.innerHTML = charSVG(cur); }), html: SCHRANK_SVG + '<b>Kleiderschrank öffnen</b>' })));
       drawGallery();
     }
     function zufall() {
@@ -574,12 +626,13 @@
       draw(); tone(600, 0.1, 'triangle', 0.15); tone(900, 0.12, 'triangle', 0.15, 0.08);
     }
     function speichern() {
-      cur.name = (name.value || '').trim() || pick(['Lina', 'Tom', 'Ella', 'Finn', 'Nora', 'Paul', 'Lia', 'Noah']);
+      cur.name = (name.value || '').trim();
+      if (!cur.name) { needName(name, 'Wie heißt dein Kind? Schreib zuerst einen Namen hinein.'); return; }
       const i = chars.findIndex(c => c.id === cur.id);
       if (i >= 0) chars[i] = JSON.parse(JSON.stringify(cur)); else chars.push(JSON.parse(JSON.stringify(cur)));
       S.setChars(chars); draw(); cheer(); sayKid(cur.name + ' ist gespeichert!');
     }
-    function neu() { cur = { ...PRESETS[Math.floor(Math.random() * PRESETS.length)], id: id(), name: '' }; zufall(); }
+    function neu() { cur = { ...PRESETS[Math.floor(Math.random() * PRESETS.length)], id: id(), name: '' }; zufall(); name.focus(); sayKid('Ein neues Kind! Wie soll es heißen?'); }
     name.addEventListener('input', () => { cur.name = name.value; });
     draw();
   }
@@ -588,7 +641,7 @@
   function clothesSVG(t) {
     const c = { skin: 1, hair: 'glatze', hc: 0, eyes: '', mouth: '', top: t, bottom: 'hose', bc: '#e5e7eb', shoes: '#e5e7eb', acc: '' };
     // nur den Oberkörper zeigen (Ausschnitt statt ganzer Figur)
-    return charSVG(c).replace('viewBox="0 0 200 300"', 'viewBox="36 134 128 126"');
+    return charSVG(c).replace('viewBox="0 0 200 300"', 'viewBox="40 98 120 136"');
   }
   function atelier(pane) {
     let t = defTop();
@@ -631,14 +684,13 @@
   const PET_ACC = ['', '🎀', '👑', '🎩', '🕶️', '🧣', '🌸', '⭐'];
   function petsEditor(pane) {
     let sel = 'hund', acc = '';
-    const name = h('input', { class: 'wname', maxlength: '14', placeholder: 'Name' });
+    const name = h('input', { class: 'wname', maxlength: '14', placeholder: '✏️ Name eintragen' });
     const prev = h('div', { class: 'wpetprev' });
     const choose = h('div', { class: 'wsw wpets' });
     const accs = h('div', { class: 'wsw' });
     const list = h('div', { class: 'wgal' });
     put(pane, h('div', { class: 'wedit' }, h('div', { class: 'wleft' }, prev, name,
-      h('div', { class: 'btnrow' }, h('button', { class: 'btn alt', onclick: () => { name.value = pick(PET_NAMES); } }, '🎲 Name'),
-        h('button', { class: 'btn', onclick: adopt }, '❤️ Aufnehmen'))),
+      h('div', { class: 'btnrow' }, h('button', { class: 'btn', onclick: adopt }, '❤️ Aufnehmen'))),
       h('div', { class: 'wopts' }, h('div', { class: 'wrow' }, h('small', {}, 'Welches Tier?'), choose), h('div', { class: 'wrow' }, h('small', {}, 'Schmuck'), accs))),
       h('h3', { class: 'wh' }, '🏠 Meine Tiere (kommen mit ins Haus, Tierheim und Eisberg-Haus)'), list);
     function drawPrev() { prev.innerHTML = `<img src="img/tiere/${sel}.png" alt="">${acc ? `<i>${acc}</i>` : ''}`; }
@@ -651,7 +703,8 @@
       drawPrev();
     }
     function adopt() {
-      const n = (name.value || '').trim() || pick(PET_NAMES);
+      const n = (name.value || '').trim();
+      if (!n) { needName(name, 'Wie soll dein Tier heißen? Schreib zuerst einen Namen hinein.'); return; }
       const ps = S.pets(); ps.push({ id: id(), a: sel, name: n, acc }); S.setPets(ps.slice(-30));
       name.value = ''; draw(); cheer(); sayKid(n + ' wohnt jetzt bei dir!');
     }

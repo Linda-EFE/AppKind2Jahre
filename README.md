@@ -10,7 +10,7 @@ Die Themen für 7 und 17 Jahre: Neuroplastizität, Finanzen, Entscheidungen, Pro
 
 | Thema | 7 Jahre | 17 Jahre |
 |---|---|---|
-| Gestalten | 🌍 **Meine Spielwelt** (eigenes Spiel): coole Leute gestalten, Kleider im Mode-Atelier entwerfen, Haustiere aussuchen, Haus / Tierheim / Eisberg-Haus einrichten (verschiedene Hausarten zum Aussuchen: Stadthaus, Bauernhaus, Baumhaus, Modernes Haus, Schloss, Tierhof, Tierklinik, Eispalast, Eishöhle), dann mit ▶️ Spielen alles ausprobieren (Leute reden, Tiere machen Geräusche, Licht, Fernseher, Essen, Schlafen, Tag/Nacht, Schnee), Musik wählen – alles wird im Browser gespeichert | – |
+| Gestalten | 🌍 **Meine Spielwelt** (eigenes Spiel): coole Leute im Grundschulalter gestalten (Namen selbst eintragen), im 🚪 Kleiderschrank anziehen (Kleiderstange, Hosen-Regal, Schuhe, Extras-Schublade – auch als Möbel im Haus), Kleider im Mode-Atelier entwerfen, Haustiere aussuchen und selbst benennen, Haus / Tierheim / Eisberg-Haus einrichten (verschiedene Hausarten zum Aussuchen: Stadthaus, Bauernhaus, Baumhaus, Modernes Haus, Schloss, Tierhof, Tierklinik, Eispalast, Eishöhle), dann mit ▶️ Spielen alles ausprobieren (Leute reden, Tiere machen Geräusche, Licht, Fernseher, Essen, Schlafen, Tag/Nacht, Schnee), Musik wählen – alles wird im Browser gespeichert | – |
 | Bauen | 🧱 **Klötzchen-Welt**: eigene Welt aus 15 Blocksorten bauen und abbauen, Spielfigur laufen und springen lassen, 5 versteckte Sterne finden, Tag/Nacht | – |
 | Brettspiel | 🔴 **Vier in einer Reihe** gegen den Computer (leicht/mittel/schwer) oder zu zweit | – |
 | Lesen & Fakten | 💡 **Wusstest du?** – Wissens-Quiz mit Vorlesen: Tiere, Weltall, Körper, Dinos, Erde | – |
