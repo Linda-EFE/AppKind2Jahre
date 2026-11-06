@@ -1495,5 +1495,16 @@ document.querySelectorAll('[data-vcat]').forEach(t => { if (!VIDEOS_ALL.some(v =
 /* ---------- Start ---------- */
 document.body.classList.add('in-menu');
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
+  navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(reg => reg.update()).catch(() => {});
+  // Neue Version installiert → Seite einmal neu laden, damit alles aktuell ist
+  let hadController = !!navigator.serviceWorker.controller, reloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (hadController && !reloaded) {
+      reloaded = true;
+      // Nicht mitten im Spiel neu laden – erst, wenn man wieder im Menü ist
+      const now = () => /^(start|menu)/.test(current || '') && (location.reload(), true);
+      if (!now()) setInterval(now, 1500);
+    }
+    hadController = true;
+  });
 }
