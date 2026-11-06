@@ -494,3 +494,9 @@
 .bzplay:active { transform: translateY(4px); box-shadow: 0 2px 0 #166534; }
 .bzplay.pulse { animation: wpulse 1.6s ease-in-out infinite; }
 @media (max-width: 480px) { .bzctl { gap: 8px; } .bznav { min-width: 0; padding: 12px 14px; } .bzplay { width: 84px; height: 84px; } .bzcard { min-height: 200px; } }
+/* Blitz-Lesen: Tempo-Schieber und Zeitbalken */
+.bzspeed { transition: opacity .2s; }
+.bzspeed.off { opacity: .55; }
+.bzspeed.off .dsval::after { content: ' – schaltet den Blitz-Modus an'; font-weight: 400; color: #8b84b8; }
+.bzbar { position: absolute; left: 16px; bottom: 12px; height: 8px; border-radius: 99px; background: linear-gradient(90deg, #f59e0b, #7c3aed); }
+.bzcard.hide .bzbar { display: none; }

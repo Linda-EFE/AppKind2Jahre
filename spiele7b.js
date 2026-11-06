@@ -20,7 +20,7 @@
     inp.addEventListener('input', () => { paint(); if (+inp.value !== last) { last = +inp.value; tone(330 + (last - o.min) * 50, 0.05, 'triangle', 0.12); } });
     inp.addEventListener('change', () => o.onChange && o.onChange(+inp.value));
     paint();
-    return h('div', { class: 'dslider' }, h('div', { class: 'dsrow' }, h('span', { class: 'dsend' }, '😊 Leicht'), inp, h('span', { class: 'dsend' }, '😎 Schwer')), lbl);
+    return h('div', { class: 'dslider' }, h('div', { class: 'dsrow' }, h('span', { class: 'dsend' }, o.lo || '😊 Leicht'), inp, h('span', { class: 'dsend' }, o.hi || '😎 Schwer')), lbl);
   }
   window.diffSlider = diffSlider;
 
@@ -389,7 +389,10 @@
     id: 'blitzlesen', icon: '⚡', color: '#7c3aed', skill: 'Lesen üben', title: 'Blitz-Lesen',
     intro: 'Lies das Wort! Dann drück auf ▶️ – und hör, ob du richtig gelesen hast. Mit ➜ kommt das nächste Wort.',
     render(body) {
-      let lv = store.get('blitz_lv', 0), blitz = store.get('blitz_mode', false);
+      let lv = store.get('blitz_lv', 0), blitz = store.get('blitz_mode', false), tempo = store.get('blitz_tempo', 4);
+      // Tempo 1 (langsam) … 10 (blitzschnell): so lange bleibt das Wort sichtbar (längere Wörter etwas länger)
+      const showMs = () => { const w = plain(deck[i][0]).replace(/\s/g, '').length; return Math.round((4200 - (tempo - 1) * 390) * (0.55 + w * 0.06)); };
+      const sec = ms => (ms / 1000).toLocaleString('de-DE', { maximumFractionDigits: 1 });
       let deck = [], i = 0, shown = false, hideT = null;
       const card = h('button', { class: 'bzcard', 'aria-label': 'Wort' });
       const count = h('span', { class: 'pill' });
@@ -399,14 +402,25 @@
       const playB = h('button', { class: 'bzplay', 'aria-label': 'Vorlesen', onclick: play }, '▶');
       const nextB = h('button', { class: 'btn bznav', 'aria-label': 'Nächstes Wort', onclick: () => go(1) }, 'Weiter ➜');
       const slider = window.diffSlider({ min: 0, max: BLITZ.length - 1, value: lv, label: v => BLITZ[v].de, onChange: v => { lv = v; store.set('blitz_lv', v); neu(); sayKid(BLITZ[v].de.replace(/^\S+\s/, '')); } });
-      put(body, slider, h('div', { class: 'row bzinfo' }, count, total, modeBtn), card, h('div', { class: 'bzctl' }, prevB, playB, nextB));
+      const speed = window.diffSlider({ min: 1, max: 10, value: tempo, lo: '🐢 Langsam', hi: '⚡ Schnell',
+        label: v => `Tempo ${v} von 10 ${['🐢', '🐢', '🚶', '🚶', '🚲', '🚲', '🚗', '🚗', '🚀', '⚡'][v - 1]} · ein kurzes Wort ist ca. ${sec((4200 - (v - 1) * 390) * 0.85)} Sekunden zu sehen`,
+        onChange: v => { tempo = v; store.set('blitz_tempo', v); if (!blitz) { blitz = true; store.set('blitz_mode', true); paintMode(); } show(); } });
+      speed.classList.add('bzspeed');
+      const bar = h('span', { class: 'bzbar' });
+      put(body, slider, h('div', { class: 'row bzinfo' }, count, total, modeBtn), speed, card, h('div', { class: 'bzctl' }, prevB, playB, nextB));
       card.addEventListener('click', () => { if (blitz && card.classList.contains('hide')) { card.classList.remove('hide'); flash(); } });
-      function paintMode() { modeBtn.textContent = blitz ? '⚡ Blitz: an' : '⚡ Blitz: aus'; modeBtn.classList.toggle('on', blitz); }
+      function paintMode() { modeBtn.textContent = blitz ? '⚡ Blitz: an' : '⚡ Blitz: aus'; modeBtn.classList.toggle('on', blitz); speed.classList.toggle('off', !blitz); }
       function neu() { deck = shuffle(BLITZ[lv].w.slice()); i = 0; show(); }
       function flash() {
         clearTimeout(hideT);
         // Blitz: Wort ist nur kurz zu sehen (längere Wörter etwas länger)
-        if (blitz && !shown) hideT = setTimeout(() => { if (!shown) card.classList.add('hide'); }, 900 + plain(deck[i][0]).length * 90);
+        if (blitz && !shown) {
+          const ms = showMs();
+          // Zeitbalken läuft leer, dann verschwindet das Wort
+          card.appendChild(bar); bar.style.transition = 'none'; bar.style.width = 'calc(100% - 32px)'; void bar.offsetWidth;
+          bar.style.transition = `width ${ms}ms linear`; bar.style.width = '0%';
+          hideT = setTimeout(() => { if (!shown) card.classList.add('hide'); }, ms);
+        }
       }
       function show() {
         const [w] = deck[i]; shown = false;
