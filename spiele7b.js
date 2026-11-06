@@ -6,6 +6,24 @@
    und tone(), pianoNote(), freq() aus app.js.
    ===================================================================== */
 (function () {
+  /* Schieberegler Leicht → Schwer (für alle 7er-Spiele mit Schwierigkeit).
+     o = { min, max, value, label(v) → Text, onChange(v) } */
+  function diffSlider(o) {
+    const lbl = h('b', { class: 'dsval' });
+    const inp = h('input', { type: 'range', min: String(o.min), max: String(o.max), step: '1', value: String(o.value), 'aria-label': 'Schwierigkeit' });
+    const paint = () => {
+      const v = +inp.value, t = (v - o.min) / (o.max - o.min || 1);
+      lbl.textContent = o.label ? o.label(v) : `Stufe ${v - o.min + 1} von ${o.max - o.min + 1}`;
+      inp.style.setProperty('--p', (t * 100) + '%');
+    };
+    let last = +inp.value;
+    inp.addEventListener('input', () => { paint(); if (+inp.value !== last) { last = +inp.value; tone(330 + (last - o.min) * 50, 0.05, 'triangle', 0.12); } });
+    inp.addEventListener('change', () => o.onChange && o.onChange(+inp.value));
+    paint();
+    return h('div', { class: 'dslider' }, h('div', { class: 'dsrow' }, h('span', { class: 'dsend' }, '😊 Leicht'), inp, h('span', { class: 'dsend' }, '😎 Schwer')), lbl);
+  }
+  window.diffSlider = diffSlider;
+
   /* ======================= 🧱 Klötzchen-Welt ======================= */
   const COLS = 40, ROWS = 22;
   // [Name, Grundfarbe, Musterfarbe, fest?]
@@ -178,7 +196,7 @@
     intro: 'Wirf abwechselnd Steine in das Gitter. Wer zuerst vier in einer Reihe hat – waagrecht, senkrecht oder schräg – gewinnt!',
     render(body) {
       const C = 7, R = 6;
-      let b, turn, over, vsPc = store.get('vier_pc', true), level = store.get('vier_lv', 1), busy = false;
+      let b, turn, over, vsPc = store.get('vier_pc', true), level = store.get('vier_lv10', [2, 5, 9][store.get('vier_lv', 1)] ?? 5), busy = false;
       const score = store.get('vier_score', { du: 0, pc: 0, rot: 0, gelb: 0 });
       const top = h('div', { class: 'vtop' }), board = h('div', { class: 'vboard' }), msg = h('p', { class: 'big' });
       put(body, top, msg, board, h('div', { class: 'btnrow' }, h('button', { class: 'btn', onclick: neu }, '🔁 Neues Spiel')));
@@ -187,7 +205,7 @@
         top.innerHTML = '';
         put(top,
           h('div', { class: 'seg7' }, h('button', { class: vsPc ? 'on' : '', onclick: () => { vsPc = true; store.set('vier_pc', true); neu(); } }, '🤖 Gegen den Computer'), h('button', { class: vsPc ? '' : 'on', onclick: () => { vsPc = false; store.set('vier_pc', false); neu(); } }, '👫 Zu zweit')),
-          vsPc ? h('div', { class: 'seg7' }, ...[[0, '😊 Leicht'], [1, '🙂 Mittel'], [2, '😎 Schwer']].map(([l, t]) => h('button', { class: level === l ? 'on' : '', onclick: () => { level = l; store.set('vier_lv', l); drawTop(); } }, t))) : null,
+          vsPc ? diffSlider({ min: 0, max: 10, value: level, label: v => `Computer-Stärke ${v + 1} von 11 ${['🐣', '🐣', '🐣', '🙂', '🙂', '🙂', '🙂', '🤓', '🤓', '😎', '🏆'][v]}`, onChange: v => { level = v; store.set('vier_lv10', v); sayKid(v < 4 ? 'Leicht' : v < 8 ? 'Mittel' : 'Schwer'); } }) : null,
           h('span', { class: 'pill' }, vsPc ? `Du ${score.du} : ${score.pc} Computer` : `🔴 ${score.rot} : ${score.gelb} 🟡`));
       }
       function neu() { b = Array.from({ length: R }, () => Array(C).fill(0)); turn = 1; over = false; busy = false; drawTop(); draw(); msg.textContent = vsPc ? 'Du bist 🔴 Rot. Tippe auf eine Spalte!' : '🔴 Rot fängt an!'; }
@@ -234,21 +252,22 @@
         if (!play(col, turn)) { softFail(); return; }
         if (vsPc && !over) { busy = true; timers.set(() => { play(pcMove(), 2); busy = false; }, 650); }
       }
-      // Computer: Leicht = zufällig mit etwas Blocken, Mittel = gewinnen/blocken, Schwer = 2 Züge vorausdenken
+      // Computer-Stärke 0–10 (Schieber): je stärker, desto öfter gewinnt/blockt er,
+      // vermeidet Fallen und spielt in die Mitte
       function pcMove() {
+        const k = level / 10, chance = x => Math.random() < x;
         const valid = [...Array(C).keys()].filter(c => drop(b, c) >= 0);
         const tryMove = (c, p) => { const bb = b.map(r => r.slice()); bb[drop(bb, c)][c] = p; return bb; };
         const winNow = p => valid.find(c => wins(tryMove(c, p), p));
-        if (level >= 1) { const w = winNow(2); if (w !== undefined) return w; }
-        const block = winNow(1); if (block !== undefined && (level >= 1 || Math.random() < 0.5)) return block;
+        const w = winNow(2); if (w !== undefined && chance(0.35 + 0.65 * k * 1.6)) return w;
+        const block = winNow(1); if (block !== undefined && chance(0.3 + 0.7 * k * 1.5)) return block;
         let pool = valid;
-        if (level === 2) {
+        if (chance(k * 1.25 - 0.25)) {
           // keine Züge, nach denen der Mensch sofort gewinnen kann
           const safe = valid.filter(c => { const bb = tryMove(c, 2); return ![...Array(C).keys()].some(c2 => { const r2 = drop(bb, c2); if (r2 < 0) return false; const b2 = bb.map(r => r.slice()); b2[r2][c2] = 1; return wins(b2, 1); }); });
           if (safe.length) pool = safe;
-          const center = [3, 2, 4, 1, 5, 0, 6].find(c => pool.includes(c)); if (Math.random() < 0.7) return center;
         }
-        if (level === 1) { const center = [3, 2, 4].filter(c => pool.includes(c)); if (center.length && Math.random() < 0.6) return center[Math.floor(Math.random() * center.length)]; }
+        if (chance(0.15 + 0.6 * k)) { const center = [3, 2, 4, 1, 5, 0, 6].filter(c => pool.includes(c)).slice(0, level >= 8 ? 1 : 3); if (center.length) return center[Math.floor(Math.random() * center.length)]; }
         return pool[Math.floor(Math.random() * pool.length)];
       }
       neu();

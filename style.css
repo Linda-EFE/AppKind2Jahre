@@ -441,3 +441,27 @@ body.toddler-menu #voiceBtn { display: block; }
 .tile[hidden] { display: none; }
 .tile-video .thwlogo { font: 900 0.42em/1 Arial, sans-serif; color: #1e3a8a; background: #fff; padding: .18em .3em; border-radius: .15em; letter-spacing: .03em; }
 .tile-video .blau { position: absolute; left: 10%; top: 10%; font-size: .45em; font-style: normal; }
+
+/* ---------- Bauen: Bausteine rechts statt unten ---------- */
+#bauen, #bauen3d { --palw: clamp(112px, 19vw, 230px); }
+#buildZone, #scene3d { bottom: 0; right: var(--palw); }
+#bauen .palette, #bauen3d .palette {
+  left: auto; right: 0; top: 0; bottom: 0; width: var(--palw); height: auto;
+  flex-direction: column; flex-wrap: nowrap; justify-content: center; align-items: center;
+  gap: 2.2vh; align-content: center;
+  border-top: 0; border-left: 6px solid #d9bf94;
+  padding: calc(max(10px, env(safe-area-inset-top)) + 70px) 0 max(10px, env(safe-area-inset-bottom)) 0;
+  padding-right: env(safe-area-inset-right); overflow-y: auto;
+}
+#bauen .pal, #bauen3d .pal { --ps: min(calc(var(--palw) * .62), calc((100vh - 110px) / (var(--n, 5) * 1.12))); width: var(--ps); height: var(--ps); }
+#bauen .pal[data-shape=rect], #bauen .pal[data-shape=semi], #bauen3d .pal[data-shape=rect], #bauen3d .pal[data-shape=semi] { width: calc(var(--palw) * .82); height: min(calc(var(--palw) * .41), var(--ps)); }
+#bauen .palette.few .pal, #bauen3d .palette.few .pal { --ps: min(calc(var(--palw) * .78), 24vh); }
+#bauen .palette.few .pal[data-shape=rect], #bauen .palette.few .pal[data-shape=semi], #bauen3d .palette.few .pal[data-shape=rect], #bauen3d .palette.few .pal[data-shape=semi] { width: calc(var(--palw) * .88); height: calc(var(--palw) * .44); }
+#bauen .navBuild, #bauen3d .navBuild { left: calc((100% - var(--palw)) / 2); }
+#bauen .sun { right: calc(var(--palw) + 3vw); }
+@media (orientation: portrait) {
+  #bauen .palette:not(.few), #bauen3d .palette:not(.few) { flex-wrap: nowrap; gap: 1.6vh; }
+}
+@media (max-width: 560px) {
+  #bauen .navBuild, #bauen3d .navBuild { top: calc(max(10px, env(safe-area-inset-top)) + 74px); }
+}

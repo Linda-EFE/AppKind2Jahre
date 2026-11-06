@@ -110,20 +110,23 @@ const GAMES7 = [
     id: 'memory', icon: '🧠', color: '#ff006e', skill: 'Gehirn trainieren', title: 'Gehirn-Trainer',
     intro: 'Finde immer zwei gleiche Tiere! Jedes Mal, wenn du übst, baut dein Gehirn neue Wege.',
     render(body) {
-      const LEVELS = [4, 6, 8];
-      let level = 0;
+      // Anzahl Paare: Schieber von leicht (3 Paare) bis schwer (10 Paare)
+      let n = store.get('mem7_pairs', 4);
+      const mkSlider = () => window.diffSlider({ min: 3, max: 10, value: n, label: v => `${v} Paare · ${v * 2} Karten`, onChange: v => { n = v; store.set('mem7_pairs', v); start(); } });
+      let slider = mkSlider();
+      put(body, slider);
       const info = h('div', { class: 'row' });
       const grid = h('div', { class: 'memory' });
       const after = h('div');
       put(body, info, grid, after);
       function start() {
         after.innerHTML = '';
-        const n = LEVELS[level];
         const pics = shuffle(ANIMAL_IMGS).slice(0, n);
         let first = null, lock = false, moves = 0, found = 0;
         const movesEl = h('span', { class: 'pill' }, 'Züge: 0');
         info.innerHTML = '';
-        put(info, h('span', { class: 'pill' }, `Stufe ${level + 1} von ${LEVELS.length}`), movesEl);
+        put(info, h('span', { class: 'pill' }, `${n} Paare`), movesEl);
+        grid.style.gridTemplateColumns = `repeat(${{ 3: 3, 4: 4, 5: 5, 6: 4, 7: 5, 8: 4, 9: 6, 10: 5 }[n]}, 1fr)`;
         grid.innerHTML = '';
         shuffle([...pics, ...pics]).forEach(p => {
           const c = h('button', { class: 'mem', 'aria-label': 'Karte' },
@@ -161,7 +164,7 @@ const GAMES7 = [
             brainSVG(plays),
             h('p', {}, `Du hast schon ${plays}-mal geübt. Jedes Mal werden die Wege in deinem Gehirn stärker – wie ein Trampelpfad im Gras, der immer breiter wird, je öfter man ihn geht.`),
             h('div', { class: 'btnrow' },
-              level < LEVELS.length - 1 ? h('button', { class: 'btn', onclick: () => { level++; start(); } }, 'Nächste Stufe ➜') : null,
+              n < 10 ? h('button', { class: 'btn', onclick: () => { n++; store.set('mem7_pairs', n); const s2 = mkSlider(); slider.replaceWith(s2); slider = s2; start(); } }, 'Schwerer ➜') : null,
               h('button', { class: 'btn alt', onclick: start }, 'Nochmal 🔁'))));
           sayKid(msg + ' Dein Gehirn ist wieder ein bisschen stärker geworden!');
           after.scrollIntoView({ behavior: 'smooth', block: 'start' });

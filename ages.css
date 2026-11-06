@@ -459,3 +459,13 @@
 .wp.wpc b, .wp.wpn b { position: absolute; bottom: 3px; left: 0; right: 0; font-size: 11px; color: #2b2250; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .btn.wallin { align-self: center; padding: 10px 14px; font-size: 16px; }
 .btn.winhaus { width: 100%; margin-top: 8px; background: linear-gradient(135deg, #22c55e, #16a34a); box-shadow: 0 5px 0 #166534; }
+/* =================== Schieberegler Leicht → Schwer =================== */
+.dslider { background: #fff; border-radius: 18px; padding: 10px 14px; box-shadow: 0 2px 8px rgba(0,0,0,.08); margin: 0 auto 10px; max-width: 560px; text-align: center; color: #2b2250; }
+.dsrow { display: flex; align-items: center; gap: 10px; }
+.dsend { font-weight: 800; font-size: 14px; white-space: nowrap; }
+.dsval { display: block; margin-top: 4px; font-size: 16px; }
+.dslider input[type=range] { flex: 1; min-width: 80px; -webkit-appearance: none; appearance: none; height: 16px; border-radius: 99px; background: linear-gradient(90deg, #22c55e, #facc15 50%, #ef4444); outline: none; touch-action: pan-y; }
+.dslider input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 40px; height: 40px; border-radius: 50%; background: #fff; border: 5px solid #3a86ff; box-shadow: 0 3px 6px rgba(0,0,0,.25); cursor: grab; }
+.dslider input[type=range]::-moz-range-thumb { width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 5px solid #3a86ff; box-shadow: 0 3px 6px rgba(0,0,0,.25); cursor: grab; }
+.vtop .dslider { margin: 0; flex: 1 1 320px; }
+@media (max-width: 480px) { .dsend { font-size: 12px; } .dsrow { gap: 6px; } }

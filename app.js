@@ -457,6 +457,7 @@ function updatePalette() {
 function showPalette(palList, types) {
   palList.forEach(p => { p.hidden = !types.has(p.dataset.shape); });
   palList[0].parentNode.classList.toggle('few', types.size <= 2);
+  palList[0].parentNode.style.setProperty('--n', types.size);
 }
 // Schmuck oben auf dem Gebäude: Kreuz als Zeichnung (das Emoji sieht je nach Gerät wie ein lila Kästchen aus)
 const CROSS_SVG = '<svg viewBox="0 0 40 60"><path d="M16 0h8v16h14v8H24v36h-8V24H2v-8h14z" fill="#f4c430" stroke="#b8860b" stroke-width="2"/></svg>';
@@ -1198,7 +1199,9 @@ const HABITATS = [
     ['dodo', 'der Dodo', 'Додо'], ['einhorn', 'das Einhorn', 'Единорог'], ['drache', 'der Drache', 'Дракон']] },
 ];
 // Bilder-Spiel mit Kategorien (für Tiere und Fahrzeuge): Antippen liest den Namen vor
-function makePicker(section, bar, grid, cats, dir) {
+// Zufällig mischen (neue Reihenfolge bei jedem Aufruf)
+function mixed(a) { const r = a.slice(); for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; } return r; }
+function makePicker(section, bar, grid, cats, dir, mix) {
   let idx = 0;
   function show(i, speak = true) {
     idx = i;
@@ -1209,7 +1212,7 @@ function makePicker(section, bar, grid, cats, dir) {
     grid.classList.toggle('videos', !!C.render);
     if (C.render) { C.render(grid); if (speak) say(T(C.de, C.ru)); return; }
     if (C.extra) grid.appendChild(C.extra());
-    C.items.forEach(([img, de, ru, html], k) => {
+    (mix ? mixed(C.items) : C.items).forEach(([img, de, ru, html], k) => {
       const b = document.createElement('button');
       b.className = 'nameCard';
       b.style.animationDelay = (k * 0.04) + 's';
@@ -1414,7 +1417,7 @@ function renderVideos(grid) {
 screens.videos = {
   enter() {
     const C = VIDEO_CATS[videoCat] || VIDEO_CATS.feuerwehr;
-    VIDEOS = VIDEOS_ALL.filter(v => v.cat === videoCat);
+    VIDEOS = mixed(VIDEOS_ALL.filter(v => v.cat === videoCat)); // jedes Mal neu gemischt
     document.getElementById('videos').style.background = C.bg;
     document.querySelector('#videos .vhead').textContent = `${C.icon} ${T(C.de, C.ru)}`;
     const g = document.getElementById('videoGrid');
@@ -1424,7 +1427,7 @@ screens.videos = {
   },
   leave() { closeVideo(); },
 };
-const fzGame = makePicker(document.getElementById('fahrzeuge'), document.getElementById('fzBar'), document.getElementById('fzGrid'), VEHICLE_CATS, 'img/fahrzeuge');
+const fzGame = makePicker(document.getElementById('fahrzeuge'), document.getElementById('fzBar'), document.getElementById('fzGrid'), VEHICLE_CATS, 'img/fahrzeuge', true);
 screens.fahrzeuge = { enter: fzGame.enter, leave() { closeVideo(); } };
 
 /* ---------- Sprach-Knopf Deutsch / Russisch (in allen Spielen der 2-Jährigen) ---------- */
