@@ -465,3 +465,9 @@ body.toddler-menu #voiceBtn { display: block; }
 @media (max-width: 560px) {
   #bauen .navBuild, #bauen3d .navBuild { top: calc(max(10px, env(safe-area-inset-top)) + 74px); }
 }
+
+/* ---------- Kachel „Zusammen“: alle Videos ---------- */
+.tile-alle { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .1em; }
+.tile-alle .alle-ico { font-size: .55em; line-height: 1.1; text-align: center; }
+.tile-alle .alle-txt { font-size: max(15px, .22em); color: #fff; font-weight: 900; letter-spacing: .02em; text-shadow: 0 2px 0 rgba(0,0,0,.25); }
+#videoPlayer.manual .vhorn, #videoPlayer.manual .vmode, #videoPlayer.manual .vnext { display: none; }

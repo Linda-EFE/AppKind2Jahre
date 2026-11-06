@@ -1352,6 +1352,8 @@ const VIDEO_CATS = {
   thw: { de: 'THW', ru: 'Спасатели', icon: '🚧', say: ['Die Videos vom THW!', 'Видео со спасателями!'], bg: 'linear-gradient(#0f172a, #1e40af)' },
   polizeimotorrad: { de: 'Polizei-Motorräder', ru: 'Полицейские мотоциклы', icon: '🏍️', say: ['Die Polizei-Motorräder!', 'Полицейские мотоциклы!'], bg: 'linear-gradient(#0f172a, #0e7490)' },
   heli: { de: 'Hubschrauber', ru: 'Вертолёты', icon: '🚁', say: ['Die Hubschrauber-Videos!', 'Видео с вертолётами!'], bg: 'linear-gradient(#0c4a6e, #0369a1)' },
+  // „Zusammen“: alle Videos gemischt, nach jedem Video zurück zur Auswahl, ohne Tatütata
+  alle: { de: 'Alle Videos zusammen', ru: 'Все видео вместе', icon: '🎬', say: ['Alle Videos zusammen!', 'Все видео вместе!'], bg: 'linear-gradient(#1f2937, #6d28d9)', manual: true },
   motorrad: { de: 'Motorräder', ru: 'Мотоциклы', icon: '🏍️', say: ['Die Motorrad-Videos!', 'Видео с мотоциклами!'], bg: 'linear-gradient(#1f2937, #4d7c0f)' },
 };
 let videoCat = 'feuerwehr';
@@ -1359,6 +1361,7 @@ let VIDEOS = VIDEOS_ALL.filter(v => v.cat === videoCat);
 const player = document.getElementById('videoPlayer');
 const pv = player.querySelector('video');
 let vIdx = 0;
+const manualMode = () => !!VIDEO_CATS[videoCat]?.manual;
 // Tatütata-Modus: Bei Videos ohne deutsches Zweitonhorn spielt die App das Martinshorn dazu
 let hornMode = true, hornIv = null;
 try { hornMode = localStorage.getItem('fe_hornmode') !== 'off'; } catch { /* egal */ }
@@ -1369,7 +1372,7 @@ function startHornLoop() {
   stopHornLoop();
   const v = VIDEOS[vIdx];
   pv.volume = 1;
-  if (!hornMode || v.tatue) return;
+  if (manualMode() || !hornMode || v.tatue) return;
   pv.volume = 0.35;
   martinshorn();
   hornIv = setInterval(() => { if (!pv.paused) martinshorn(); }, 8 * 620);
@@ -1401,7 +1404,7 @@ player.querySelector('.vnext').addEventListener('click', () => playVideo(vIdx + 
 player.querySelector('.vhorn').addEventListener('click', () => martinshorn());
 pv.addEventListener('click', () => (pv.paused ? pv.play() : pv.pause()));
 // Endlos im Kreis: Am Ende sofort das nächste Video (nach dem letzten wieder das erste)
-pv.addEventListener('ended', () => { if (!player.hidden) playVideo(vIdx + 1); });
+pv.addEventListener('ended', () => { if (player.hidden) return; if (manualMode()) closeVideo(); else playVideo(vIdx + 1); });
 function renderVideos(grid) {
   VIDEOS.forEach((v, k) => {
     const b = document.createElement('button');
@@ -1417,7 +1420,8 @@ function renderVideos(grid) {
 screens.videos = {
   enter() {
     const C = VIDEO_CATS[videoCat] || VIDEO_CATS.feuerwehr;
-    VIDEOS = mixed(VIDEOS_ALL.filter(v => v.cat === videoCat)); // jedes Mal neu gemischt
+    VIDEOS = mixed(C.manual ? VIDEOS_ALL : VIDEOS_ALL.filter(v => v.cat === videoCat)); // jedes Mal neu gemischt
+    player.classList.toggle('manual', !!C.manual);
     document.getElementById('videos').style.background = C.bg;
     document.querySelector('#videos .vhead').textContent = `${C.icon} ${T(C.de, C.ru)}`;
     const g = document.getElementById('videoGrid');
@@ -1490,7 +1494,7 @@ voicePanel.querySelector('.vclose').addEventListener('click', () => { voicePanel
 if ('speechSynthesis' in window) speechSynthesis.addEventListener?.('voiceschanged', () => { if (!voicePanel.hidden) buildVoicePanel(); });
 
 // Video-Kacheln ohne Videos ausblenden
-document.querySelectorAll('[data-vcat]').forEach(t => { if (!VIDEOS_ALL.some(v => v.cat === t.dataset.vcat)) t.hidden = true; });
+document.querySelectorAll('[data-vcat]').forEach(t => { if (!VIDEO_CATS[t.dataset.vcat]?.manual && !VIDEOS_ALL.some(v => v.cat === t.dataset.vcat)) t.hidden = true; });
 
 /* ---------- Start ---------- */
 document.body.classList.add('in-menu');
