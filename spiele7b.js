@@ -377,21 +377,32 @@
   /* ======================= ⚡ Blitz-Lesen ======================= */
   // Silben mit „-“ getrennt (für die farbigen Silben nach dem Vorlesen), Leerzeichen trennt Wörter
   const BLITZ = [
+    { de: '🔤 Silben', w: ['Ma', 'Mo', 'Mi', 'Mu', 'La', 'Lo', 'Li', 'Le', 'Sa', 'So', 'Si', 'Ra', 'Ro', 'Ri', 'Na', 'No', 'Ni', 'Fa', 'Fi', 'Fo', 'Pa', 'Po', 'Ha', 'Ho', 'Ba', 'Bo', 'Wa', 'Wi'].map(x => [x, '']) },
     { de: '🐣 Ganz kurz', w: [['Ei', '🥚'], ['Eis', '🍦'], ['O-ma', '👵'], ['O-pa', '👴'], ['Uhr', '⌚'], ['Rad', '🚲'], ['Bus', '🚌'], ['Zug', '🚆'], ['Hut', '🎩'], ['Kuh', '🐄'], ['Reh', '🦌'], ['Ma-ma', '👩'], ['Pa-pa', '👨'], ['Au-to', '🚗'], ['So-fa', '🛋️'], ['La-ma', '🦙'], ['Ho-se', '👖'], ['Na-se', '👃'], ['Ro-se', '🌹'], ['I-gel', '🦔'], ['E-sel', '🫏'], ['Mo-fa', '🛵'], ['Ki-wi', '🥝'], ['Piz-za', '🍕']] },
     { de: '🙂 Ein Klang', w: [['Hund', '🐕'], ['Maus', '🐭'], ['Haus', '🏠'], ['Baum', '🌳'], ['Ball', '⚽'], ['Bett', '🛏️'], ['Brot', '🍞'], ['Mond', '🌙'], ['Fisch', '🐟'], ['Tisch', '🍽️'], ['Kind', '🧒'], ['Bein', '🦵'], ['Hand', '✋'], ['Fuß', '🦶'], ['Buch', '📖'], ['Stern', '⭐'], ['Schaf', '🐑'], ['Pferd', '🐴'], ['Zelt', '⛺'], ['Herz', '❤️'], ['Milch', '🥛'], ['Schuh', '👟'], ['Bär', '🐻'], ['Frosch', '🐸']] },
     { de: '📗 Zwei Silben', w: [['Kat-ze', '🐱'], ['Ap-fel', '🍎'], ['Blu-me', '🌸'], ['Son-ne', '☀️'], ['Tas-se', '☕'], ['Bir-ne', '🍐'], ['En-te', '🦆'], ['Ha-se', '🐰'], ['Wol-ke', '☁️'], ['Pup-pe', '🪆'], ['Ker-ze', '🕯️'], ['Gei-ge', '🎻'], ['Schu-le', '🏫'], ['Fe-der', '🪶'], ['Rau-pe', '🐛'], ['Ku-chen', '🍰'], ['Zwie-bel', '🧅'], ['Ta-xi', '🚕'], ['Pin-sel', '🖌️'], ['Kro-ne', '👑'], ['Dra-chen', '🐉'], ['Ze-bra', '🦓'], ['Lö-we', '🦁'], ['Af-fe', '🐒']] },
     { de: '📘 Drei Silben', w: [['Ba-na-ne', '🍌'], ['To-ma-te', '🍅'], ['Ka-rot-te', '🥕'], ['Gi-raf-fe', '🦒'], ['Ra-ke-te', '🚀'], ['Ka-nin-chen', '🐇'], ['E-le-fant', '🐘'], ['Schmet-ter-ling', '🦋'], ['Pa-pa-gei', '🦜'], ['Pin-gu-in', '🐧'], ['Gi-tar-re', '🎸'], ['Kro-ko-dil', '🐊'], ['Te-le-fon', '☎️'], ['Schild-krö-te', '🐢'], ['Erd-bee-re', '🍓'], ['Fla-min-go', '🦩'], ['Pi-ra-ten', '🏴‍☠️'], ['Zi-tro-ne', '🍋'], ['Ham-bur-ger', '🍔'], ['Ro-bo-ter', '🤖']] },
     { de: '📙 Lange Wörter', w: [['Feu-er-wehr', '🚒'], ['Schnee-mann', '⛄'], ['Fuß-ball', '⚽'], ['Eis-bär', '🐻‍❄️'], ['Hub-schrau-ber', '🚁'], ['Re-gen-schirm', '☂️'], ['Weih-nachts-baum', '🎄'], ['Schul-ran-zen', '🎒'], ['Zahn-bürs-te', '🪥'], ['Son-nen-blu-me', '🌻'], ['Kran-ken-wa-gen', '🚑'], ['Po-li-zei-au-to', '🚓'], ['Ein-horn', '🦄'], ['Flug-zeug', '✈️'], ['Spiel-platz', '🛝'], ['Re-gen-bo-gen', '🌈'], ['Ma-ri-en-kä-fer', '🐞'], ['Scho-ko-la-de', '🍫'], ['Ge-burts-tag', '🎂'], ['Fahr-rad-helm', '🚴']] },
+    { de: '🦕 Riesen-Wörter', w: [['Eich-hörn-chen', '🐿️'], ['Ach-ter-bahn', '🎢'], ['Wasch-ma-schi-ne', '🧺'], ['Hams-ter-kä-fig', '🐹'], ['Feu-er-wehr-schlauch', '🚒'], ['Ge-burts-tags-tor-te', '🎂'], ['Fuß-ball-tor-wart', '⚽'], ['Weih-nachts-mann', '🎅'], ['Os-ter-ha-se', '🐰'], ['Bus-hal-te-stel-le', '🚏'], ['Bau-stel-len-fahr-zeug', '🚧'], ['Ku-schel-tier', '🧸'], ['Di-no-sau-ri-er', '🦖'], ['Erd-beer-mar-me-la-de', '🍓'], ['Tisch-ten-nis-schlä-ger', '🏓'], ['Re-gen-bo-gen-far-ben', '🌈'], ['Zahn-pas-ten-tu-be', '🪥'], ['Lö-wen-zahn-blü-te', '🌼'], ['Ei-sen-bahn-brü-cke', '🌉'], ['Schmet-ter-lings-flü-gel', '🦋'], ['Kin-der-gar-ten-fest', '🎉'], ['Pa-pa-gei-en-fe-der', '🦜']] },
     { de: '📚 Kleine Sätze', w: [['Der Hund bellt.', '🐕'], ['Die Son-ne scheint.', '☀️'], ['Ich es-se ein Eis.', '🍦'], ['Ma-ma liest ein Buch.', '📖'], ['Das Au-to ist rot.', '🚗'], ['Die Kat-ze schläft.', '🐱'], ['Wir spie-len Fuß-ball.', '⚽'], ['Der Mond ist rund.', '🌙'], ['O-ma backt Ku-chen.', '🍰'], ['Es reg-net heu-te.', '🌧️'], ['Ich ma-le ein Haus.', '🏠'], ['Der Zug fährt schnell.', '🚆'], ['Das Ba-by lacht.', '👶'], ['Pa-pa kocht Nu-deln.', '🍝'], ['Die En-te schwimmt.', '🦆'], ['Im Gar-ten blüht ei-ne Blu-me.', '🌸'], ['Der Bus ist gelb.', '🚌'], ['Ich ha-be ei-nen Ball.', '⚽']] },
+    { de: '📖 Lange Sätze', w: [['Der klei-ne Hund spielt im Gar-ten mit dem Ball.', '🐕'], ['Am Mor-gen scheint die Son-ne durch das Fens-ter.', '☀️'], ['Mei-ne O-ma backt heu-te ei-nen le-cke-ren Ku-chen.', '🍰'], ['Die Feu-er-wehr löscht das Feu-er mit viel Was-ser.', '🚒'], ['Im Win-ter bau-en wir ei-nen gro-ßen Schnee-mann.', '⛄'], ['Der E-le-fant trinkt Was-ser mit sei-nem Rüs-sel.', '🐘'], ['Nach der Schu-le spie-le ich mit mei-nen Freun-den.', '🧒'], ['Die Kat-ze schläft ge-müt-lich auf dem So-fa.', '🐱'], ['Im Zoo ha-ben wir ei-ne Gi-raf-fe ge-se-hen.', '🦒'], ['Der Pi-rat sucht ei-nen Schatz auf der In-sel.', '🏴‍☠️'], ['Die Ra-ke-te fliegt ganz schnell zum Mond.', '🚀'], ['Wir fah-ren mit dem Zug zu O-ma und O-pa.', '🚆'], ['Der Bä-cker backt am Mor-gen fri-sches Brot.', '🍞'], ['Im Herbst fal-len bun-te Blät-ter von den Bäu-men.', '🍂'], ['Die En-te schwimmt mit ih-ren Kü-ken im Teich.', '🦆'], ['Heu-te A-bend le-sen wir ein span-nen-des Buch.', '📖']] },
   ];
+  // Tempo 1–15: so lange bleibt ein Wort sichtbar (Grundzeit, längere Wörter etwas länger) – 9 s bis 0,3 s
+  const TEMPO_MAX = 15;
+  const tempoBase = t => 9000 * Math.pow(0.035, (t - 1) / (TEMPO_MAX - 1));
+  const TEMPO_ICON = ['🐌', '🐌', '🐢', '🐢', '🐢', '🚶', '🚶', '🚲', '🚲', '🚗', '🚗', '🚂', '✈️', '🚀', '⚡'];
   const plain = w => w.replace(/-/g, '');
   const BLITZ_GAME = {
     id: 'blitzlesen', icon: '⚡', color: '#7c3aed', skill: 'Lesen üben', title: 'Blitz-Lesen',
     intro: 'Lies das Wort! Dann drück auf ▶️ – und hör, ob du richtig gelesen hast. Mit ➜ kommt das nächste Wort.',
     render(body) {
-      let lv = store.get('blitz_lv', 0), blitz = store.get('blitz_mode', false), tempo = store.get('blitz_tempo', 4);
+      // alte Einstellungen (vor der Erweiterung) passend übernehmen
+      const oldLv = store.get('blitz_lv', null), oldT = store.get('blitz_tempo', null);
+      const nearestT = ms => { let b = 1; for (let t = 1; t <= TEMPO_MAX; t++) if (Math.abs(tempoBase(t) - ms) < Math.abs(tempoBase(b) - ms)) b = t; return b; };
+      let lv = store.get('blitz_lv2', oldLv == null ? 1 : [1, 2, 3, 4, 5, 7][oldLv] ?? 1), blitz = store.get('blitz_mode', false),
+        tempo = store.get('blitz_tempo2', oldT == null ? 6 : nearestT(4200 - (oldT - 1) * 390));
       // Tempo 1 (langsam) … 10 (blitzschnell): so lange bleibt das Wort sichtbar (längere Wörter etwas länger)
-      const showMs = () => { const w = plain(deck[i][0]).replace(/\s/g, '').length; return Math.round((4200 - (tempo - 1) * 390) * (0.55 + w * 0.06)); };
+      const showMs = () => { const w = plain(deck[i][0]).replace(/\s/g, '').length; return Math.round(tempoBase(tempo) * (0.55 + w * 0.06)); };
       const sec = ms => (ms / 1000).toLocaleString('de-DE', { maximumFractionDigits: 1 });
       let deck = [], i = 0, shown = false, hideT = null;
       const card = h('button', { class: 'bzcard', 'aria-label': 'Wort' });
@@ -401,10 +412,10 @@
       const prevB = h('button', { class: 'btn alt bznav', 'aria-label': 'Wort davor', onclick: () => go(-1) }, '◀ Davor');
       const playB = h('button', { class: 'bzplay', 'aria-label': 'Vorlesen', onclick: play }, '▶');
       const nextB = h('button', { class: 'btn bznav', 'aria-label': 'Nächstes Wort', onclick: () => go(1) }, 'Weiter ➜');
-      const slider = window.diffSlider({ min: 0, max: BLITZ.length - 1, value: lv, label: v => BLITZ[v].de, onChange: v => { lv = v; store.set('blitz_lv', v); neu(); sayKid(BLITZ[v].de.replace(/^\S+\s/, '')); } });
-      const speed = window.diffSlider({ min: 1, max: 10, value: tempo, lo: '🐢 Langsam', hi: '⚡ Schnell',
-        label: v => `Tempo ${v} von 10 ${['🐢', '🐢', '🚶', '🚶', '🚲', '🚲', '🚗', '🚗', '🚀', '⚡'][v - 1]} · ein kurzes Wort ist ca. ${sec((4200 - (v - 1) * 390) * 0.85)} Sekunden zu sehen`,
-        onChange: v => { tempo = v; store.set('blitz_tempo', v); if (!blitz) { blitz = true; store.set('blitz_mode', true); paintMode(); } show(); } });
+      const slider = window.diffSlider({ min: 0, max: BLITZ.length - 1, value: lv, label: v => BLITZ[v].de, onChange: v => { lv = v; store.set('blitz_lv2', v); neu(); sayKid(BLITZ[v].de.replace(/^\S+\s/, '')); } });
+      const speed = window.diffSlider({ min: 1, max: TEMPO_MAX, value: tempo, lo: '🐌 Langsam', hi: '⚡ Schnell',
+        label: v => `Tempo ${v} von ${TEMPO_MAX} ${TEMPO_ICON[v - 1]} · ein kurzes Wort ist ca. ${sec(tempoBase(v) * 0.85)} Sekunden zu sehen`,
+        onChange: v => { tempo = v; store.set('blitz_tempo2', v); if (!blitz) { blitz = true; store.set('blitz_mode', true); paintMode(); } show(); } });
       speed.classList.add('bzspeed');
       const bar = h('span', { class: 'bzbar' });
       put(body, slider, h('div', { class: 'row bzinfo' }, count, total, modeBtn), speed, card, h('div', { class: 'bzctl' }, prevB, playB, nextB));
@@ -440,7 +451,7 @@
         // Silben farbig (blau/rot wie in der Schule) + Bild
         const syl = w.split(' ').map(word => word.split('-').map((s, k) => `<span class="s${k % 2}">${s}</span>`).join('')).join(' ');
         card.className = 'bzcard open' + (plain(w).length > 14 ? ' long' : '') + (plain(w).length > 24 ? ' xlong' : '');
-        card.innerHTML = `<span class="bzword">${syl}</span><span class="bzemo">${emo}</span>`;
+        card.innerHTML = `<span class="bzword">${syl}</span>${emo ? `<span class="bzemo">${emo}</span>` : ''}`;
         playB.classList.remove('pulse');
         say(plain(w), { lang: 'de', rate: 0.75, pitch: 1.1 });
         if (!shown) { shown = true; store.set('blitz_total', store.get('blitz_total', 0) + 1); total.textContent = `📖 ${store.get('blitz_total', 0)} gelesen`; }
