@@ -348,7 +348,7 @@
   };
 
   /* ----- Spiel-Modus: was passiert beim Antippen? ----- */
-  const FOOD = '🍕🍎🍌🍓🍦🥨🥛🍫🧁🎂🍳🍖🥕🐟🦴🍵';
+  const FOOD = '🍕🍎🍌🍓🍦🥨🥛🍫🧁🎂🍳🍖🥕🐟🦴🍵🍟🍿🥪🍝🍤🥧🥞🍲🧀🥚🥔🌽🍅🥦🍄🧅🥩🍞🥒🧈🍰☕';
   const SAYINGS = ['Hallo!', 'Juhu!', 'Mir ist langweilig.', 'Lass uns spielen!', 'Ich hab Hunger!', 'Toll hier!', 'Komm mit!', 'Hihi!', 'Wie schön!', 'Ich bin müde.'];
   const PET_SOUND = { hund: 'Wau wau!', pudel: 'Wau!', katze: 'Miau!', hase: 'Schnupper!', hamster: 'Fiep fiep!', maus: 'Piep!', schwein: 'Oink!', kueken: 'Piep piep!', ente: 'Quak!', pferd: 'Hüüü!', esel: 'I-ah!', ziege: 'Mäh!', papagei: 'Hallo! Hallo!', pinguin: 'Quiek!', eisbaer: 'Brumm!', robbe: 'Ö-ö-ö!', wal: 'Huuuu!', delfin: 'Ki-ki-ki!', einhorn: 'Glitzer!', drache: 'Fauch!', eule: 'Uhu!', lama: 'Mmmh!', fuchs: 'Hatschi!', panda: 'Mampf!' };
   function bubble(layer, it, text) {
@@ -373,6 +373,23 @@
     }
     if (it.t === 'iglu') { anim(el, 'wwig'); bubble(ctx.layer, it, 'Schön warm hier drin!'); tone(500, 0.3, 'sine', 0.2); return; }
     if (it.t === 'schrank') { ctx.wardrobe(it); return; }
+    if (it.t === 'o') { objTap(it, el, ctx); return; }
+    if (v === '⏰') { [0, 1, 2, 3, 4, 5, 6, 7].forEach(k => tone(k % 2 ? 1400 : 1700, 0.07, 'square', 0.08, k * 0.09)); anim(el, 'wwig'); let n = 0; ctx.items().forEach(i => { if (i.lie) { i.lie = false; n++; } }); ctx.save(); ctx.draw(); bubble(ctx.layer, it, n ? 'Aufstehen!' : 'Rrrring!'); if (n) sayKid('Guten Morgen! Aufstehen!'); return; }
+    if (v === '🎶') { ['E4', 'E4', 'G4', 'E4', 'E4', 'G4', 'E4', 'G4', 'C5', 'B4', 'A4', 'A4', 'G4'].forEach((n, i) => pianoNote(freq(n), i * 0.42, null, 0.25)); bubble(ctx.layer, it, '🎵 Schlaf schön …'); return; }
+    if (v === '📖') { const st = pick(STORIES); bubble(ctx.layer, it, '📖 Es war einmal …'); sayKid(st); return; }
+    if (v === '☎️') { [0, 1, 2, 3].forEach(k => tone(k % 2 ? 1300 : 1100, 0.08, 'sine', 0.15, k * 0.1)); [0, 1, 2, 3].forEach(k => tone(k % 2 ? 1300 : 1100, 0.08, 'sine', 0.15, 0.7 + k * 0.1)); setTimeout(() => { const t = pick(['Hallo? Hier ist Oma!', 'Hallo? Wer ist da?', 'Pizza-Dienst? Eine Pizza bitte!', 'Hallo, Papa? Kommst du bald?']); bubble(ctx.layer, it, t); sayKid(t); }, 1300); anim(el, 'wwig'); return; }
+    if (v === '📻') { ['C5', 'E5', 'G5', 'E5', 'F5', 'D5', 'B4', 'C5'].forEach((n, i) => pianoNote(freq(n), i * 0.2, null, 0.25)); bubble(ctx.layer, it, '🎵 Radio!'); anim(el, 'wwig'); return; }
+    if (v === '🪞') { bubble(ctx.layer, it, 'Wer ist das? Das bin ja ich! 😄'); tone(1200, 0.2, 'sine', 0.15); return; }
+    if (v === '📬') { const t = pick(LETTERS); bubble(ctx.layer, it, '✉️ Post!'); sayKid(t); return; }
+    if (v === '🔑') { [0, 1, 2].forEach(k => tone(2400 + k * 300, 0.04, 'triangle', 0.1, k * 0.07)); bubble(ctx.layer, it, 'Kling-kling!'); return; }
+    if ('🧥👟🧢🛼🧦'.includes(v)) { anim(el, 'whop', 700); bubble(ctx.layer, it, v === '🧦' ? 'Kuschelige Socken!' : 'Anziehen und los!'); return; }
+    if (v === '☂️') { ctx.snow(); bubble(ctx.layer, it, 'Es regnet!'); return; }
+    if (v === '🚂') { anim(el, 'wslide', 1600); ['G4', 'G4'].forEach((n, i) => tone(500, 0.25, 'square', 0.06, i * 0.35)); bubble(ctx.layer, it, 'Tschu-tschu!'); return; }
+    if (v === '🚀') { anim(el, 'wrocket', 1800); [0, 1, 2, 3, 4, 5].forEach(k => tone(200 + k * 120, 0.12, 'sawtooth', 0.04, k * 0.1)); return; }
+    if ('🧩🎲'.includes(v)) { anim(el, 'wwig'); bubble(ctx.layer, it, v === '🎲' ? 'Eine ' + (1 + Math.floor(Math.random() * 6)) + '!' : 'Passt!'); tone(700, 0.1, 'triangle', 0.15); return; }
+    if (v === '🦖') { anim(el, 'whop', 700); bubble(ctx.layer, it, 'ROAAAR!'); tone(110, 0.5, 'sawtooth', 0.1); return; }
+    if (v === '🌙') { ctx.night(); return; }
+    if (v === '🎮') { bubble(ctx.layer, it, 'Nur ein bisschen spielen!'); [0, 1, 2].forEach(k => tone(400 + k * 200, 0.08, 'square', 0.06, k * 0.1)); return; }
     if (FOOD.includes(v)) { el.classList.add('weaten'); bubble(ctx.layer, it, 'Mampf! Lecker!'); [0, 1, 2].forEach(i => tone(300 + i * 60, 0.08, 'square', 0.08, i * 0.12)); setTimeout(() => el.classList.remove('weaten'), 4000); return; }
     if ('💡🕯️🔦'.includes(v)) { it.on = !it.on; el.classList.toggle('won', it.on); tone(it.on ? 1200 : 600, 0.06, 'square', 0.1); ctx.save(); return; }
     if (v === '📺') { it.on = !it.on; el.classList.toggle('wtv', it.on); if (it.on) ['C5', 'E5', 'G5'].forEach((n, i) => pianoNote(freq(n), i * 0.15, null, 0.25)); ctx.save(); return; }
@@ -392,10 +409,177 @@
     anim(el, 'wwig'); tone(500 + Math.random() * 400, 0.1, 'triangle', 0.12);
   }
 
-  function sceneEditor(pane, sid) {
+
+  /* ---------------- Wohnung: einzelne Zimmer zum Durchlaufen ---------------- */
+  // Hintergrund eines Zimmers: Wand, Fußboden, Fußleiste + Deko je Zimmer
+  const roomBg = (wall, floor, deco) => SV(`<rect width="160" height="100" fill="${wall}"/><rect y="74" width="160" height="26" fill="${floor}"/>
+    <rect y="72" width="160" height="2.5" fill="#ffffff" opacity=".8"/><rect y="74" width="160" height="1" fill="#000" opacity=".12"/>
+    ${[0, 1, 2, 3, 4, 5, 6, 7].map(k => `<rect x="${k * 20}" y="75" width="0.6" height="25" fill="#000" opacity=".06"/>`).join('')}${deco}`);
+  const DECO = {
+    r_kueche: `<g opacity=".9">${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(k => `<rect x="${32 + (k % 8) * 12}" y="${44 + Math.floor(k / 8) * 8}" width="11.4" height="7.4" fill="#fff" opacity=".55"/>`).join('')}</g>
+      <rect x="62" y="12" width="36" height="22" rx="2" fill="#bfe3ff" stroke="#fff" stroke-width="2"/><path d="M80 12 V34 M62 23 H98" stroke="#fff" stroke-width="1.5"/>`,
+    r_wohn: `<rect x="58" y="10" width="44" height="34" rx="2" fill="#bfe3ff" stroke="#fff" stroke-width="2.5"/><path d="M80 10 V44 M58 27 H102" stroke="#fff" stroke-width="1.6"/>
+      <path d="M52 8 Q57 30 54 48 L60 48 Q63 26 60 8Z M108 8 Q103 30 106 48 L100 48 Q97 26 100 8Z" fill="#e76f51" opacity=".9"/><rect x="50" y="6" width="60" height="3" rx="1.5" fill="#8d5524"/>
+      <ellipse cx="80" cy="88" rx="44" ry="7" fill="#f4a261" opacity=".55"/><rect x="20" y="16" width="16" height="12" fill="#fff" stroke="#8d5524" stroke-width="1.5"/><circle cx="28" cy="22" r="3" fill="#ffd60a"/>`,
+    r_flur: `<rect x="20" y="8" width="120" height="3" fill="#000" opacity=".06"/>${[46, 62, 78, 94, 110].map(x => `<circle cx="${x}" cy="30" r="1.8" fill="#8d5524"/>`).join('')}<rect x="42" y="28" width="72" height="2.4" rx="1" fill="#8d5524"/>
+      <rect x="36" y="80" width="88" height="12" rx="2" fill="#e63946" opacity=".75"/><rect x="38" y="82" width="84" height="8" rx="1.5" fill="none" stroke="#ffd60a" stroke-width=".8" stroke-dasharray="2 2"/>
+      <rect x="72" y="12" width="16" height="10" rx="1" fill="#fff" stroke="#6b5fa5" stroke-width="1"/><circle cx="76" cy="17" r="1.5" fill="#3a86ff"/><path d="M79 19 L82 15 L86 19Z" fill="#2a9d4a"/>`,
+    r_schlaf: `<rect x="58" y="12" width="40" height="28" rx="2" fill="#1e3a8a" stroke="#fff" stroke-width="2.5"/><circle cx="88" cy="20" r="4" fill="#fde68a"/><circle cx="86.5" cy="19" r="3.4" fill="#1e3a8a"/>
+      ${[[66, 18], [72, 30], [92, 33], [64, 34], [80, 22]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r=".8" fill="#fff"/>`).join('')}<path d="M78 12 V40 M58 26 H98" stroke="#fff" stroke-width="1.4"/>
+      <ellipse cx="80" cy="88" rx="38" ry="6" fill="#c4b5fd" opacity=".6"/>${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(k => `<text x="${10 + k * 15}" y="${8 + (k % 2) * 4}" font-size="4" fill="#fff" opacity=".7">★</text>`).join('')}`,
+    r_spiel: `<path d="M0 6 Q20 14 40 6 Q60 14 80 6 Q100 14 120 6 Q140 14 160 6" stroke="#6b5fa5" stroke-width=".8" fill="none"/>
+      ${[0, 1, 2, 3, 4, 5, 6, 7].map(k => `<path d="M${6 + k * 20} ${8 + (k % 2)} l5 9 l5 -9Z" fill="${['#e63946', '#ffd60a', '#3a86ff', '#2a9d4a', '#ff70a6', '#ff8c00', '#9b5de5', '#2ec4b6'][k]}"/>`).join('')}
+      <rect x="40" y="80" width="80" height="14" rx="7" fill="#fff" opacity=".6"/>${[0, 1, 2, 3, 4, 5, 6, 7].map(k => `<circle cx="${48 + k * 9.3}" cy="87" r="3" fill="${['#e63946', '#ffd60a', '#3a86ff', '#2a9d4a'][k % 4]}" opacity=".7"/>`).join('')}
+      <rect x="66" y="16" width="28" height="20" rx="2" fill="#bfe3ff" stroke="#fff" stroke-width="2"/><path d="M80 16 V36 M66 26 H94" stroke="#fff" stroke-width="1.4"/>`,
+  };
+  const ROOMS = {
+    r_kueche: { de: 'Küche', icon: '🍳', walls: [['#fde68a', 'Gelb'], ['#bbf7d0', 'Mint'], ['#fecaca', 'Rosa']], floor: '#d6d3d1' },
+    r_wohn: { de: 'Wohnzimmer', icon: '🛋️', walls: [['#fde2c3', 'Sand'], ['#c7d2fe', 'Blau'], ['#d9f99d', 'Grün']], floor: '#c08457' },
+    r_flur: { de: 'Flur', icon: '🚪', walls: [['#f5f5f4', 'Weiß'], ['#fed7aa', 'Orange'], ['#e9d5ff', 'Lila']], floor: '#a8a29e' },
+    r_schlaf: { de: 'Schlafzimmer', icon: '🛏️', walls: [['#ddd6fe', 'Lila'], ['#bae6fd', 'Himmel'], ['#fbcfe8', 'Rosa']], floor: '#b08968' },
+    r_spiel: { de: 'Spielzimmer', icon: '🧸', walls: [['#a7f3d0', 'Mint'], ['#fef08a', 'Sonne'], ['#fbcfe8', 'Bonbon']], floor: '#93c5fd' },
+  };
+  const ROOM_ORDER = ['r_kueche', 'r_wohn', 'r_flur', 'r_schlaf', 'r_spiel'];
+  ROOM_ORDER.forEach(r => { STYLES[r] = ROOMS[r].walls.map(([c, de], k) => ({ id: r + k, de, svg: roomBg(c, ROOMS[r].floor, DECO[r]) })); });
+
+  // Möbel & Geräte (eigene Zeichnungen, Zustand z. B. „an“ wird mitgezeichnet)
+  const OBJ = {
+    herd: { de: 'Herd', w: 0.15, ar: 1.15, svg: it => `<svg viewBox="0 0 60 69"><rect x="2" y="8" width="56" height="59" rx="4" fill="#f8fafc" stroke="#64748b" stroke-width="2"/><rect x="2" y="2" width="56" height="9" rx="3" fill="#334155"/>
+      ${[[16, 6.5], [44, 6.5]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="9" ry="2.6" fill="${it.on ? '#ef4444' : '#0f172a'}"/>`).join('')}
+      <rect x="9" y="24" width="42" height="34" rx="3" fill="#1e293b"/><rect x="13" y="28" width="34" height="22" rx="2" fill="${it.on ? '#f59e0b' : '#475569'}" opacity=".85"/><rect x="16" y="52" width="28" height="3" rx="1.5" fill="#94a3b8"/>
+      ${[12, 24, 36, 48].map(x => `<circle cx="${x}" cy="16" r="2.6" fill="#94a3b8"/>`).join('')}${it.on ? '<path d="M14 0 q3 -6 0 -10 M30 0 q3 -6 0 -10 M44 0 q3 -6 0 -10" stroke="#cbd5e1" stroke-width="2" fill="none" opacity=".8"/>' : ''}</svg>` },
+    kuehl: { de: 'Kühlschrank', w: 0.12, ar: 2, svg: it => `<svg viewBox="0 0 50 100"><rect x="2" y="2" width="46" height="96" rx="6" fill="#e0f2fe" stroke="#64748b" stroke-width="2"/><path d="M2 36 H48" stroke="#64748b" stroke-width="2"/>
+      <rect x="38" y="12" width="4" height="16" rx="2" fill="#94a3b8"/><rect x="38" y="44" width="4" height="22" rx="2" fill="#94a3b8"/><circle cx="14" cy="50" r="4" fill="#ff70a6"/><rect x="10" y="60" width="9" height="7" fill="#ffd60a" transform="rotate(-8 14 63)"/>
+      ${it.open ? '<rect x="4" y="38" width="42" height="58" fill="#f8fafc"/><path d="M4 58 H46 M4 78 H46" stroke="#cbd5e1" stroke-width="2"/><circle cx="14" cy="52" r="5" fill="#ef4444"/><rect x="26" y="45" width="8" height="12" rx="2" fill="#fff" stroke="#93c5fd"/><circle cx="34" cy="72" r="5" fill="#fb923c"/><rect x="10" y="66" width="12" height="10" rx="2" fill="#fde047"/>' : ''}</svg>` },
+    spuele: { de: 'Spüle', w: 0.17, ar: 0.82, svg: it => `<svg viewBox="0 0 80 66"><rect x="2" y="22" width="76" height="42" rx="3" fill="#e7d3b0" stroke="#8d6e63" stroke-width="2"/><rect x="2" y="18" width="76" height="7" rx="2" fill="#94a3b8"/>
+      <rect x="22" y="19" width="36" height="5" rx="2" fill="#475569"/><path d="M40 18 V6 Q40 2 46 2 H52" stroke="#64748b" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+      <path d="M40 34 V60 M10 30 H36 M44 30 H70" stroke="#8d6e63" stroke-width="1.4"/><circle cx="34" cy="46" r="1.8" fill="#8d6e63"/><circle cx="46" cy="46" r="1.8" fill="#8d6e63"/>
+      ${it.on ? '<path d="M51 4 Q52 12 50 20" stroke="#60a5fa" stroke-width="3" fill="none" opacity=".9"/><circle cx="46" cy="19" r="2" fill="#bfdbfe"/><circle cx="56" cy="18" r="1.6" fill="#bfdbfe"/>' : ''}</svg>` },
+    toaster: { de: 'Toaster', w: 0.08, ar: 0.9, svg: it => `<svg viewBox="0 0 50 45">${it.on ? '<rect x="11" y="0" width="12" height="16" rx="3" fill="#d97706"/><rect x="27" y="0" width="12" height="16" rx="3" fill="#d97706"/>' : ''}
+      <rect x="3" y="12" width="44" height="31" rx="9" fill="#ef4444" stroke="#991b1b" stroke-width="2"/><rect x="11" y="13" width="12" height="3" rx="1.5" fill="#1f2937"/><rect x="27" y="13" width="12" height="3" rx="1.5" fill="#1f2937"/><rect x="40" y="22" width="5" height="9" rx="2" fill="#fca5a5"/></svg>` },
+    tisch: { de: 'Esstisch', w: 0.22, ar: 0.5, svg: () => `<svg viewBox="0 0 100 50"><rect x="2" y="8" width="96" height="8" rx="3" fill="#a0652e" stroke="#6b3e1d" stroke-width="1.5"/><rect x="6" y="2" width="88" height="7" rx="2" fill="#fff" opacity=".85"/>
+      <path d="M6 9 L10 2 M24 9 L28 2 M42 9 L46 2 M60 9 L64 2 M78 9 L82 2" stroke="#e63946" stroke-width="1.5" opacity=".6"/><rect x="10" y="16" width="6" height="32" fill="#8d5524"/><rect x="84" y="16" width="6" height="32" fill="#8d5524"/></svg>` },
+    kamin: { de: 'Kamin', w: 0.18, ar: 0.9, svg: it => `<svg viewBox="0 0 80 72"><rect x="2" y="2" width="76" height="10" rx="2" fill="#a16207"/><rect x="6" y="10" width="68" height="60" fill="#b45309"/>
+      ${[0, 1, 2, 3, 4, 5].map(k => `<path d="M6 ${18 + k * 9} H74" stroke="#92400e" stroke-width="1"/>`).join('')}<path d="M20 70 V36 Q40 20 60 36 V70Z" fill="#1c1917"/>
+      ${it.on ? '<path d="M28 70 Q26 54 34 46 Q34 56 40 58 Q38 44 46 38 Q48 52 52 54 Q56 60 52 70Z" fill="#f97316"/><path d="M34 70 Q34 60 40 56 Q42 62 46 64 Q48 68 46 70Z" fill="#fde047"/>' : '<rect x="26" y="62" width="28" height="5" rx="2" fill="#78350f"/><rect x="30" y="58" width="22" height="5" rx="2" fill="#92400e" transform="rotate(-6 40 60)"/>'}</svg>` },
+    fenster: { de: 'Fenster', w: 0.14, ar: 1, svg: () => `<svg viewBox="0 0 60 60"><rect x="3" y="3" width="54" height="54" rx="3" fill="#bfe3ff" stroke="#fff" stroke-width="4"/><path d="M30 3 V57 M3 30 H57" stroke="#fff" stroke-width="3"/>
+      <circle cx="44" cy="15" r="5" fill="#ffd60a"/><g fill="#fff"><circle cx="14" cy="16" r="3"/><circle cx="18" cy="14" r="3.6"/><circle cx="22" cy="16" r="3"/></g><path d="M3 57 h54" stroke="#8d5524" stroke-width="4"/></svg>` },
+    tuer: { de: 'Haustür', w: 0.11, ar: 1.85, svg: () => `<svg viewBox="0 0 50 92"><rect x="2" y="2" width="46" height="88" rx="4" fill="#2a9d4a" stroke="#14532d" stroke-width="3"/><rect x="10" y="10" width="30" height="22" rx="10" fill="#bfe3ff" stroke="#14532d" stroke-width="2"/>
+      <rect x="10" y="40" width="30" height="40" rx="2" fill="none" stroke="#14532d" stroke-width="2"/><circle cx="40" cy="56" r="3" fill="#ffd60a"/><rect x="16" y="64" width="18" height="4" rx="1" fill="#ffd60a"/></svg>` },
+    kiste: { de: 'Spielzeugkiste', w: 0.15, ar: 0.72, svg: it => `<svg viewBox="0 0 70 50">${it.open ? '<path d="M4 14 L12 0 L66 0 L66 6Z" fill="#fb923c" stroke="#9a3412" stroke-width="2"/>' : ''}<rect x="4" y="12" width="62" height="36" rx="4" fill="#f97316" stroke="#9a3412" stroke-width="2"/>
+      ${it.open ? '' : '<rect x="2" y="6" width="66" height="10" rx="3" fill="#fb923c" stroke="#9a3412" stroke-width="2"/>'}<text x="35" y="38" font-size="16" text-anchor="middle">🧸</text><circle cx="12" cy="28" r="3" fill="#ffd60a"/><circle cx="58" cy="28" r="3" fill="#3a86ff"/></svg>` },
+    staffelei: { de: 'Malstaffelei', w: 0.12, ar: 1.35, svg: it => `<svg viewBox="0 0 60 81"><path d="M14 80 L26 8 M46 80 L34 8 M30 60 V80" stroke="#8d5524" stroke-width="3.4" stroke-linecap="round"/>
+      <rect x="6" y="10" width="48" height="40" rx="2" fill="#fff" stroke="#8d5524" stroke-width="2.5"/><rect x="4" y="50" width="52" height="4" rx="1.5" fill="#a0652e"/>
+      <text x="30" y="40" font-size="24" text-anchor="middle">${it.pic || '🎨'}</text></svg>` },
+    turm: { de: 'Bauklötze', w: 0.07, ar: 2.6, svg: it => { const n = it.n || 2; const C = ['#e63946', '#ffd60a', '#3a86ff', '#2a9d4a', '#ff70a6', '#ff8c00', '#9b5de5']; return `<svg viewBox="0 0 40 104">${Array.from({ length: n }, (_, k) => `<rect x="${4 + (k % 2) * 3}" y="${88 - k * 14}" width="30" height="14" rx="2" fill="${C[k % 7]}" stroke="#1f2937" stroke-width="1.2"/>`).join('')}</svg>`; } },
+  };
+  const COOK = { '🥚': ['🍳', 'Spiegelei'], '🥔': ['🍟', 'Pommes'], '🌽': ['🍿', 'Popcorn'], '🥩': ['🍖', 'Braten'], '🐟': ['🍤', 'Fischstäbchen'], '🍅': ['🍝', 'Nudeln mit Tomatensoße'], '🥕': ['🍲', 'Gemüsesuppe'], '🧅': ['🍲', 'Zwiebelsuppe'], '🥦': ['🍲', 'Brokkolisuppe'], '🍄': ['🍲', 'Pilzsuppe'], '🍎': ['🥧', 'Apfelkuchen'], '🍌': ['🥞', 'Pfannkuchen'], '🧀': ['🍕', 'Pizza'], '🍞': ['🥪', 'Toast'], '🥛': ['☕', 'heiße Milch'] };
+  const FRIDGE = ['🥚', '🥔', '🌽', '🥩', '🐟', '🍅', '🥕', '🥦', '🍄', '🍎', '🍌', '🧀', '🥛', '🍓', '🥒', '🧈'];
+  const TOYS = ['🧸', '🪀', '⚽', '🚂', '🪁', '🎈', '🦖', '🚗', '🤖', '🪆', '🚀', '🏀'];
+  const PICS = ['🌈', '🏠', '🐱', '🌻', '🚀', '🦄', '☀️', '🐳', '🌳', '🚒'];
+  const LETTERS = ['Liebe Grüße von Oma! Ich hab dich lieb!', 'Einladung zum Geburtstag! Am Samstag gibt es Kuchen.', 'Eine Postkarte vom Meer: Hier ist es sonnig!', 'Dein Freund schreibt: Kommst du morgen zum Spielen?'];
+  const STORIES = ['Es war einmal ein kleiner Drache, der wollte Feuer spucken – aber es kamen nur Seifenblasen. Alle Kinder fanden das toll! Gute Nacht!', 'Der Mond sagt: Schlaft gut, ihr Sterne! Und die Sterne blinzeln: Gute Nacht, lieber Mond!', 'Ein Teddy ging spazieren und fand einen Honigtopf. Er teilte ihn mit allen Freunden. Gute Nacht!'];
+  const CATALOG_ROOMS = {
+    r_kueche: { '🍳 Küche': ['O:herd', 'O:kuehl', 'O:spuele', 'O:toaster', 'O:tisch', '🪑', '🫖', '🍽️', '🥄', '☕', '🧺', '🪴'], '🥕 Zutaten': FRIDGE.concat(['🍞', '🍝', '🍰']) },
+    r_wohn: { '🛋️ Wohnzimmer': ['🛋️', '📺', 'O:kamin', 'O:fenster', '🎹', '☎️', '📻', '🪴', '🕰️', '💡', '🪑', '🖼️', '📚', '🎮'] },
+    r_flur: { '🚪 Flur': ['O:tuer', '🪞', '📬', '🔑', '🧥', '👟', '🧢', '☂️', '🪴', '🖼️', '💡', '🛼'] },
+    r_schlaf: { '🛏️ Schlafzimmer': ['🛏️', 'SCHRANK', 'O:fenster', '⏰', '🎶', '📖', '💡', '🧸', '🪞', '🧦', '👑', '🌙'] },
+    r_spiel: { '🧸 Spielzimmer': ['O:kiste', 'O:staffelei', 'O:turm', '🚂', '🚀', '⚽', '🪀', '🎈', '🪁', '🥁', '🎸', '🧩', '🎲', '🦖'] },
+  };
+  Object.assign(CATALOG, CATALOG_ROOMS);
+  const R = (t, v, x, y, s = 1) => ({ t, v, x, y, s });
+  Object.assign(SCENE_DEF, {
+    r_kueche: { start: [R('o', 'kuehl', 12, 52), R('o', 'herd', 33, 60), R('o', 'spuele', 56, 62), R('o', 'toaster', 50, 51), R('o', 'tisch', 80, 74), R('e', '🥚', 72, 64), R('e', '🥕', 80, 64), R('e', '🍅', 88, 64)] },
+    r_wohn: { start: [R('e', '🛋️', 32, 70, 2.6), R('e', '📺', 64, 66, 1.6), R('o', 'kamin', 85, 60), R('e', '☎️', 50, 76), R('e', '🪴', 12, 66, 1.5), R('e', '📻', 74, 80)] },
+    r_flur: { start: [R('o', 'tuer', 50, 50), R('e', '🪞', 26, 40, 1.3), R('e', '📬', 74, 46), R('e', '🧥', 34, 28), R('e', '👟', 70, 82), R('e', '🔑', 62, 30)] },
+    r_schlaf: { start: [R('e', '🛏️', 34, 70, 3), R('schrank', null, 80, 54, 1.3), R('e', '⏰', 60, 76), R('e', '🎶', 64, 48), R('e', '📖', 14, 80), R('e', '💡', 58, 40)] },
+    r_spiel: { start: [R('o', 'kiste', 22, 70), R('o', 'staffelei', 76, 52), R('o', 'turm', 50, 64, 1.3), R('e', '🚂', 40, 86), R('e', '⚽', 64, 84), R('e', '🥁', 86, 82)] },
+  });
+  // Antippen im Spiel-Modus (Zimmer-Sachen)
+  function objTap(it, el, ctx) {
+    const add = (v, dx, dy) => ctx.add({ t: 'e', v, x: Math.max(6, Math.min(94, it.x + dx)), y: Math.max(8, Math.min(92, it.y + dy)) });
+    switch (it.v) {
+      case 'herd': it.on = !it.on; ctx.save(); ctx.draw(); bubble(ctx.layer, it, it.on ? 'Herd an! Leg Essen drauf!' : 'Herd aus.'); tone(it.on ? 180 : 120, 0.25, 'sawtooth', 0.05); if (it.on) sayKid('Der Herd ist an. Zieh etwas zum Kochen auf den Herd!'); return;
+      case 'kuehl': { it.open = true; ctx.save(); ctx.draw(); tone(90, 0.5, 'sine', 0.12); const f = pick(FRIDGE); setTimeout(() => { add(f, it.x > 50 ? -12 : 12, 14); bubble(ctx.layer, it, 'Lecker: ' + f); it.open = false; ctx.save(); ctx.draw(); }, 700); return; }
+      case 'spuele': it.on = true; ctx.draw(); [0, 1, 2, 3, 4, 5].forEach(k => tone(900 + Math.random() * 700, 0.05, 'sine', 0.06, k * 0.12)); bubble(ctx.layer, it, 'Plätscher!'); setTimeout(() => { it.on = false; ctx.draw(); }, 2200); return;
+      case 'toaster': if (it.on) return; it.on = false; anim(el, 'wwig'); tone(200, 1.2, 'sawtooth', 0.03); setTimeout(() => { it.on = true; ctx.draw(); tone(1300, 0.12, 'triangle', 0.2); bubble(ctx.layer, it, 'Pling! Toast!'); add('🍞', 10, 4); setTimeout(() => { it.on = false; ctx.draw(); }, 1500); }, 1400); return;
+      case 'tisch': [0, 1, 2].forEach(k => tone(1500, 0.3, 'sine', 0.15, k * 0.25)); bubble(ctx.layer, it, 'Essen ist fertig!'); sayKid('Essen ist fertig! Alle an den Tisch!'); ctx.items().filter(i => i.t === 'char').forEach(k => { const e = ctx.elOf(k); if (e) anim(e, 'whop', 700); }); return;
+      case 'kamin': it.on = !it.on; ctx.save(); ctx.draw(); if (it.on) { [0, 1, 2, 3, 4, 5, 6, 7].forEach(k => tone(120 + Math.random() * 300, 0.03, 'square', 0.04, k * 0.13)); bubble(ctx.layer, it, 'Schön warm!'); } return;
+      case 'fenster': ctx.night(); return;
+      case 'tuer': {
+        tone(880, 0.35, 'sine', 0.25); tone(700, 0.5, 'sine', 0.25, 0.4); bubble(ctx.layer, it, 'Ding-dong!');
+        setTimeout(() => { const v = pick(['🎁', '📦', '💐', '🍕']); add(v, it.x > 50 ? -14 : 14, 20); const txt = { '🎁': 'Ein Geschenk für dich!', '📦': 'Der Postbote bringt ein Paket!', '💐': 'Blumen von den Nachbarn!', '🍕': 'Die Pizza ist da!' }[v]; bubble(ctx.layer, it, txt); sayKid(txt); }, 1100); return;
+      }
+      case 'kiste': it.open = true; ctx.draw(); tone(500, 0.1, 'triangle', 0.15); setTimeout(() => { add(pick(TOYS), (Math.random() - 0.5) * 30, -10); it.open = false; ctx.save(); ctx.draw(); }, 500); return;
+      case 'staffelei': it.pic = pick(PICS.filter(p => p !== it.pic)); ctx.save(); ctx.draw(); [0, 1, 2].forEach(k => tone(600 + k * 200, 0.08, 'triangle', 0.12, k * 0.08)); bubble(ctx.layer, it, 'Mein Bild!'); return;
+      case 'turm':
+        it.n = (it.n || 2) + 1;
+        if (it.n > 7) { it.n = 1; ctx.save(); ctx.draw(); [0, 1, 2, 3].forEach(k => tone(140 - k * 20, 0.12, 'square', 0.12, k * 0.07)); bubble(ctx.layer, it, 'Bumm! Umgefallen!'); sayKid('Bumm! Nochmal bauen!'); }
+        else { ctx.save(); ctx.draw(); tone(300 + it.n * 80, 0.08, 'square', 0.08); }
+        return;
+    }
+  }
+  // Etwas auf ein Gerät gezogen (z. B. Essen auf den Herd)
+  function objDrop(it, target, ctx) {
+    if (target.v === 'herd' && it.t === 'e' && COOK[it.v]) {
+      target.on = true; const [res, name] = COOK[it.v];
+      bubble(ctx.layer, target, 'Brutzel …'); [0, 1, 2, 3, 4, 5, 6].forEach(k => tone(1800 + Math.random() * 900, 0.03, 'square', 0.03, k * 0.15));
+      ctx.save(); ctx.draw();
+      setTimeout(() => { it.v = res; ctx.save(); ctx.draw(); bubble(ctx.layer, it, name + '!'); sayKid(name + ' ist fertig! Lecker!'); cheer(); }, 1400);
+      return true;
+    }
+    if (target.v === 'herd' && it.t === 'e') { bubble(ctx.layer, target, 'Das kann man nicht kochen.'); return true; }
+    if (target.v === 'spuele' && it.t === 'e') { target.on = true; ctx.draw(); bubble(ctx.layer, it, '✨ Sauber!'); setTimeout(() => { target.on = false; ctx.draw(); }, 1500); return true; }
+    if (target.v === 'kiste' && it.t === 'e' && TOYS.includes(it.v)) { ctx.remove(it); bubble(ctx.layer, target, 'Aufgeräumt!'); tone(400, 0.1, 'triangle', 0.15); return true; }
+    if (target.v === 'kuehl' && it.t === 'e' && FRIDGE.includes(it.v)) { ctx.remove(it); bubble(ctx.layer, target, 'Ab in den Kühlschrank!'); return true; }
+    return false;
+  }
+  // Haus-Kachel: Ganzes Haus + einzelne Zimmer mit Türen
+  function hausPane(pane) {
+    let room = store.get('welt_room', 'haus'), mode = 'bauen', cleanup = null;
+    const bar = h('div', { class: 'wroombar' }), box = h('div', { class: 'wroombox' });
+    put(pane, bar, box);
+    const label = r => r === 'haus' ? '🏡 Ganzes Haus' : `${ROOMS[r].icon} ${ROOMS[r].de}`;
+    function drawBar() {
+      bar.innerHTML = '';
+      ['haus', ...ROOM_ORDER].forEach(r => put(bar, h('button', { class: 'wroom' + (r === room ? ' on' : ''), onclick: () => go(r) }, label(r))));
+    }
+    function steps() { [0, 1, 2, 3].forEach(k => tone(k % 2 ? 160 : 190, 0.06, 'triangle', 0.12, k * 0.16)); }
+    function go(to, dir, carried) {
+      if (to === room && !carried) return;
+      const out = dir === 'r' ? 'wgo-l' : dir === 'l' ? 'wgo-r' : 'wgo-f';
+      box.classList.add(out); steps();
+      setTimeout(() => { box.classList.remove(out); room = to; store.set('welt_room', to); render(dir); }, 260);
+    }
+    function render(dir) {
+      if (cleanup) cleanup();
+      box.innerHTML = ''; drawBar();
+      const k = ROOM_ORDER.indexOf(room);
+      const doors = room === 'haus' ? null : [k > 0 ? { side: 'l', to: ROOM_ORDER[k - 1] } : null, k < ROOM_ORDER.length - 1 ? { side: 'r', to: ROOM_ORDER[k + 1] } : null].filter(Boolean)
+        .map(d => ({ ...d, label: `${ROOMS[d.to].icon} ${ROOMS[d.to].de}` }));
+      cleanup = sceneEditor(box, room, {
+        mode, onMode: m => { mode = m; }, doors, scale: room === 'haus' ? null : { e: 1.1, char: 1.6, pet: 1.4, img: 1.4, schrank: 1.7 }, styleLabel: room === 'haus' ? 'Welches Haus?' : 'Welche Tapete?',
+        go: (to, side) => go(to, side),
+        carry: (it, side, to) => {
+          const key = 'welt_scene_' + to;
+          const list = store.get(key, null) || SCENE_DEF[to].start.map(i => ({ s: 1, f: 1, ...i, id: id() }));
+          list.push({ ...it, x: side === 'r' ? 12 : 88, lie: false });
+          store.set(key, list);
+          const nm = it.t === 'char' ? (it.c.name || 'Ich') : it.t === 'pet' ? it.p.name : '';
+          go(to, side, true);
+          setTimeout(() => sayKid(`${nm ? nm + ' geht' : 'Ab'} in ${to === 'r_kueche' ? 'die Küche' : to === 'r_spiel' ? 'das Spielzimmer' : to === 'r_flur' ? 'den Flur' : to === 'r_wohn' ? 'das Wohnzimmer' : 'das Schlafzimmer'}!`), 300);
+        },
+      });
+      if (dir) { const c = dir === 'r' ? 'win-r' : dir === 'l' ? 'win-l' : 'win-f'; box.classList.add(c); setTimeout(() => box.classList.remove(c), 320); }
+    }
+    render();
+    return () => { if (cleanup) cleanup(); };
+  }
+
+  function sceneEditor(pane, sid, opt = {}) {
     const key = 'welt_scene_' + sid, skey = 'welt_style_' + sid;
     let items = store.get(key, null) || SCENE_DEF[sid].start.map(i => ({ s: 1, f: 1, ...i, id: id() }));
-    let sel = null, mode = 'bauen', isNight = false;
+    let sel = null, mode = opt.mode || 'bauen', isNight = false;
     const styleOf = () => STYLES[sid].find(s => s.id === store.get(skey, STYLES[sid][0].id)) || STYLES[sid][0];
     const save = () => store.set(key, items);
     const wrap = h('div', { class: 'wscene' });
@@ -407,6 +591,10 @@
     const nightEl = h('div', { class: 'wnight' });
     const snowEl = h('div', { class: 'wsnow' });
     put(stage, bgEl, layer, nightEl, snowEl);
+    // Türen zu den Nachbarzimmern (links/rechts) – antippen = hinübergehen
+    (opt.doors || []).forEach(d => put(stage, h('button', { class: 'wdoorbtn ' + d.side, 'aria-label': 'Tür: ' + d.label, onclick: e => { e.stopPropagation(); opt.go(d.to, d.side); } },
+      h('span', { class: 'wdlbl' }, (d.side === 'l' ? '◀ ' : '') + d.label + (d.side === 'r' ? ' ▶' : '')))));
+    stage.querySelectorAll('.wdoorbtn').forEach(b => b.addEventListener('pointerdown', e => e.stopPropagation()));
     const tools = h('div', { class: 'wtools' });
     const pal = h('div', { class: 'wpal' });
     const catBar = h('div', { class: 'wcats' });
@@ -419,6 +607,7 @@
       if (it.t === 'img') return `<img src="img/tiere/${it.v}.png" alt="" draggable="false">`;
       if (it.t === 'iglu') return IGLU;
       if (it.t === 'schrank') return SCHRANK_SVG;
+      if (it.t === 'o') return OBJ[it.v] ? OBJ[it.v].svg(it) : '';
       if (it.t === 'char') { const c = liveChar(it); return charSVG(c) + (c.name ? `<span class="wcn">${c.name}</span>` : ''); }
       if (it.t === 'pet') return `<span class="wpet"><img src="img/tiere/${it.p.a}.png" alt="" draggable="false">${it.p.acc ? `<i>${it.p.acc}</i>` : ''}<b>${it.p.name}</b></span>`;
       return '';
@@ -426,7 +615,8 @@
     function size(it) {
       const w = stage.clientWidth;
       const k = w < 500 ? 1.35 : 1; // auf dem Handy etwas größer
-      return k * ({ e: w * 0.075, img: w * 0.1, iglu: w * 0.22, char: w * 0.11, pet: w * 0.1, schrank: w * 0.08 }[it.t] || w * 0.08);
+      if (it.t === 'o') return k * w * (OBJ[it.v] ? OBJ[it.v].w : 0.1) * (opt.scale ? 1.15 : 1);
+      return k * ((opt.scale || {})[it.t] || 1) * ({ e: w * 0.075, img: w * 0.1, iglu: w * 0.22, char: w * 0.11, pet: w * 0.1, schrank: w * 0.08 }[it.t] || w * 0.08);
     }
     // Figuren immer so zeigen, wie sie bei 👫 Leute zuletzt angezogen wurden
     let live = S.chars();
@@ -439,7 +629,7 @@
         const sz = size(it);
         el.style.left = it.x + '%'; el.style.top = it.y + '%';
         el.style.width = sz + 'px';
-        el.style.height = (it.t === 'char' ? sz * 1.5 : it.t === 'iglu' ? sz * 0.6 : it.t === 'schrank' ? sz * 1.25 : sz) + 'px';
+        el.style.height = (it.t === 'char' ? sz * 1.5 : it.t === 'iglu' ? sz * 0.6 : it.t === 'schrank' ? sz * 1.25 : it.t === 'o' ? sz * (OBJ[it.v] ? OBJ[it.v].ar : 1) : sz) + 'px';
         el.style.fontSize = sz * 0.85 + 'px';
         el.style.setProperty('--tf', `translate(-50%, -50%) scale(${it.s || 1}) scaleX(${it.f || 1})`);
         el.addEventListener('pointerdown', e => {
@@ -457,6 +647,14 @@
           const up = () => {
             el.removeEventListener('pointermove', mv); el.removeEventListener('pointerup', up); el.removeEventListener('pointercancel', up);
             el.classList.remove('wwalk');
+            // Durch die Tür ins Nachbarzimmer mitnehmen
+            const walker = it.t === 'char' || it.t === 'pet' || it.t === 'img';
+            const door = moved && walker && opt.doors && opt.doors.find(d => (d.side === 'l' && it.x < 7) || (d.side === 'r' && it.x > 93));
+            if (door) { items = items.filter(x => x !== it); sel = null; save(); opt.carry(it, door.side, door.to); return; }
+            if (mode === 'spielen' && moved) {
+              const target = items.find(o => o !== it && o.t === 'o' && hitObj(o, it));
+              if (target && objDrop(it, target, ctx)) { save(); return; }
+            }
             if (mode === 'spielen') {
               if (!moved) playTap(it, el, ctx);
               else if (it.t === 'char' || it.t === 'pet' || it.t === 'img') {
@@ -475,6 +673,12 @@
       });
     }
     stage.addEventListener('pointerdown', () => { if (mode === 'bauen') { sel = null; draw(); drawTools(); } });
+    // Liegt „it“ auf dem Gerät „o“? (in Prozent der Bühne)
+    function hitObj(o, it) {
+      const W = stage.clientWidth || 1, H = stage.clientHeight || 1, sz = size(o) * (o.s || 1);
+      const hw = sz / W * 50 + 3, hh = sz * (OBJ[o.v] ? OBJ[o.v].ar : 1) / H * 50 + 5;
+      return Math.abs(it.x - o.x) < hw && Math.abs(it.y - o.y) < hh;
+    }
     function drawTools() {
       tools.innerHTML = '';
       if (mode !== 'bauen') return;
@@ -494,9 +698,11 @@
       items.push(it); sel = it.id; save(); draw(); drawTools();
       tone(700 + Math.random() * 300, 0.1, 'triangle', 0.15);
     }
-    const cats = sid === 'haus'
-      ? { '👫 Meine Leute': 'chars', '🐶 Hunde & Katzen': 'dogcats', '🐾 Meine Tiere': 'pets', ...CATALOG[sid], '🐹 Andere Tiere': 'animals' }
-      : { '👫 Meine Leute': 'chars', '🐾 Meine Tiere': 'pets', ...CATALOG[sid], '🐾 Tiere': 'animals' };
+    const cats = ROOMS[sid]
+      ? { ...CATALOG[sid], '👫 Meine Leute': 'chars', '🐶 Hunde & Katzen': 'dogcats', '🐾 Meine Tiere': 'pets' }
+      : sid === 'haus'
+        ? { '👫 Meine Leute': 'chars', '🐶 Hunde & Katzen': 'dogcats', '🐾 Meine Tiere': 'pets', ...CATALOG[sid], '🐹 Andere Tiere': 'animals' }
+        : { '👫 Meine Leute': 'chars', '🐾 Meine Tiere': 'pets', ...CATALOG[sid], '🐾 Tiere': 'animals' };
     const charBtn = c => h('button', { class: 'wp wpc', 'aria-label': c.name, onclick: () => { add({ t: 'char', c: JSON.parse(JSON.stringify(c)) }); sayKid((c.name || 'Ich') + ' ist im Haus!'); }, html: charSVG(c) + `<b>${c.name || ''}</b>` });
     function allIn() {
       const cs = S.chars(); let n = 0;
@@ -508,7 +714,11 @@
       [...catBar.children].forEach(b => b.classList.toggle('on', b.textContent === name));
       pal.innerHTML = '';
       const v = cats[name];
-      if (Array.isArray(v)) v.forEach(e => put(pal, h('button', { class: 'wp', onclick: () => add(e === 'IGLU' ? { t: 'iglu', s: 1.2 } : e === 'SCHRANK' ? { t: 'schrank', s: 1.3 } : { t: 'e', v: e }), html: e === 'IGLU' ? IGLU : e === 'SCHRANK' ? SCHRANK_SVG : e })));
+      if (Array.isArray(v)) v.forEach(e => {
+        const o = e.startsWith('O:') ? e.slice(2) : null;
+        put(pal, h('button', { class: 'wp' + (o ? ' wpo' : ''), 'aria-label': o ? OBJ[o].de : e, onclick: () => add(o ? { t: 'o', v: o } : e === 'IGLU' ? { t: 'iglu', s: 1.2 } : e === 'SCHRANK' ? { t: 'schrank', s: 1.3 } : { t: 'e', v: e }),
+          html: o ? OBJ[o].svg({}) : e === 'IGLU' ? IGLU : e === 'SCHRANK' ? SCHRANK_SVG : e }));
+      });
       else if (v === 'animals') SCENE_ANIMALS[sid].forEach(a => put(pal, h('button', { class: 'wp', onclick: () => add({ t: 'img', v: a }), html: `<img src="img/tiere/${a}.png" alt="">` })));
       else if (v === 'chars') {
         const cs = S.chars();
@@ -527,7 +737,7 @@
     // Hausart auswählen
     function drawStyles() {
       styleBar.innerHTML = '';
-      put(styleBar, h('small', {}, 'Welches Haus?'));
+      put(styleBar, h('small', {}, opt.styleLabel || 'Welches Haus?'));
       STYLES[sid].forEach(st => put(styleBar, h('button', {
         class: 'wstyle' + (st.id === styleOf().id ? ' on' : ''), 'aria-label': st.de,
         onclick: () => { store.set(skey, st.id); bgEl.innerHTML = st.svg; drawStyles(); sayKid(st.de); tone(660, 0.12, 'triangle', 0.15); },
@@ -535,7 +745,7 @@
     }
     // Bauen ↔ Spielen
     function setMode(m) {
-      mode = m; sel = null;
+      mode = m; sel = null; if (opt.onMode) opt.onMode(m);
       wrap.classList.toggle('playing', m === 'spielen');
       modeBar.innerHTML = '';
       if (m === 'bauen') {
@@ -544,10 +754,11 @@
         put(modeBar,
           h('button', { class: 'wbuildbtn', onclick: () => { setMode('bauen'); if (isNight) toggleNight(); sayKid('Bauen'); } }, '🔨 Bauen'),
           h('button', { class: 'wnightbtn', onclick: toggleNight }, isNight ? '☀️ Tag' : '🌙 Nacht'),
-          h('span', { class: 'whint' }, '👆 Tippe auf Leute, Tiere und Sachen! Zieh Leute aufs Bett zum Schlafen.'));
+          h('span', { class: 'whint' }, opt.doors ? '👆 Tippe auf alles! Zieh Essen auf den Herd. Zieh Kinder an den Rand zur Tür – dann gehen sie ins nächste Zimmer.' : '👆 Tippe auf Leute, Tiere und Sachen! Zieh Leute aufs Bett zum Schlafen.'));
       }
       draw(); drawTools();
-      if (m === 'spielen') setTimeout(() => wrap.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+      if (m === 'spielen' && !opt.quiet) setTimeout(() => wrap.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+      opt.quiet = false;
     }
     function toggleNight() {
       isNight = !isNight; stage.classList.toggle('isnight', isNight);
@@ -565,9 +776,12 @@
       const kid = kids.reduce((a, b) => (Math.hypot(b.x - sch.x, b.y - sch.y) < Math.hypot(a.x - sch.x, a.y - sch.y) ? b : a));
       openWardrobe(liveChar(kid), nc => { kid.c = nc; storeChar(nc); save(); draw(); });
     }
-    const ctx = { layer, save, draw, snow: letItSnow, night: toggleNight, wardrobe: wardrobeFor, liveChar };
+    const ctx = { layer, save, draw, snow: letItSnow, night: toggleNight, wardrobe: wardrobeFor, liveChar,
+      items: () => items, elOf: it => layer.children[items.indexOf(it)],
+      add: item => { items.push({ s: 1, f: 1, id: id(), ...item }); save(); draw(); },
+      remove: it => { items = items.filter(x => x !== it); save(); draw(); } };
     const ro = new ResizeObserver(draw); ro.observe(stage);
-    drawStyles(); showCat(Object.keys(cats)[0]); setMode('bauen');
+    drawStyles(); showCat(Object.keys(cats)[0]); opt.quiet = true; setMode(mode);
     return () => ro.disconnect();
   }
 
@@ -788,7 +1002,7 @@
     render(body) {
       const TABS = [
         ['👫', 'Leute', peopleEditor], ['👗', 'Atelier', atelier], ['🐾', 'Tiere', petsEditor],
-        ['🏡', 'Haus', p => sceneEditor(p, 'haus')], ['🐶', 'Tierheim', p => sceneEditor(p, 'tierheim')],
+        ['🏡', 'Haus', hausPane], ['🐶', 'Tierheim', p => sceneEditor(p, 'tierheim')],
         ['🧊', 'Eisberg-Haus', p => sceneEditor(p, 'eisberg')], ['🎵', 'Musik', musikPane],
       ];
       const bar = h('div', { class: 'wtabs' }), pane = h('div', { class: 'wpane' });

@@ -500,3 +500,25 @@
 .bzspeed.off .dsval::after { content: ' – schaltet den Blitz-Modus an'; font-weight: 400; color: #8b84b8; }
 .bzbar { position: absolute; left: 16px; bottom: 12px; height: 8px; border-radius: 99px; background: linear-gradient(90deg, #f59e0b, #7c3aed); }
 .bzcard.hide .bzbar { display: none; }
+/* =================== Wohnung: Zimmer & Türen =================== */
+.wroombar { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 10px; scrollbar-width: thin; }
+.wroom { flex: none; padding: 9px 14px; border-radius: 99px; background: #fff; font-weight: 800; font-size: 15px; color: #2b2250; box-shadow: 0 3px 0 #d6cff5; white-space: nowrap; }
+.wroom.on { background: #ff006e; color: #fff; box-shadow: 0 3px 0 #9d0047; }
+.wroombox { transition: none; }
+.wroombox.wgo-l { animation: wgoL .26s ease-in forwards; } .wroombox.wgo-r { animation: wgoR .26s ease-in forwards; } .wroombox.wgo-f { animation: wgoF .26s ease-in forwards; }
+.wroombox.win-r { animation: winR .3s ease-out; } .wroombox.win-l { animation: winL .3s ease-out; } .wroombox.win-f { animation: winF .3s ease-out; }
+@keyframes wgoL { to { transform: translateX(-30%); opacity: 0; } } @keyframes wgoR { to { transform: translateX(30%); opacity: 0; } } @keyframes wgoF { to { opacity: 0; transform: scale(.96); } }
+@keyframes winR { from { transform: translateX(30%); opacity: 0; } } @keyframes winL { from { transform: translateX(-30%); opacity: 0; } } @keyframes winF { from { opacity: 0; transform: scale(.96); } }
+.wdoorbtn { position: absolute; bottom: 8%; z-index: 6; width: 9%; min-width: 46px; height: 58%; border-radius: 10px 10px 0 0; background: linear-gradient(90deg, #a0652e, #c08457); border: 3px solid #6b3e1d; box-shadow: inset 0 0 0 4px rgba(255,255,255,.18); display: flex; align-items: flex-start; justify-content: center; padding-top: 6px; }
+.wdoorbtn.l { left: 0; border-left: 0; border-radius: 0 10px 0 0; } .wdoorbtn.r { right: 0; border-right: 0; border-radius: 10px 0 0 0; }
+.wdoorbtn::after { content: ''; position: absolute; top: 55%; width: 8px; height: 8px; border-radius: 50%; background: #ffd60a; }
+.wdoorbtn.l::after { right: 18%; } .wdoorbtn.r::after { left: 18%; }
+.wdlbl { position: absolute; top: -34px; white-space: nowrap; background: #fff; color: #2b2250; font-weight: 800; font-size: 12px; padding: 3px 8px; border-radius: 99px; box-shadow: 0 2px 6px rgba(0,0,0,.2); }
+.wdoorbtn.l .wdlbl { left: 4px; } .wdoorbtn.r .wdlbl { right: 4px; }
+.wdoorbtn:hover, .wdoorbtn:active { filter: brightness(1.12); }
+.wscene.playing .wdoorbtn { animation: wdoorGlow 2.2s ease-in-out infinite; }
+@keyframes wdoorGlow { 50% { box-shadow: inset 0 0 0 4px rgba(255,255,255,.18), 0 0 14px 4px #ffd60a; } }
+.wp.wpo svg { width: 100%; height: 100%; }
+.witem.wrocket { animation: wrocket 1.8s ease-in; }
+@keyframes wrocket { 40% { transform: var(--tf) translateY(-160%); } 41% { transform: var(--tf) translateY(-400%); opacity: 0; } 60% { transform: var(--tf) translateY(0); opacity: 0; } 100% { opacity: 1; } }
+@media (max-width: 560px) { .wdlbl { font-size: 10px; top: -28px; padding: 2px 6px; } .wdoorbtn { min-width: 34px; } }
