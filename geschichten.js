@@ -148,7 +148,7 @@
     const list = deVoices(), want = store.get('story_voice', '');
     return list.find(v => v.voiceURI === want) || list.find(isFemale) || list.find(v => !isMale(v)) || list[0] || null;
   }
-  let readTok = 0, cur = null, rState = 'idle';
+  let readTok = 0, cur = null, rState = 'idle', readVol = 1;
   const rListeners = new Set();
   const setState = st => { rState = st; rListeners.forEach(f => f(st)); };
   function stopReading() { readTok++; cur = null; if ('speechSynthesis' in window) speechSynthesis.cancel(); setState('idle'); }
@@ -167,7 +167,7 @@
       cur.i = i;
       if (onPart) onPart(i);
       const u = new SpeechSynthesisUtterance(texts[i]);
-      u.lang = 'de-DE'; try { if (v) u.voice = v; } catch (e) { /* Stimme nicht setzbar: Standard */ } u.rate = 0.92; u.pitch = 1.05;
+      u.lang = 'de-DE'; try { if (v) u.voice = v; } catch (e) { /* Stimme nicht setzbar: Standard */ } u.rate = 0.92; u.pitch = 1.05; u.volume = readVol;
       u.onend = () => setTimeout(() => next(i + 1), 250); u.onerror = () => next(i + 1);
       speechSynthesis.speak(u);
     };
@@ -211,6 +211,10 @@
     render(body) {
       let voiceOn = store.get('story_voice_on', true);
       const view = h('div'); put(body, view);
+      // Jede Berührung / Taste irgendwo in der App weckt den Einschlaf-Modus auf (Lautstärke wieder 100 %)
+      let wakeFn = null;
+      const onAny = e => { if (e.isTrusted && wakeFn) wakeFn(); };
+      document.addEventListener('pointerdown', onAny, true); document.addEventListener('keydown', onAny, true);
       // Schwebender Pause-Knopf: beim Vorlesen immer sichtbar, auch beim Scrollen
       const fab = h('button', { class: 'stfab', hidden: true, onclick: () => { if (rState === 'reading') pauseReading(); else if (rState === 'paused') resumeReading(); } });
       put(body, fab);
@@ -248,7 +252,11 @@
         const pageBox = h('div', { class: 'stpage' });
         const chat = h('div', { class: 'stchat' });
         const castBtn = h('button', { class: 'btn alt', onclick: showCast }, '👥 Wer ist wer?');
-        put(view, h('div', { class: 'row stnavtop' }, h('button', { class: 'btn alt', onclick: shelf }, '📚 Alle Geschichten'), castBtn), voiceBar(() => { if (voiceOn) readPage(); }), pageBox, chat);
+        const chapSel = h('select', { class: 'stchapsel', 'aria-label': 'Kapitel wählen' }, st.pages.map((pg, i) => h('option', { value: String(i) }, `${i + 1}. ${pg.t}`)));
+        chapSel.addEventListener('change', () => { page = +chapSel.value; draw(); });
+        let fade = 0, qTimer = null;
+        const sleepBar = h('div', { class: 'stsleep' });
+        put(view, h('div', { class: 'row stnavtop' }, h('button', { class: 'btn alt', onclick: shelf }, '📚 Alle Geschichten'), chapSel, castBtn), voiceBar(() => { if (voiceOn) readPage(); }), sleepBar, pageBox, chat);
         function showCast() {
           stopReading();
           pageBox.innerHTML = '';
@@ -277,10 +285,47 @@
           if (!voiceOn) return;
           const pg = st.pages[page], paras = [...pageBox.querySelectorAll('.stp')];
           readAll([`Kapitel ${page + 1}: ${pg.t}.`, ...pg.p.slice(0, pg.q ? 2 : undefined)], i => { paras.forEach(x => x.classList.remove('reading')); if (i > 0 && paras[i - 1]) paras[i - 1].classList.add('reading'); },
-            () => { if (pg.q && !pageBox.querySelector('.stq.answered')) readAll([pg.q.text]); });
+            () => {
+              if (!pg.q || pageBox.querySelector('.stq.answered')) { chapterDone(); return; }
+              // Mitmach-Frage vorlesen; antwortet niemand, wählt die Geschichte nach 12 Sekunden selbst
+              readAll([pg.q.text], null, () => { clearTimeout(qTimer); const myPage = page; qTimer = setTimeout(() => { const c = pageBox.querySelectorAll('.stq .choice:not([disabled])'); if (page === myPage && c.length && voiceOn) c[Math.floor(Math.random() * c.length)].click(); }, 12000); });
+            });
+        }
+        /* Einschlaf-Automatik: nach jedem Kapitel geht es von selbst weiter, jedes Kapitel 25 % leiser.
+           Bei 0 % schaltet sich die App aus. Jede Berührung setzt alles zurück auf 100 %. */
+        const volNow = () => Math.max(0, 1 - 0.25 * fade);
+        function paintSleep() {
+          const pct = Math.round(volNow() * 100);
+          sleepBar.innerHTML = '';
+          put(sleepBar, h('span', {}, '🌙 Einschlaf-Modus'), h('span', { class: 'stsleepvol' }, [0, 1, 2, 3].map(k => h('i', { class: k < 4 - fade ? 'on' : '' }))),
+            h('small', {}, fade ? `Lautstärke ${pct} % · nach jedem Kapitel 25 % leiser · Tippen = wieder laut` : 'Kapitel laufen von selbst weiter und werden jedes Mal 25 % leiser'));
+        }
+        function wake() {
+          if (!fade) return;
+          fade = 0; readVol = 1; paintSleep();
+          // sofort wieder laut: aktuellen Absatz mit voller Lautstärke neu beginnen
+          if (rState === 'reading' && cur) { const c = cur; readAll(c.texts, c.onPart, c.onDone, c.i); }
+        }
+        wakeFn = wake;
+        function chapterDone() {
+          if (!voiceOn) return;
+          if (page === st.pages.length - 1) { setTimeout(() => { store.set('story_done_' + st.id, true); readAll(['Ende. Gute Nacht!'], null, () => goSleep(true)); }, 600); return; }
+          fade++; readVol = volNow(); paintSleep();
+          if (readVol <= 0) { goSleep(false); return; }
+          setTimeout(() => { if (rState !== 'idle') return; page++; draw(); view.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 1500);
+        }
+        function goSleep(ende) {
+          stopReading(); clearTimeout(qTimer); fade = 0; readVol = 1;
+          if (ende) store.set('story_page_' + st.id, 0);
+          try { if (typeof musicStop === 'function') musicStop(); } catch (e) { /* egal */ }
+          const ov = h('div', { class: 'stnight' }, h('div', { class: 'stnightin' }, h('div', { class: 'stmoon' }, '🌙'), h('h2', {}, 'Gute Nacht!'),
+            h('p', {}, ende ? 'Die Geschichte ist zu Ende. Die App hat sich ausgeschaltet.' : 'Die Stimme ist ganz leise geworden. Die App hat sich ausgeschaltet.'),
+            h('button', { class: 'btn', onclick: () => { ov.remove(); paintSleep(); if (ende) shelf(); else draw(); } }, '☀️ Aufwachen')));
+          document.body.appendChild(ov);
         }
         function draw() {
-          stopReading();
+          stopReading(); clearTimeout(qTimer);
+          if (chapSel) chapSel.value = String(page);
           const pg = st.pages[page];
           store.set('story_page_' + st.id, page);
           pageBox.innerHTML = '';
@@ -294,7 +339,7 @@
             const qb = h('div', { class: 'stq' }, h('b', {}, '🤔 ' + pg.q.text), h('div', { class: 'choices' }, pg.q.a.map(([lbl, txt]) => h('button', { class: 'choice', onclick: () => {
               qb.classList.add('answered'); qb.querySelectorAll('button').forEach(b => { b.disabled = true; });
               const ans = h('p', { class: 'stp stans' }, txt); qb.after(ans); rest.hidden = false; tone(880, 0.1, 'triangle', 0.15);
-              if (voiceOn) { const all = [txt, ...pg.p.slice(2)]; const els = [ans, ...rest.querySelectorAll('.stp')]; readAll(all, i => { pageBox.querySelectorAll('.stp').forEach(x => x.classList.remove('reading')); if (i >= 0 && els[i]) els[i].classList.add('reading'); }); }
+              if (voiceOn) { const all = [txt, ...pg.p.slice(2)]; const els = [ans, ...rest.querySelectorAll('.stp')]; clearTimeout(qTimer); readAll(all, i => { pageBox.querySelectorAll('.stp').forEach(x => x.classList.remove('reading')); if (i >= 0 && els[i]) els[i].classList.add('reading'); }, chapterDone); }
             } }, lbl))));
             put(pageBox, qb, rest);
           } else put(pageBox, ...paras);
@@ -353,12 +398,12 @@
             };
           }
         })();
-        draw();
+        paintSleep(); draw();
       }
       shelf();
       // Begrüßung ebenfalls mit der Geschichten-Stimme (statt der allgemeinen App-Stimme)
       const introT = setTimeout(() => { if (voiceOn && !view.querySelector('.stpage')) readAll([GESCHICHTEN.intro]); }, 350);
-      return () => { clearTimeout(introT); stopReading(); };
+      return () => { clearTimeout(introT); stopReading(); document.removeEventListener('pointerdown', onAny, true); document.removeEventListener('keydown', onAny, true); };
     },
   };
   GESCHICHTEN.speak = t => readAll([t]); // 🔊-Knopf oben: ebenfalls Frauenstimme

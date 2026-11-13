@@ -568,3 +568,16 @@
 .stfab { position: fixed; right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); z-index: 40; padding: 14px 20px; border-radius: 99px; font-size: 18px; font-weight: 800; color: #fff; background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 6px 16px rgba(0,0,0,.25); }
 .stfab.paused { background: linear-gradient(135deg, #ec4899, #be185d); }
 .stfab[hidden] { display: none; }
+/* Geschichten: Einschlaf-Modus */
+.stchapsel { font: inherit; font-size: 15px; padding: 8px 10px; border-radius: 12px; border: 2px solid #ddd6fe; background: #fff; max-width: 260px; flex: 1 1 160px; }
+.stnavtop { gap: 8px; flex-wrap: wrap; }
+.stsleep { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 10px; background: #1e1b4b; color: #e0e7ff; border-radius: 16px; padding: 8px 14px; margin-bottom: 10px; font-weight: 800; }
+.stsleep small { flex-basis: 100%; text-align: center; font-weight: 600; opacity: .85; }
+.stsleepvol { display: inline-flex; gap: 3px; align-items: flex-end; }
+.stsleepvol i { width: 7px; height: 8px; border-radius: 2px; background: #475569; }
+.stsleepvol i:nth-child(2) { height: 12px; } .stsleepvol i:nth-child(3) { height: 16px; } .stsleepvol i:nth-child(4) { height: 20px; }
+.stsleepvol i.on { background: #fde68a; }
+.stnight { position: fixed; inset: 0; z-index: 90; background: radial-gradient(circle at 50% 30%, #312e81, #020617 70%); display: grid; place-items: center; color: #e0e7ff; text-align: center; padding: 20px; animation: wfade 1.5s ease; }
+.stnightin h2 { font-size: 36px; margin: 6px 0; } .stnightin p { font-size: 18px; opacity: .85; max-width: 420px; margin: 0 auto 18px; }
+.stmoon { font-size: 90px; animation: stmoonf 4s ease-in-out infinite; }
+@keyframes stmoonf { 50% { transform: translateY(-12px); } }
