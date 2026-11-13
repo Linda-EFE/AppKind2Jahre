@@ -559,3 +559,12 @@
 .stmic.on { background: #ef4444 !important; color: #fff !important; animation: wpulse 1s infinite; }
 .stnote { display: block; margin-top: 6px; color: #8b84b8; }
 @media (max-width: 480px) { .stp { font-size: 18px; } .stctl { gap: 8px; } .stplay { width: 66px; height: 66px; } }
+/* Geschichten: Vorlesen / Pause / Weiter vorlesen */
+.stplaywrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.stpcap { font-weight: 800; color: #be185d; font-size: 13px; white-space: nowrap; }
+.stplay .stpi { display: block; line-height: 1; }
+.stplay.pausing { background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 6px 0 #92400e; padding-left: 0; }
+.stplay.paused { animation: wpulse 1.6s ease-in-out infinite; }
+.stfab { position: fixed; right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); z-index: 40; padding: 14px 20px; border-radius: 99px; font-size: 18px; font-weight: 800; color: #fff; background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 6px 16px rgba(0,0,0,.25); }
+.stfab.paused { background: linear-gradient(135deg, #ec4899, #be185d); }
+.stfab[hidden] { display: none; }

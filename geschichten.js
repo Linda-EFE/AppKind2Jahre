@@ -148,23 +148,30 @@
     const list = deVoices(), want = store.get('story_voice', '');
     return list.find(v => v.voiceURI === want) || list.find(isFemale) || list.find(v => !isMale(v)) || list[0] || null;
   }
-  let readTok = 0;
-  function stopReading() { readTok++; if ('speechSynthesis' in window) speechSynthesis.cancel(); }
+  let readTok = 0, cur = null, rState = 'idle';
+  const rListeners = new Set();
+  const setState = st => { rState = st; rListeners.forEach(f => f(st)); };
+  function stopReading() { readTok++; cur = null; if ('speechSynthesis' in window) speechSynthesis.cancel(); setState('idle'); }
+  // Pause: merkt sich den Absatz; Weiter: liest ab diesem Absatz weiter
+  function pauseReading() { if (rState !== 'reading' || !cur) return; readTok++; if ('speechSynthesis' in window) speechSynthesis.cancel(); setState('paused'); }
+  function resumeReading() { if (rState !== 'paused' || !cur) return; const c = cur; readAll(c.texts, c.onPart, c.onDone, c.i); }
   // Liest Texte nacheinander; onPart(i) markiert den aktuellen Absatz
-  function readAll(texts, onPart, onDone) {
+  function readAll(texts, onPart, onDone, start = 0) {
     stopReading(); const tok = readTok;
     if (!('speechSynthesis' in window)) { if (onDone) onDone(); return; }
     const v = storyVoice();
+    cur = { texts, onPart, onDone, i: start }; setState('reading');
     const next = i => {
       if (tok !== readTok) return;
-      if (i >= texts.length) { if (onPart) onPart(-1); if (onDone) onDone(); return; }
+      if (i >= texts.length) { cur = null; setState('idle'); if (onPart) onPart(-1); if (onDone) onDone(); return; }
+      cur.i = i;
       if (onPart) onPart(i);
       const u = new SpeechSynthesisUtterance(texts[i]);
       u.lang = 'de-DE'; try { if (v) u.voice = v; } catch (e) { /* Stimme nicht setzbar: Standard */ } u.rate = 0.92; u.pitch = 1.05;
       u.onend = () => setTimeout(() => next(i + 1), 250); u.onerror = () => next(i + 1);
       speechSynthesis.speak(u);
     };
-    next(0);
+    next(start);
   }
 
   /* ---------------- Gespräch: Claude (im Claude-Link) oder Geschichten-Hilfe ---------------- */
@@ -204,6 +211,11 @@
     render(body) {
       let voiceOn = store.get('story_voice_on', true);
       const view = h('div'); put(body, view);
+      // Schwebender Pause-Knopf: beim Vorlesen immer sichtbar, auch beim Scrollen
+      const fab = h('button', { class: 'stfab', hidden: true, onclick: () => { if (rState === 'reading') pauseReading(); else if (rState === 'paused') resumeReading(); } });
+      put(body, fab);
+      const paintFab = st => { if (!fab.isConnected && fab.dataset.shown) { rListeners.delete(paintFab); return; } fab.hidden = st === 'idle'; fab.textContent = st === 'reading' ? '⏸️ Pause' : '▶️ Weiter'; fab.classList.toggle('paused', st === 'paused'); };
+      rListeners.add(paintFab); paintFab(rState); setTimeout(() => { fab.dataset.shown = '1'; }, 0);
       if ('speechSynthesis' in window) speechSynthesis.addEventListener?.('voiceschanged', () => { const sel = view.querySelector('.stvoice'); if (sel) fillVoices(sel); });
       function fillVoices(sel) {
         const list = deVoices(), cur = storyVoice();
@@ -243,6 +255,24 @@
           put(pageBox, h('h3', {}, '👥 Wer ist wer?'), h('div', { class: 'stcast' }, st.cast.map(([e, n, d]) => h('div', { class: 'stperson' }, h('span', {}, e), h('div', {}, h('b', {}, n), h('small', {}, d))))),
             h('div', { class: 'btnrow' }, h('button', { class: 'btn', onclick: draw }, '📖 Zurück zur Geschichte')));
         }
+        // Ein Knopf: ▶ Vorlesen · ⏸ Pause · ▶ Weiter vorlesen
+        function playBtn() {
+          const icon = h('span', { class: 'stpi' }), cap = h('small', { class: 'stpcap' });
+          const b = h('button', { class: 'stplay', onclick: () => {
+            if (rState === 'reading') { pauseReading(); return; }
+            if (rState === 'paused') { resumeReading(); return; }
+            if (!voiceOn) { voiceOn = true; store.set('story_voice_on', true); const vb = view.querySelector('.stvoicebtn'); if (vb) { vb.className = 'btn stvoicebtn'; vb.textContent = '🔊 Vorlesen: an'; } }
+            readPage();
+          } }, icon);
+          const paint = st => {
+            if (!b.isConnected && b.dataset.shown) { rListeners.delete(paint); return; }
+            icon.textContent = st === 'reading' ? '⏸️' : '▶';
+            cap.textContent = st === 'reading' ? 'Pause' : st === 'paused' ? 'Weiter vorlesen' : 'Vorlesen';
+            b.setAttribute('aria-label', cap.textContent); b.classList.toggle('pausing', st === 'reading'); b.classList.toggle('paused', st === 'paused');
+          };
+          paint(rState); rListeners.add(paint); setTimeout(() => { b.dataset.shown = '1'; }, 0);
+          return h('div', { class: 'stplaywrap' }, b, cap);
+        }
         function readPage() {
           if (!voiceOn) return;
           const pg = st.pages[page], paras = [...pageBox.querySelectorAll('.stp')];
@@ -271,7 +301,7 @@
           const last = page === st.pages.length - 1;
           put(pageBox, h('div', { class: 'stctl' },
             h('button', { class: 'btn alt', disabled: page === 0 ? true : null, onclick: () => { page--; draw(); } }, '◀ Zurück'),
-            h('button', { class: 'stplay', 'aria-label': 'Vorlesen', onclick: () => { if (!voiceOn) { voiceOn = true; store.set('story_voice_on', true); const b = view.querySelector('.stvoicebtn'); if (b) { b.className = 'btn stvoicebtn'; b.textContent = '🔊 Vorlesen: an'; } } readPage(); } }, '▶'),
+            playBtn(),
             last ? h('button', { class: 'btn', onclick: () => { store.set('story_done_' + st.id, true); store.set('story_page_' + st.id, 0); cheer(); shelf(); if (voiceOn) readAll(['Super, du hast die ganze Geschichte gelesen!']); } }, '⭐ Fertig!')
               : h('button', { class: 'btn', onclick: () => { page++; draw(); view.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }, 'Weiter ▶')));
           readPage();
