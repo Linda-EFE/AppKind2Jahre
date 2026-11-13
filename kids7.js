@@ -54,14 +54,14 @@ function openGame(screenId, game) {
   const head = h('header', { class: 'ghead', style: `--c:${game.color}` },
     h('span', { class: 'gicon' }, game.icon),
     h('div', { class: 'gtitle' }, h('small', {}, game.skill), h('h2', {}, game.title)),
-    kid && game.intro ? h('button', { class: 'speak', 'aria-label': 'Vorlesen', onclick: () => sayKid(game.intro) }, '🔊') : null);
+    kid && game.intro ? h('button', { class: 'speak', 'aria-label': 'Vorlesen', onclick: () => (game.speak ? game.speak(game.intro) : sayKid(game.intro)) }, '🔊') : null);
   const body = h('div', { class: 'gbody' });
   put(root, ...[head, kid && game.intro ? h('p', { class: 'intro' }, game.intro) : null, body].filter(Boolean));
   go(screenId);
   root.scrollTop = 0;
   const c = game.render(body);
   gameCleanup = () => { timers.clear(); if (typeof c === 'function') c(); };
-  if (kid && game.intro) timers.set(() => sayKid(game.intro), 350);
+  if (kid && game.intro && !game.ownVoice) timers.set(() => sayKid(game.intro), 350); // eigene Stimme: Spiel liest selbst vor
 }
 screens.game7 = { leave: closeGame };
 screens.game17 = { leave: closeGame };

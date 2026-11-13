@@ -522,3 +522,40 @@
 .witem.wrocket { animation: wrocket 1.8s ease-in; }
 @keyframes wrocket { 40% { transform: var(--tf) translateY(-160%); } 41% { transform: var(--tf) translateY(-400%); opacity: 0; } 60% { transform: var(--tf) translateY(0); opacity: 0; } 100% { opacity: 1; } }
 @media (max-width: 560px) { .wdlbl { font-size: 10px; top: -28px; padding: 2px 6px; } .wdoorbtn { min-width: 34px; } }
+/* =================== 📚 Geschichten =================== */
+.stbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; }
+.stvlabel { font-weight: 700; color: #2b2250; font-size: 15px; }
+.stvoice { font: inherit; font-size: 15px; padding: 8px 10px; border-radius: 12px; border: 2px solid #ddd6fe; background: #fff; max-width: 220px; }
+.stshelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+.stbook { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; text-align: left; padding: 16px; border-radius: 20px; background: linear-gradient(135deg, #fff, #fdf2f8); box-shadow: 0 6px 0 #f9a8d4; color: #2b2250; border: 3px solid #fbcfe8; }
+.stbook .stcover { font-size: 36px; letter-spacing: 1px; white-space: nowrap; }
+.stbook b { font-size: 20px; } .stbook small { color: #6b5fa5; }
+.stmore { color: #8b84b8; margin-top: 14px; }
+.stnavtop { justify-content: space-between; margin-bottom: 8px; }
+.stpage { background: #fff; border-radius: 22px; padding: 16px 18px; box-shadow: 0 6px 18px rgba(0,0,0,.08); color: #2b2250; }
+.stpic { border-radius: 18px; padding: 18px 10px; text-align: center; font-size: clamp(40px, 9vw, 70px); letter-spacing: 6px; line-height: 1.2; margin-bottom: 10px; }
+.stchap { color: #be185d; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+.stt { margin: 2px 0 10px; font-size: 24px; }
+.stp { font-size: 20px; line-height: 1.6; margin: 0 0 12px; padding: 4px 8px; border-radius: 10px; transition: background .3s; }
+.stp.reading { background: #fef3c7; }
+.stp.stans { background: #ecfdf5; border-left: 5px solid #22c55e; }
+.stq { background: #faf5ff; border-radius: 16px; padding: 12px; margin: 6px 0 14px; }
+.stq b { display: block; margin-bottom: 8px; font-size: 19px; }
+.stctl { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 8px; }
+.stctl .btn:disabled { opacity: .4; }
+.stplay { width: 76px; height: 76px; border-radius: 50%; font-size: 34px; color: #fff; padding-left: 6px; background: linear-gradient(135deg, #ec4899, #be185d); box-shadow: 0 6px 0 #831843; flex: none; }
+.stplay:active { transform: translateY(4px); box-shadow: 0 2px 0 #831843; }
+.stcast { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; margin-bottom: 12px; }
+.stperson { display: flex; gap: 10px; align-items: center; background: #f8fafc; border-radius: 14px; padding: 8px 10px; }
+.stperson > span { font-size: 34px; } .stperson b { display: block; } .stperson small { color: #6b5fa5; }
+.stchat { margin-top: 16px; background: #fff; border-radius: 22px; padding: 14px; box-shadow: 0 6px 18px rgba(0,0,0,.08); color: #2b2250; }
+.stchat h3 { margin: 0 0 8px; }
+.stlog { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 4px; }
+.stmsg { max-width: 85%; padding: 10px 14px; border-radius: 18px; font-size: 17px; line-height: 1.45; white-space: pre-wrap; }
+.stmsg.ai { align-self: flex-start; background: #fdf2f8; border-bottom-left-radius: 4px; }
+.stmsg.kid { align-self: flex-end; background: #dbeafe; border-bottom-right-radius: 4px; }
+.strow { display: flex; gap: 8px; margin-top: 10px; }
+.stin { flex: 1; min-width: 0; font: inherit; font-size: 17px; padding: 12px 14px; border-radius: 14px; border: 2px solid #ddd6fe; }
+.stmic.on { background: #ef4444 !important; color: #fff !important; animation: wpulse 1s infinite; }
+.stnote { display: block; margin-top: 6px; color: #8b84b8; }
+@media (max-width: 480px) { .stp { font-size: 18px; } .stctl { gap: 8px; } .stplay { width: 66px; height: 66px; } }
